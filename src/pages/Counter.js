@@ -43,7 +43,6 @@ function Counter({
       if (stepIndex + 1 < stepsLength) {
         setStepIndex((prev) => prev + 1);
         setTime(initialTime);
-        console.log(random);
         setRandom(generateRandomNumber());
         setUrl(randomUrl);
       } else {
