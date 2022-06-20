@@ -23,7 +23,8 @@ function Cooking() {
   const [isCounting, setIsCounting] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
   const [stepsLength, setStepsLength] = useState(0);
-  const [url, setUrl] = useState('https://firebasestorage.googleapis.com/v0/b/cook-your-way.appspot.com/o/tunetank.com_5423_lazy-bones_by_vital.mp3?alt=media&token=30cb614d-0230-482a-b83c-9c82bf77022e');
+  const DEFAULT_URL = 'https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3';
+  const [url, setUrl] = useState(DEFAULT_URL);
 
   useEffect(() => {
     setTime(initialTime);
