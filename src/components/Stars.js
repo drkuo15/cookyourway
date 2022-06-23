@@ -4,11 +4,8 @@ import PropTypes from 'prop-types';
 class StarRating extends React.Component {
   constructor(props) {
     super(props);
-    const rating = props.rating || 0;
-
     this.state = {
       stars: [],
-      rating,
       hovered: 0,
       selectedIcon: '★',
       deselectedIcon: '☆',
@@ -21,10 +18,6 @@ class StarRating extends React.Component {
   }
 
   changeRating(newRating) {
-    this.setState({
-      rating: newRating,
-    });
-
     const { onChange } = this.props;
     if (onChange) { onChange(newRating); }
   }
@@ -37,13 +30,13 @@ class StarRating extends React.Component {
 
   render() {
     const {
-      stars, rating, hovered, deselectedIcon, selectedIcon,
+      stars, hovered, deselectedIcon, selectedIcon,
     } = this.state;
+    const { rating } = this.props;
 
     return (
       <div>
         <div className="rating" style={{ fontSize: '1rem', color: '#EDC805' }}>
-
           {stars.map((star) => (
             <span
               key={star}
