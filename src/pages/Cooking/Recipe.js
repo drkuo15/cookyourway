@@ -2,7 +2,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
-import { db } from '../firestore';
+import { db } from '../../firestore';
 
 const Wrapper = styled.div`
   display: flex;
@@ -28,45 +28,6 @@ const WrapperStepButton = styled(Wrapper)`
   justify-content: space-around;
   margin-top: 20px;
 `;
-
-// const StepsNav = styled(Wrapper)`
-//   width: 900px;
-//   height: 120px;
-//   justify-content: space-between;
-//   font-size: 1.5rem;
-// `;
-
-// const StepArea = styled.div`
-//   width: calc(100%/3);
-//   height: 66.5%;
-//   background-color: ${(props) => (props.selected ? '#EB811F' : '#584743')};
-//   ${'' /* border-radius: 0 50% 50% 0; */}
-//   position: relative;
-//   &:before {
-//   content:'';
-//   display: inline-block;
-//   width:0;
-//   height:0;
-//   border:40px solid transparent;
-//   vertical-align: middle;
-//   border-top-color: green;
-//   border-bottom-color: green;
-//   border-right-color: green;
-//   left: 0;
-//   transform: translateX(-75%);
-//   };
-//   &:after {
-//   content:'';
-//   display: inline-block;
-//   width:0;
-//   height:0;
-//   border:40px solid transparent;
-//   vertical-align: middle;
-//   border-left-color: red;
-//   right: 0;
-//   transform: translateX(75%);
-//   };
-// `;
 
 const StepsNav = styled(Wrapper)`
   ${'' /* display: block; */}
@@ -142,7 +103,7 @@ function Recipe({
       } else {
         setIsPrevStep(false);
       }
-      setInitialTime((docData.steps[stepIndex].time) * 2);
+      setInitialTime((docData.steps[stepIndex].stepTime));
       // setInitialTime((docData.steps[stepIndex].time));
       setStepsLength(docData.steps.length);
     }
@@ -156,34 +117,26 @@ function Recipe({
         return steps
           .filter((_, index) => index <= stepIndex + 2)
           .map((step, index) => (
-            <StepArea selected={index === 0} key={step.title}>
-              {step.title}
+            <StepArea selected={index === 0} key={step.stepTitle}>
+              {step.stepTitle}
             </StepArea>
           ));
       case (steps.length - 1):
         // console.log('last');
         return steps.filter((_, index) => index >= stepIndex - 2)
           .map((step, index) => (
-            <StepArea selected={index === 2} key={step.title}>
-              {step.title}
+            <StepArea selected={index === 2} key={step.stepTitle}>
+              {step.stepTitle}
             </StepArea>
           ));
       default:
         // console.log('default');
         return steps.filter((_, index) => index <= (stepIndex + 1) && index >= (stepIndex - 1))
           .map(((step, index) => (
-            <StepArea selected={index === 1} key={step.title}>
-              {step.title}
+            <StepArea selected={index === 1} key={step.stepTitle}>
+              {step.stepTitle}
             </StepArea>
           )));
-      // return steps.map((step, index) => (
-      //   index <= (stepIndex + 1) && index >= (stepIndex - 1)
-      //     ? (
-      //       <StepArea key={step.title}>
-      //         {step.title}
-      //       </StepArea>
-      //     )
-      //     : null));
     }
   }
 
@@ -203,21 +156,22 @@ function Recipe({
         {renderSwitch()}
       </StepsNav>
       {steps.map((step, index) => (
-        <div key={step.title}>
+        <div key={step.stepTitle}>
           <WrapperStepTitle>
             <StepTitle>
               {index + 1}
-              {step.title}
+              {step.stepTitle}
             </StepTitle>
             <div>
               預計時間：
-              {step.time}
-              分鐘
+              {step.stepMinute ? `${step.stepMinute}分` : ''}
+              {step.stepSecond ? `${step.stepSecond}秒` : ''}
             </div>
           </WrapperStepTitle>
           <StepContent>
-            {step.content}
+            {step.stepContent}
           </StepContent>
+          <img src={step.stepImgUrl} alt="stepImage" />
         </div>
       )).filter((_, index) => index === stepIndex)}
       <WrapperStepButton>

@@ -17,14 +17,25 @@ const Wrapper = styled.div`
   margin-top: 140px; 
 `;
 
+const playlist = [
+  'https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3',
+  'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+  'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+  'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
+];
+
 function Cooking() {
   const [initialTime, setInitialTime] = useState(0);
   const [time, setTime] = useState(initialTime);
   const [isCounting, setIsCounting] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
   const [stepsLength, setStepsLength] = useState(0);
-  const DEFAULT_URL = 'https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3';
-  const [url, setUrl] = useState(DEFAULT_URL);
+  const [playIndex, setPlayIndex] = useState(0);
+  const url = playlist[playIndex];
+  // const DEFAULT_URL = 'https://firebasestorage.googleapis.com/v0/b/cook-your-way.appspot.com/o/tunetank.com_5423_lazy-bones_by_vital.mp3?alt=media&token=30cb614d-0230-482a-b83c-9c82bf77022e';
+  // const [url, setUrl] = useState(DEFAULT_URL);
+  // const [random, setRandom] = useState(Math.floor(Math.random() * playlist.length));
+  // const randomUrl = playlist[random];
 
   useEffect(() => {
     setTime(initialTime);
@@ -40,10 +51,22 @@ function Cooking() {
             isCounting={isCounting}
             setIsCounting={setIsCounting}
             initialTime={initialTime}
-            stepIndex={stepIndex}
-            setStepIndex={setStepIndex}
-            stepsLength={stepsLength}
-            setUrl={setUrl}
+            onTimeUp={() => {
+              const generateRandomNumber = () => {
+                const randomNumber = Math.floor(Math.random() * playlist.length);
+                if (randomNumber !== playIndex) {
+                  return randomNumber;
+                }
+                return generateRandomNumber();
+              };
+              if (stepIndex + 1 < stepsLength) {
+                setStepIndex((prev) => prev + 1);
+                setTime(initialTime);
+                setPlayIndex(generateRandomNumber());
+              } else {
+                setIsCounting(false);
+              }
+            }}
           />
           <Player
             url={url}
