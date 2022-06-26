@@ -2,6 +2,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
+import { Link, useLocation } from 'react-router-dom';
 import { db } from '../../firestore';
 
 const Wrapper = styled.div`
@@ -79,20 +80,28 @@ const StepContent = styled.div`
   text-align: start;
   margin-top: 20px;
 `;
+
+const Img = styled.img`
+width: 100px;
+height: 100px;
+`;
 function Recipe({
-  setInitialTime, stepIndex, setStepIndex, setStepsLength, setIsCounting,
+  setInitialTime, stepIndex, setStepIndex, setStepsLength, setIsCounting, setTitle,
 }) {
   const [steps, setSteps] = useState([]);
   const [isNextStep, setIsNextStep] = useState(true);
   const [isPrevStep, setIsPrevStep] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     async function getData() {
-      const docRef = doc(db, 'recipes', 'O3pzlJ8g9gTtHahU9aeZ');
+      const currentRecipeId = location.search.split('=')[1];
+      const docRef = doc(db, 'recipes', currentRecipeId);
       const docSnap = await getDoc(docRef);
       const docData = docSnap.data();
 
       setSteps(docData.steps);
+      setTitle(docData.title);
       if (docData.steps.length === stepIndex + 1) {
         setIsNextStep(false);
       } else {
@@ -108,7 +117,7 @@ function Recipe({
       setStepsLength(docData.steps.length);
     }
     getData();
-  }, [setInitialTime, setStepsLength, stepIndex]);
+  }, [location.search, setInitialTime, setStepsLength, setTitle, stepIndex]);
 
   function renderSwitch() {
     switch (stepIndex) {
@@ -171,14 +180,18 @@ function Recipe({
           <StepContent>
             {step.stepContent}
           </StepContent>
-          <img src={step.stepImgUrl} alt="stepImage" />
+          <Img src={step.stepImgUrl} alt="stepImage" />
         </div>
       )).filter((_, index) => index === stepIndex)}
       <WrapperStepButton>
-        {stepIndex + 1 !== steps.length ? <button type="button" onClick={() => { setIsCounting(true); }}>開始料理</button> : ''}
-        {isPrevStep ? <button type="button" onClick={() => { handlePrevStep(); }}>上一步</button> : ''}
-        {isNextStep ? <button type="button" onClick={() => { handleNextStep(); }}>下一步</button> : ''}
-        {stepIndex + 1 === steps.length ? <button type="button">結束料理</button> : ''}
+        {stepIndex + 1 !== steps.length && !isPrevStep ? <button type="button" onClick={() => { setIsCounting(true); }}>開始料理</button> : <button type="button" onClick={() => { handlePrevStep(); }}>上一步</button>}
+        {stepIndex + 1 === steps.length && !isNextStep ? (
+          <Link to={`/read_recipe?id=${location.search.split('=')[1]}`}>
+            <button type="button">
+              結束料理
+            </button>
+          </Link>
+        ) : <button type="button" onClick={() => { handleNextStep(); }}>下一步</button>}
       </WrapperStepButton>
     </RecipeArea>
   );
@@ -190,6 +203,7 @@ Recipe.propTypes = {
   setStepIndex: PropTypes.func.isRequired,
   setStepsLength: PropTypes.func.isRequired,
   setIsCounting: PropTypes.func.isRequired,
+  setTitle: PropTypes.func.isRequired,
 };
 
 export default Recipe;

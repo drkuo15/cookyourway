@@ -17,6 +17,10 @@ const Wrapper = styled.div`
   margin-top: 140px; 
 `;
 
+const Title = styled.div`
+  font-size: 1.5rem;
+`;
+
 const playlist = [
   'https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3',
   'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
@@ -25,6 +29,7 @@ const playlist = [
 ];
 
 function Cooking() {
+  const [title, setTitle] = useState('');
   const [initialTime, setInitialTime] = useState(0);
   const [time, setTime] = useState(initialTime);
   const [isCounting, setIsCounting] = useState(false);
@@ -45,6 +50,7 @@ function Cooking() {
     <div>
       <Wrapper>
         <LeftTimer>
+          <Title>{title}</Title>
           <Counter
             time={time}
             setTime={setTime}
@@ -80,6 +86,7 @@ function Cooking() {
           setStepIndex={setStepIndex}
           setStepsLength={setStepsLength}
           setIsCounting={setIsCounting}
+          setTitle={setTitle}
         />
       </Wrapper>
     </div>

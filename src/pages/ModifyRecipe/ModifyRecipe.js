@@ -1,4 +1,4 @@
-/* eslint-disable no-alert */
+// 待修： 判斷輸入欄是否都有輸入, 優化NAN提示(下方出現輸入請輸入數字);
 import { useEffect, useState } from 'react';
 import {
   collection, doc, setDoc, onSnapshot, updateDoc,
@@ -12,6 +12,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { db, storage } from '../../firestore';
 import defaultImage from '../../images/upload.png';
 import StarRating from '../../components/Stars';
+import { ToastContainer, showCustomAlert } from '../../components/CustomAlert';
 
 const Img = styled.img`
 width: 100px;
@@ -23,7 +24,10 @@ const Div = styled.div`
   justify-content: space-between;
   width:  500px;
   margin-left: 500px;
+`;
 
+const TextArea = styled.textarea`
+  width: 100%;
 `;
 
 function ModifyRecipe() {
@@ -66,13 +70,14 @@ function ModifyRecipe() {
     const currentRecipeId = location.search.split('=')[1];
     if (queryString) {
       const unsubscribe = onSnapshot(
-        doc(db, 'cities', currentRecipeId),
+        doc(db, 'recipes', currentRecipeId),
         (document) => {
           const recipeData = document.data();
           setTitle(recipeData.title);
           setOldTitle(recipeData.title);
           setDifficulty(recipeData.difficulty);
           setImgUrl(recipeData.mainImage);
+          setImgPath(recipeData.mainImagePath);
           setIngredients(recipeData.ingredients);
           setSteps(recipeData.steps);
           setComment(recipeData.comment);
@@ -107,7 +112,8 @@ function ModifyRecipe() {
   }, [img, imgPath]);
 
   // 依照當前使用者id抓出使用者名稱和id
-  const currentId = 'XmtaQyFOf0wPGlQUKYJG';
+  const currentId = 'XmtaQyFOf0wPGlQUKYJG'; // Zoe
+  // const currentId = 'FzrMOc7gXewUwNg5cyMn'; // David
   useEffect(() => {
     const unsubscribe = onSnapshot(
       doc(db, 'users', currentId),
@@ -122,7 +128,16 @@ function ModifyRecipe() {
 
   async function setNewRecipeAndNavigate() {
     // 只知道collection，要產生id
-    const docId = doc(collection(db, 'cities')).id;
+    const docId = doc(collection(db, 'recipes')).id;
+
+    // 將文字轉換成數字
+    const parsedIngredients = [...ingredients];
+    parsedIngredients.forEach((ingredientObj) => {
+      const ingredientObjTemp = ingredientObj;
+      ingredientObjTemp.ingredientsQuantity = Number(ingredientObj.ingredientsQuantity);
+      return ingredientObjTemp;
+    });
+
     const newRecipeData = {
       recipeId: docId,
       createTime: new Date(),
@@ -130,30 +145,52 @@ function ModifyRecipe() {
       difficulty,
       fullTime: steps.reduce((accValue, step) => accValue + step.stepTime, 0),
       mainImage: imgUrl,
+      mainImagePath: imgPath,
       ingredients,
       steps,
       comment,
       authorName: userName,
       authorId: userId,
     };
-    const hasEmptyIngValue = (obj) => Object.values(obj).some((value) => !value);
+    const hasEmptyIngValue = (obj) => Object.values(obj).some((value) => value === '');
     const hasEmptyIngredientInput = ingredients.some((ingredient) => hasEmptyIngValue(ingredient));
-    const hasEmptyStepValue = (obj) => Object.values(obj).some((value) => !value);
+    const hasEmptyStepValue = (obj) => Object.values(obj).some((value) => value === '');
     const hasEmptyStepInput = steps.some((step) => hasEmptyStepValue(step));
     const hasEmptyOtherInput = Object.values(newRecipeData).some((value) => !value);
-    if (hasEmptyIngredientInput || hasEmptyStepInput || hasEmptyOtherInput) {
-      window.alert('請填寫完整食譜內容');
+    if (hasEmptyOtherInput) {
+      if (!title) {
+        showCustomAlert('請填寫食譜名稱');
+      } else if (!imgUrl) {
+        showCustomAlert('請上傳食譜封面照');
+      } else if (!comment) {
+        showCustomAlert('請填寫叮嚀事項');
+      }
+      return;
+    } if (hasEmptyIngredientInput) {
+      showCustomAlert('請填寫完整食材內容');
+      return;
+    } if (hasEmptyStepInput) {
+      showCustomAlert('請填寫完整步驟內容');
       return;
     }
     // 知道collection name, document name，新建資料
-    setDoc(doc(db, 'cities', docId), newRecipeData);
+    setDoc(doc(db, 'recipes', docId), newRecipeData);
     // 依照新建的食譜id導到對應頁面
     navigate({ pathname: '/read_recipe', search: `?id=${docId}` });
   }
 
   async function updateRecipeAndNavigate() {
     const currentRecipeId = location.search.split('=')[1];
-    const RecipeRef = doc(db, 'cities', currentRecipeId);
+    const RecipeRef = doc(db, 'recipes', currentRecipeId);
+
+    // 將文字轉換成數字
+    const parsedIngredients = [...ingredients];
+    parsedIngredients.forEach((ingredientObj) => {
+      const ingredientObjTemp = ingredientObj;
+      ingredientObjTemp.ingredientsQuantity = Number(ingredientObj.ingredientsQuantity);
+      return ingredientObjTemp;
+    });
+
     const newRecipeData = {
       recipeId: currentRecipeId,
       createTime: new Date(),
@@ -161,19 +198,33 @@ function ModifyRecipe() {
       difficulty,
       fullTime: steps.reduce((accValue, step) => accValue + step.stepTime, 0),
       mainImage: imgUrl,
-      ingredients,
+      mainImagePath: imgPath,
+      ingredients: parsedIngredients,
       steps,
       comment,
       authorName: userName,
       authorId: userId,
     };
-    const hasEmptyIngValue = (obj) => Object.values(obj).some((value) => !value);
+    const hasEmptyIngValue = (obj) => Object.values(obj).some((value) => value === '');
     const hasEmptyIngredientInput = ingredients.some((ingredient) => hasEmptyIngValue(ingredient));
-    const hasEmptyStepValue = (obj) => Object.values(obj).some((value) => !value);
+    const hasEmptyStepValue = (obj) => Object.values(obj).some((value) => value === '');
     const hasEmptyStepInput = steps.some((step) => hasEmptyStepValue(step));
     const hasEmptyOtherInput = Object.values(newRecipeData).some((value) => !value);
-    if (hasEmptyIngredientInput || hasEmptyStepInput || hasEmptyOtherInput) {
-      window.alert('請填寫完整食譜內容');
+
+    if (hasEmptyOtherInput) {
+      if (!title) {
+        showCustomAlert('請填寫食譜名稱');
+      } else if (!imgUrl) {
+        showCustomAlert('請上傳食譜封面照');
+      } else if (!comment) {
+        showCustomAlert('請填寫叮嚀事項');
+      }
+      return;
+    } if (hasEmptyIngredientInput) {
+      showCustomAlert('請填寫完整食材內容');
+      return;
+    } if (hasEmptyStepInput) {
+      showCustomAlert('請填寫完整步驟內容');
       return;
     }
     updateDoc(RecipeRef, newRecipeData);
@@ -196,13 +247,8 @@ function ModifyRecipe() {
 
   function updateQuantityValue(e, targetIndex) {
     const newIngredients = [...ingredients];
-    newIngredients[targetIndex].ingredientsQuantity = Number(e.target.value);
-    // const newIngredients2 = ingredients.map((ingredient, i) => {
-    //   if (i === targetIndex) {
-    //     return { ...ingredient, ingredientsQuantity: Number(e.target.value) };
-    //   }
-    //   return ingredient;
-    // });
+    const input = e.target.value;
+    newIngredients[targetIndex].ingredientsQuantity = input;
     setIngredients(newIngredients);
   }
   function updateTitleValue(e, index) {
@@ -215,9 +261,9 @@ function ModifyRecipe() {
     setSteps((prevSteps) => [...prevSteps, {
       stepTitle: '',
       stepContent: '',
-      stepMinute: 0,
-      stepSecond: 0,
-      stepTime: 0,
+      stepMinute: '',
+      stepSecond: '',
+      stepTime: '',
       stepImgUrl: '',
       stepImgPath: '',
       id: v4(),
@@ -232,6 +278,13 @@ function ModifyRecipe() {
 
   function updateStepMinuteValue(e, index) {
     const newSteps = [...steps];
+    const input = Number(e.target.value);
+    if (Number.isNaN(input)) {
+      newSteps[index].stepMinute = 0;
+      newSteps[index].stepTime = newSteps[index].stepMinute + newSteps[index].stepSecond;
+      setSteps(newSteps);
+      return;
+    }
     newSteps[index].stepMinute = Number(e.target.value);
     newSteps[index].stepTime = newSteps[index].stepMinute + newSteps[index].stepSecond;
     setSteps(newSteps);
@@ -239,6 +292,13 @@ function ModifyRecipe() {
 
   function updateStepSecondValue(e, index) {
     const newSteps = [...steps];
+    const input = Number(e.target.value);
+    if (Number.isNaN(input)) {
+      newSteps[index].stepSecond = 0;
+      newSteps[index].stepTime = newSteps[index].stepMinute + newSteps[index].stepSecond;
+      setSteps(newSteps);
+      return;
+    }
     newSteps[index].stepSecond = Number(e.target.value);
     newSteps[index].stepTime = newSteps[index].stepMinute * 60 + newSteps[index].stepSecond;
     setSteps(newSteps);
@@ -285,11 +345,12 @@ function ModifyRecipe() {
         updateRecipeAndNavigate();
       } else {
         if (title === oldTitle) {
-          alert('請更改食譜名稱');
+          showCustomAlert('請更改食譜名稱');
           return;
         }
         setNewRecipeAndNavigate();
       }
+      return;
     }
     setNewRecipeAndNavigate();
   }
@@ -303,7 +364,12 @@ function ModifyRecipe() {
       <Div>{authorName}</Div>
       <Div>
         <div>食譜名稱</div>
-        <input value={title} onChange={(e) => setTitle(e.target.value)} />
+        <input
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="請輸入食譜名稱..."
+        />
+        {authorId && userId !== authorId && title === oldTitle ? <div>請為您的食譜取個新名稱</div> : ''}
       </Div>
       <Div>
         <div> 困難度</div>
@@ -332,14 +398,21 @@ function ModifyRecipe() {
             <input
               value={ingredient.ingredientsTitle}
               onChange={(e) => { updateTitleValue(e, index); }}
+              placeholder="請輸入食材名稱..."
             />
           </Div>
           <Div>
             <div>食材重量</div>
-            <input
-              value={ingredient.ingredientsQuantity}
-              onChange={(e) => { updateQuantityValue(e, index); }}
-            />
+            <div>
+              <input
+                value={ingredient.ingredientsQuantity}
+                onChange={(e) => { updateQuantityValue(e, index); }}
+                placeholder="0"
+                type="number"
+                step="0.01"
+              />
+              公克
+            </div>
           </Div>
           <Div>
             <button type="button" onClick={() => { deleteIngredients(index); }}>刪除食材</button>
@@ -355,6 +428,7 @@ function ModifyRecipe() {
             <input
               value={step.stepTitle}
               onChange={(e) => { updateStepTitleValue(e, index); }}
+              placeholder="請輸入步驟簡稱..."
             />
           </Div>
           <Div>
@@ -362,19 +436,24 @@ function ModifyRecipe() {
             <input
               value={steps[index].stepMinute}
               onChange={(e) => { updateStepMinuteValue(e, index); }}
+              placeholder="0"
+              type="number"
             />
             分鐘
             <input
               value={steps[index].stepSecond}
               onChange={(e) => { updateStepSecondValue(e, index); }}
+              placeholder="0"
+              type="number"
             />
             秒
           </Div>
           <Div>
             <div>步驟敘述</div>
-            <input
+            <TextArea
               value={steps[index].stepContent}
               onChange={(e) => { updateStepContentValue(e, index); }}
+              placeholder="請描述步驟"
             />
           </Div>
           <Div><div>步驟圖片</div></Div>
@@ -396,13 +475,15 @@ function ModifyRecipe() {
       ))}
       <button type="button" onClick={addSteps}>新增步驟</button>
       <Div>
-        <div>小叮嚀</div>
-        <input
+        <div>小撇步</div>
+        <TextArea
           value={comment}
           onChange={(e) => setComment(e.target.value)}
+          placeholder="有什麼我們可以注意的地方嗎？"
         />
       </Div>
       <button type="button" onClick={submitData}>儲存食譜</button>
+      <ToastContainer />
     </>
   );
 }
