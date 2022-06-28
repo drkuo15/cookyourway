@@ -112,8 +112,8 @@ function ModifyRecipe() {
   }, [img, imgPath]);
 
   // 依照當前使用者id抓出使用者名稱和id
-  const currentId = 'XmtaQyFOf0wPGlQUKYJG'; // Zoe
-  // const currentId = 'FzrMOc7gXewUwNg5cyMn'; // David
+  // const currentId = 'XmtaQyFOf0wPGlQUKYJG'; // Zoe
+  const currentId = 'FzrMOc7gXewUwNg5cyMn'; // David
   useEffect(() => {
     const unsubscribe = onSnapshot(
       doc(db, 'users', currentId),
