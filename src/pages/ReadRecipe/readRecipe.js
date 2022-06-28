@@ -1,12 +1,14 @@
+/* eslint-disable no-unused-vars */
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { Link, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { db } from '../../firestore';
 import Stars from '../../components/DisplayStars';
 import defaultImage from '../../images/upload.png';
 import { ToastContainer, showCustomAlert } from '../../components/CustomAlert';
+import Header from '../../components/Header';
 
 const Div = styled.div`
   display: flex;
@@ -31,10 +33,11 @@ function ReadRecipe() {
   const [authorName, setAuthorName] = useState('');
   const [authorId, setAuthorId] = useState('');
   const [fullTime, setFulltime] = useState(0);
+  const [myFavorites, setMyFavorites] = useState([]);
   const location = useLocation();
 
+  const currentRecipeId = location.search.split('=')[1];
   useEffect(() => {
-    const currentRecipeId = location.search.split('=')[1];
     const unsubscribe = onSnapshot(
       doc(db, 'recipes', currentRecipeId),
       (document) => {
@@ -51,7 +54,7 @@ function ReadRecipe() {
       },
     );
     return unsubscribe;
-  }, [location]);
+  }, [currentRecipeId]);
 
   // 依照當前使用者id抓出使用者名稱和id
   // const currentId = 'XmtaQyFOf0wPGlQUKYJG'; // Zoe
@@ -62,6 +65,7 @@ function ReadRecipe() {
       (document) => {
         const userdata = document.data();
         setUserId(userdata.id);
+        setMyFavorites(userdata.myFavorites);
       },
     );
     return () => { unsubscribe(); };
@@ -81,8 +85,20 @@ function ReadRecipe() {
     }
   }
 
+  function addToFavorites() {
+    const UserRef = doc(db, 'users', currentId);
+    const isRecipeExisting = myFavorites.some((id) => id === currentRecipeId);
+    if (isRecipeExisting) {
+      return;
+    }
+    const updatedMyFavorite = [...myFavorites, currentRecipeId];
+    setMyFavorites(updatedMyFavorite);
+    updateDoc(UserRef, { myFavorites: updatedMyFavorite });
+  }
+
   return (
     <>
+      <Header />
       <Div>
         <div>{title}</div>
         <div>
@@ -158,6 +174,7 @@ function ReadRecipe() {
         </button>
       </Link>
       <button type="button" onClick={exportIngredients}>匯出食材</button>
+      <button type="button" onClick={addToFavorites}>加到最愛</button>
       <ToastContainer />
     </>
   );

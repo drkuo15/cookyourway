@@ -2,7 +2,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { db } from '../../firestore';
 
 const Wrapper = styled.div`
@@ -92,6 +92,7 @@ function Recipe({
   const [isNextStep, setIsNextStep] = useState(true);
   const [isPrevStep, setIsPrevStep] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function getData() {
@@ -159,6 +160,13 @@ function Recipe({
     setIsCounting(false);
   }
 
+  function handleEnding() {
+    setIsCounting(false);
+    setTimeout(() => {
+      navigate({ pathname: '/read_recipe', search: `?id=${location.search.split('=')[1]}` });
+    }, 100);
+  }
+
   return (
     <RecipeArea>
       <StepsNav>
@@ -186,11 +194,9 @@ function Recipe({
       <WrapperStepButton>
         {stepIndex + 1 !== steps.length && !isPrevStep ? <button type="button" onClick={() => { setIsCounting(true); }}>開始料理</button> : <button type="button" onClick={() => { handlePrevStep(); }}>上一步</button>}
         {stepIndex + 1 === steps.length && !isNextStep ? (
-          <Link to={`/read_recipe?id=${location.search.split('=')[1]}`}>
-            <button type="button">
-              結束料理
-            </button>
-          </Link>
+          <button type="button" onClick={() => { handleEnding(); }}>
+            結束料理
+          </button>
         ) : <button type="button" onClick={() => { handleNextStep(); }}>下一步</button>}
       </WrapperStepButton>
     </RecipeArea>
