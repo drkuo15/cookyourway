@@ -1,5 +1,5 @@
 // 待修： 判斷輸入欄是否都有輸入, 優化NAN提示(下方出現輸入請輸入數字);
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import {
   collection, doc, setDoc, onSnapshot, updateDoc,
 } from 'firebase/firestore';
@@ -13,6 +13,7 @@ import { db, storage } from '../../firestore';
 import defaultImage from '../../images/upload.png';
 import StarRating from '../../components/Stars';
 import { ToastContainer, showCustomAlert } from '../../components/CustomAlert';
+import AuthContext from '../../components/AuthContext';
 
 const Img = styled.img`
 width: 100px;
@@ -33,6 +34,7 @@ const TextArea = styled.textarea`
 function ModifyRecipe() {
   const [title, setTitle] = useState('');
   const [oldTitle, setOldTitle] = useState('');
+  const [titleKeywords, setTitleKeyWords] = useState([]);
   const [difficulty, setDifficulty] = useState(1);
   const [ingredients, setIngredients] = useState([{
     ingredientsQuantity: '',
@@ -56,10 +58,13 @@ function ModifyRecipe() {
   const [img, setImg] = useState('');
   const [imgPath, setImgPath] = useState('');
   const [imgUrl, setImgUrl] = useState('');
-  const [userName, setUserName] = useState('');
-  const [userId, setUserId] = useState('');
   const [authorName, setAuthorName] = useState('');
   const [authorId, setAuthorId] = useState('');
+  const userInfo = useContext(AuthContext);
+  const userId = userInfo.uid;
+  const userName = userInfo.name;
+  // const [userName, setUserName] = useState('');
+  // const [userId, setUserId] = useState('');
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -75,6 +80,7 @@ function ModifyRecipe() {
           const recipeData = document.data();
           setTitle(recipeData.title);
           setOldTitle(recipeData.title);
+          setTitleKeyWords(recipeData.titleKeywords);
           setDifficulty(recipeData.difficulty);
           setImgUrl(recipeData.mainImage);
           setImgPath(recipeData.mainImagePath);
@@ -113,18 +119,18 @@ function ModifyRecipe() {
 
   // 依照當前使用者id抓出使用者名稱和id
   // const currentId = 'XmtaQyFOf0wPGlQUKYJG'; // Zoe
-  const currentId = 'FzrMOc7gXewUwNg5cyMn'; // David
-  useEffect(() => {
-    const unsubscribe = onSnapshot(
-      doc(db, 'users', currentId),
-      (document) => {
-        const userdata = document.data();
-        setUserName(userdata.name);
-        setUserId(userdata.id);
-      },
-    );
-    return () => { unsubscribe(); };
-  }, []);
+  // const currentId = 'FzrMOc7gXewUwNg5cyMn'; // David
+  // useEffect(() => {
+  //   const unsubscribe = onSnapshot(
+  //     doc(db, 'users', currentId),
+  //     (document) => {
+  //       const userdata = document.data();
+  //       setUserName(userdata.name);
+  //       setUserId(userdata.id);
+  //     },
+  //   );
+  //   return () => { unsubscribe(); };
+  // }, []);
 
   async function setNewRecipeAndNavigate() {
     // 只知道collection，要產生id
@@ -142,6 +148,7 @@ function ModifyRecipe() {
       recipeId: docId,
       createTime: new Date(),
       title,
+      titleKeywords,
       difficulty,
       fullTime: steps.reduce((accValue, step) => accValue + step.stepTime, 0),
       mainImage: imgUrl,
@@ -151,6 +158,7 @@ function ModifyRecipe() {
       comment,
       authorName: userName,
       authorId: userId,
+
     };
     const hasEmptyIngValue = (obj) => Object.values(obj).some((value) => value === '');
     const hasEmptyIngredientInput = ingredients.some((ingredient) => hasEmptyIngValue(ingredient));
@@ -195,6 +203,7 @@ function ModifyRecipe() {
       recipeId: currentRecipeId,
       createTime: new Date(),
       title,
+      titleKeywords,
       difficulty,
       fullTime: steps.reduce((accValue, step) => accValue + step.stepTime, 0),
       mainImage: imgUrl,
@@ -366,7 +375,7 @@ function ModifyRecipe() {
         <div>食譜名稱</div>
         <input
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={(e) => { setTitle(e.target.value); setTitleKeyWords(e.target.value.split('')); }}
           placeholder="請輸入食譜名稱..."
         />
         {authorId && userId !== authorId && title === oldTitle ? <div>請為您的食譜取個新名稱</div> : ''}
