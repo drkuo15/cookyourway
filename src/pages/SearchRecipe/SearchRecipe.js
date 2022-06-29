@@ -21,19 +21,22 @@ const StyledLink = styled(Link)`
 function SearchRecipe() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [searchName, setSearchName] = useState(location.search.split('=')[1]);
+  const [searchName, setSearchName] = useState(decodeURI(location.search.split('=')[1]));
   const [searchResult, setSearchResult] = useState([]);
 
   useEffect(() => {
     if (searchName) {
+      const searchNameArray = searchName.split('');
       const recipeRef = collection(db, 'recipes');
-      const q = query(recipeRef, where('title', '==', decodeURI(searchName)));
+      const q = query(recipeRef, where('titleKeywords', 'array-contains', searchNameArray[0]));
       let queryDataArray = [];
       getDocs(q).then((querySnapshot) => {
         if (!querySnapshot.empty) {
           querySnapshot.forEach(
             (doc) => {
-              queryDataArray = [...queryDataArray, doc.data()];
+              if (doc.data().title.includes(searchName)) {
+                queryDataArray = [...queryDataArray, doc.data()];
+              }
             },
           );
         }

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import {
   collection, query, where, getDocs, onSnapshot, doc,
 } from 'firebase/firestore';
@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import SearchRecipe from '../SearchRecipe/SearchRecipe';
 import { db } from '../../firestore';
 import Stars from '../../components/DisplayStars';
+import AuthContext from '../../components/AuthContext';
 
 const Img = styled.img`
 width: 100px;
@@ -19,6 +20,7 @@ const StyledLink = styled(Link)`
 `;
 
 function Home() {
+  const userInfo = useContext(AuthContext);
   const [userId, setUserId] = useState('');
   const [userRecipes, setUserRecipes] = useState([]);
   const [userRecipeIndex, setUserRecipeIndex] = useState(0);
@@ -27,56 +29,52 @@ function Home() {
   const [myFavorites, setMyFavorites] = useState([]);
   const [favoriteRecipes, setFavoriteRecipes] = useState([]);
 
-  // const [userName, setUserName] = useState('');
-
-  // 依照當前使用者id抓出使用者名稱和id
-  // const currentId = 'XmtaQyFOf0wPGlQUKYJG'; // Zoe
-  const currentId = 'FzrMOc7gXewUwNg5cyMn'; // David
+  // 當userInfo存在時，取得uid
   useEffect(() => {
-    const unsubscribe = onSnapshot(
-      doc(db, 'users', currentId),
-      (document) => {
-        const userdata = document.data();
-        // setUserName(userdata.name);
-        setUserId(userdata.id);
-      },
-    );
-    return () => { unsubscribe(); };
-  }, []);
+    if (userInfo) {
+      setUserId(userInfo.uid);
+    } else {
+      setUserId('');
+    }
+  }, [userInfo]);
 
   // 抓出我的食譜
   useEffect(() => {
     const recipeRef = collection(db, 'recipes');
-    const q = query(recipeRef, where('authorId', '==', userId));
-    let queryDataArray = [];
-    getDocs(q).then((querySnapshot) => {
-      querySnapshot.forEach(
-        (document) => {
-          queryDataArray = [...queryDataArray, document.data()];
-        },
-      );
-      setUserRecipes(queryDataArray);
-    });
+    if (userId) {
+      const q = query(recipeRef, where('authorId', '==', userId));
+      let queryDataArray = [];
+      getDocs(q).then((querySnapshot) => {
+        querySnapshot.forEach(
+          (document) => {
+            queryDataArray = [...queryDataArray, document.data()];
+          },
+        );
+        setUserRecipes(queryDataArray);
+      });
+    }
   }, [userId]);
 
   // 抓出平均食譜難度
   useEffect(() => {
     const recipeRef = collection(db, 'recipes');
-    const q = query(recipeRef, where('authorId', '==', userId));
-    let queryDifficultyArray = [];
-    getDocs(q).then((querySnapshot) => {
-      querySnapshot.forEach(
-        (document) => {
-          queryDifficultyArray = [...queryDifficultyArray, document.data().difficulty];
-        },
-      );
-      // setUserRecipes(queryDataArray);
-      const sum = queryDifficultyArray.reduce((cur, acc) => cur + acc, 0);
-      const avg = sum / queryDifficultyArray.length;
-      if (avg) {
-        setAverageDifficulty(avg);
-      }
-    });
+    if (userId) {
+      const q = query(recipeRef, where('authorId', '==', userId));
+      let queryDifficultyArray = [];
+      getDocs(q).then((querySnapshot) => {
+        querySnapshot.forEach(
+          (document) => {
+            queryDifficultyArray = [...queryDifficultyArray, document.data().difficulty];
+          },
+        );
+        // setUserRecipes(queryDataArray);
+        const sum = queryDifficultyArray.reduce((cur, acc) => cur + acc, 0);
+        const avg = sum / queryDifficultyArray.length;
+        if (avg) {
+          setAverageDifficulty(avg);
+        }
+      });
+    }
   }, [userId]);
 
   // 抓出超過平均食譜難度的食譜
@@ -90,23 +88,26 @@ function Home() {
           queryRecipeArray = [...queryRecipeArray, document.data()];
         },
       );
-      const filterRecipeArray = queryRecipeArray.filter((recipe) => recipe.authorId !== currentId);
+      const filterRecipeArray = queryRecipeArray.filter((recipe) => recipe.authorId !== userId);
       setRecommendRecipes(filterRecipeArray);
     });
-  }, [averageDifficulty]);
+  }, [averageDifficulty, userId]);
 
   // 抓出我的最愛食譜清單
   useEffect(() => {
-    const UserRef = doc(db, 'users', currentId);
-    const unsubscribe = onSnapshot(
-      UserRef,
-      (document) => {
-        const userdata = document.data();
-        setMyFavorites(userdata.myFavorites);
-      },
-    );
-    return () => { unsubscribe(); };
-  }, []);
+    if (userId) {
+      const UserRef = doc(db, 'users', userId);
+      const unsubscribe = onSnapshot(
+        UserRef,
+        (document) => {
+          const userdata = document.data();
+          setMyFavorites(userdata.myFavorites);
+        },
+      );
+      return () => { unsubscribe(); };
+    }
+    return undefined;
+  }, [userId]);
 
   // 依照最愛清單的食譜id抓出食譜資料
   useEffect(() => {

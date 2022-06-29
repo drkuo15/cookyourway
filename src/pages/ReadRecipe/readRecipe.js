@@ -1,5 +1,4 @@
-/* eslint-disable no-unused-vars */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import styled from 'styled-components';
 import { doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { Link, useLocation } from 'react-router-dom';
@@ -9,6 +8,7 @@ import Stars from '../../components/DisplayStars';
 import defaultImage from '../../images/upload.png';
 import { ToastContainer, showCustomAlert } from '../../components/CustomAlert';
 import Header from '../../components/Header';
+import AuthContext from '../../components/AuthContext';
 
 const Div = styled.div`
   display: flex;
@@ -23,18 +23,31 @@ height: 100px;
 `;
 
 function ReadRecipe() {
+  const userInfo = useContext(AuthContext);
+  // const userId = userInfo.uid;
+  const [userId, setUserId] = useState('');
+  const [myFavorites, setMyFavorites] = useState([]);
   const [title, setTitle] = useState('');
   const [difficulty, setDifficulty] = useState(1);
   const [ingredients, setIngredients] = useState([]);
   const [steps, setSteps] = useState([]);
   const [comment, setComment] = useState('');
   const [imgUrl, setImgUrl] = useState('');
-  const [userId, setUserId] = useState('');
   const [authorName, setAuthorName] = useState('');
   const [authorId, setAuthorId] = useState('');
   const [fullTime, setFulltime] = useState(0);
-  const [myFavorites, setMyFavorites] = useState([]);
   const location = useLocation();
+
+  // 當userInfo存在時，取得uid
+  useEffect(() => {
+    if (userInfo) {
+      setUserId(userInfo.uid);
+      setMyFavorites(userInfo.myFavorites);
+    } else {
+      setUserId('');
+      setMyFavorites([]);
+    }
+  }, [userInfo]);
 
   const currentRecipeId = location.search.split('=')[1];
   useEffect(() => {
@@ -58,18 +71,18 @@ function ReadRecipe() {
 
   // 依照當前使用者id抓出使用者名稱和id
   // const currentId = 'XmtaQyFOf0wPGlQUKYJG'; // Zoe
-  const currentId = 'FzrMOc7gXewUwNg5cyMn'; // David
-  useEffect(() => {
-    const unsubscribe = onSnapshot(
-      doc(db, 'users', currentId),
-      (document) => {
-        const userdata = document.data();
-        setUserId(userdata.id);
-        setMyFavorites(userdata.myFavorites);
-      },
-    );
-    return () => { unsubscribe(); };
-  }, []);
+  // const currentId = 'FzrMOc7gXewUwNg5cyMn'; // David
+  // useEffect(() => {
+  //   const unsubscribe = onSnapshot(
+  //     doc(db, 'users', currentId),
+  //     (document) => {
+  //       const userdata = document.data();
+  //       setUserId(userdata.id);
+  //       setMyFavorites(userdata.myFavorites);
+  //     },
+  //   );
+  //   return () => { unsubscribe(); };
+  // }, []);
 
   const copyText = ingredients.reduce((acc, i) => `${acc}${i.ingredientsTitle}:${i.ingredientsQuantity}公克,`, '');
 
@@ -86,7 +99,7 @@ function ReadRecipe() {
   }
 
   function addToFavorites() {
-    const UserRef = doc(db, 'users', currentId);
+    const UserRef = doc(db, 'users', userId);
     const isRecipeExisting = myFavorites.some((id) => id === currentRecipeId);
     if (isRecipeExisting) {
       return;
@@ -174,7 +187,7 @@ function ReadRecipe() {
         </button>
       </Link>
       <button type="button" onClick={exportIngredients}>匯出食材</button>
-      <button type="button" onClick={addToFavorites}>加到最愛</button>
+      {myFavorites.includes(currentRecipeId) ? '' : <button type="button" onClick={addToFavorites}>加到最愛</button>}
       <ToastContainer />
     </>
   );
