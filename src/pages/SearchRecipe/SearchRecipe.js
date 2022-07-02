@@ -7,6 +7,7 @@ import styled from 'styled-components';
 import { db } from '../../firestore';
 import Stars from '../../components/DisplayStars';
 import Header from '../../components/Header';
+// import Footer from '../../components/Footer';
 
 const Img = styled.img`
 width: 100px;
@@ -82,7 +83,7 @@ function SearchRecipe() {
         )) : ''}
         {location.search.split('=')[1] && searchResult.length === 0 ? '查無相關結果' : ''}
       </div>
-
+      {/* <Footer /> */}
     </>
   );
 }

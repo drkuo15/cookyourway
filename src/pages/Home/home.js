@@ -3,20 +3,36 @@ import {
   collection, query, where, getDocs, onSnapshot, doc,
 } from 'firebase/firestore';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
-import SearchRecipe from '../SearchRecipe/SearchRecipe';
+import { Link, useNavigate } from 'react-router-dom';
 import { db } from '../../firestore';
 import Stars from '../../components/DisplayStars';
 import AuthContext from '../../components/AuthContext';
+import Header from '../../components/Header';
+import Footer from '../../components/Footer';
 
 const Img = styled.img`
-width: 100px;
-height: 100px;
+  width: 100px;
+  height: 100px;
 `;
 
 const StyledLink = styled(Link)`
   text-decoration: none;
   color: inherit;
+`;
+
+const SearchInput = styled.input`
+  width: calc(1282/1920 * 100vw);
+  height: 64px;
+  border: 1px #2B2A29 solid;
+  border-radius: 15px;
+  font-size: 28px;
+`;
+
+const SearchDiv = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-top: 48px;
+  margin-bottom: 68px;
 `;
 
 function Home() {
@@ -28,6 +44,7 @@ function Home() {
   const [recommendRecipes, setRecommendRecipes] = useState([]);
   const [myFavorites, setMyFavorites] = useState([]);
   const [favoriteRecipes, setFavoriteRecipes] = useState([]);
+  const navigate = useNavigate();
 
   // 當userInfo存在時，取得uid
   useEffect(() => {
@@ -127,7 +144,18 @@ function Home() {
   };
   return (
     <>
-      <SearchRecipe />
+      <Header />
+      <SearchDiv>
+        <SearchInput
+          type="search"
+          placeholder="請輸入食譜名稱"
+          onKeyPress={(e) => {
+            if (e.key === 'Enter') {
+              navigate({ pathname: '/search_recipe', search: `?q=${e.target.value}` });
+            }
+          }}
+        />
+      </SearchDiv>
       <div>推薦食譜</div>
       {recommendRecipes.map((recommendRecipe) => (
         <div key={recommendRecipe.recipeId}>
@@ -195,6 +223,7 @@ function Home() {
           </StyledLink>
         </div>
       ))}
+      <Footer />
     </>
   );
 }

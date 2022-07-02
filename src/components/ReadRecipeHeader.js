@@ -1,10 +1,13 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import { signOut } from 'firebase/auth';
 import { useContext, useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import logoImage from '../images/CookYourWay_logo_v1.png';
 import { auth } from '../firestore/index';
 import AuthContext from './AuthContext';
+import likeImage from '../images/like.png';
+import dislikeImage from '../images/dislike.png';
 
 const Background = styled.div`
   width: 100vw;
@@ -45,7 +48,7 @@ const Title = styled.div`
   font-size: calc(48*100vw/1920);
 `;
 
-const CreateButton = styled.button`
+const ModifyRecipeButton = styled.button`
   width: calc(286*100vw/1920);
   height: calc(64*100vw/1920);
   background-color: #EB811F;
@@ -54,6 +57,20 @@ const CreateButton = styled.button`
   border-radius: calc(15*100vw/1920);
   font-size: calc(28*100vw/1920);
   color: #2B2A29;
+`;
+
+const LikeButton = styled.button`
+  height: calc(64*100vw/1920);
+  background-color: transparent;
+  cursor: pointer;
+  border: 0;
+  border-radius: calc(15*100vw/1920);
+  font-size: calc(28*100vw/1920);
+  color: #2B2A29;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(10*100vw/1920)
 `;
 
 const SignOutButton = styled.button`
@@ -111,16 +128,17 @@ function SignOut() {
   }
 
   return (
-    // <div onClick={handleSignOut}>登出</div>
-    // <button type="button" onClick={handleSignOut}>登出</button>
     <SignOutButton type="button" onClick={() => handleSignOut()}>登出</SignOutButton>
 
   );
 }
 
-function Header() {
+function ReadRecipeHeader({
+  authorId, userId, addToFavorites, removeFromFavorites, myFavorites, currentRecipeId,
+}) {
   const userInfo = useContext(AuthContext);
   const [userName, setUserName] = useState('');
+  const location = useLocation();
 
   useEffect(() => {
     if (userInfo) {
@@ -140,8 +158,24 @@ function Header() {
           <Title>Cook Your Way</Title>
         </LeftDiv>
         <RightDiv>
-          <Link to="/modify_recipe">
-            <CreateButton>創建食譜</CreateButton>
+          {myFavorites.includes(currentRecipeId)
+            ? (
+              <LikeButton type="button" onClick={removeFromFavorites}>
+                <Img src={likeImage} alt="likeImage" />
+                珍藏中...
+              </LikeButton>
+            )
+
+            : (
+              <LikeButton type="button" onClick={addToFavorites}>
+                <Img src={dislikeImage} alt="dislikeImage" />
+                加入珍藏
+              </LikeButton>
+            )}
+          <Link to={`/modify_recipe?id=${location.search.split('=')[1]}`}>
+            <ModifyRecipeButton type="button">
+              {userId === authorId ? '編輯食譜' : '複製食譜'}
+            </ModifyRecipeButton>
           </Link>
           <DropdownDiv>
             <DropBtn>{userName}</DropBtn>
@@ -156,4 +190,12 @@ function Header() {
   );
 }
 
-export default Header;
+ReadRecipeHeader.propTypes = {
+  authorId: PropTypes.string.isRequired,
+  userId: PropTypes.string.isRequired,
+  addToFavorites: PropTypes.func.isRequired,
+  removeFromFavorites: PropTypes.func.isRequired,
+  myFavorites: PropTypes.arrayOf(PropTypes.string).isRequired,
+  currentRecipeId: PropTypes.string.isRequired,
+};
+export default ReadRecipeHeader;

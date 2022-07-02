@@ -5,6 +5,7 @@ import {
 import { useEffect, useState } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
+import { createGlobalStyle } from 'styled-components';
 import Cooking from './pages/Cooking';
 import ModifyRecipe from './pages/ModifyRecipe/ModifyRecipe';
 import ReadRecipe from './pages/ReadRecipe/readRecipe';
@@ -14,6 +15,16 @@ import Register from './pages/Register/Register';
 import Login from './pages/LogIn/LogIn';
 import { auth, db } from './firestore/index';
 import AuthContext from './components/AuthContext';
+
+const GlobalStyle = createGlobalStyle`
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Roboto';
+    color: #2B2A29;
+  }
+`;
 
 function App() {
   const [userInfo, setUserInfo] = useState('');
@@ -36,7 +47,7 @@ function App() {
   }, []);
 
   return (
-    <div className="App">
+    <div>
       <AuthContext.Provider value={userInfo}>
         <Router>
           <Routes>
@@ -49,6 +60,7 @@ function App() {
             <Route path="/login" element={<Login />} />
           </Routes>
         </Router>
+        <GlobalStyle />
       </AuthContext.Provider>
     </div>
   );

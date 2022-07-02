@@ -14,21 +14,144 @@ import defaultImage from '../../images/upload.png';
 import StarRating from '../../components/Stars';
 import { ToastContainer, showCustomAlert } from '../../components/CustomAlert';
 import AuthContext from '../../components/AuthContext';
+import Header from '../../components/Header';
+import Footer from '../../components/Footer';
 
 const Img = styled.img`
-width: 100px;
-height: 100px;
+  width: auto;
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
+  margin: auto;
+`;
+
+const Label = styled.label`
+  display: block;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+  border-radius: 30px;
+  text-align: center;
+  line-height: 400px;
+  color: #666;
+  position: absolute;
+  top: 0;
+  right: 0;
+  letter-spacing: 2px;
+  font-size: 36px;
+`;
+
+const ImgWrapper = styled.div`
+  width: 100%;
+  position: relative;
+  background-color: #ececec;
+  border-radius: 15px;
+  margin-top: 30px;
+`;
+
+const ImgDiv = styled.div`
+  width: 100%;
+  height: 250px;
 `;
 
 const Div = styled.div`
   display: flex;
   justify-content: space-between;
-  width:  500px;
-  margin-left: 500px;
+  align-items: center;
 `;
 
 const TextArea = styled.textarea`
   width: 100%;
+`;
+
+const LargeDiv = styled.div`
+  font-size: 48px;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+`;
+
+const Background = styled.div`
+  padding: 0 116px;
+`;
+
+const TitleWrapper = styled(Div)`
+  margin-top: 40px;
+`;
+
+const TitleInput = styled.input`
+  width: 75%;
+  font-size: 48px;
+  border-radius: 15px
+`;
+
+const HalfDiv = styled(Div)`
+  width: 47.5%;
+`;
+
+const HalfWrapper = styled.div`
+  display: flex;
+  gap: 5%;
+  margin-top: 60px;
+`;
+
+const IngredientWrapper = styled.div`
+  margin-top: 30px;
+`;
+
+const Input = styled.input`
+  width: 30%;
+  height: 60px;
+  font-size: 28px;
+  border-radius: 15px;
+  padding: 2px 8px;
+`;
+
+const QuantityInput = styled(Input)`
+  width: 100%
+`;
+
+const Quantity = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+// const Ingredient = styled.div`
+
+// `;
+
+const StepWrapper = styled.div`
+  margin-top: 30px;
+`;
+
+const StepTitleAndTime = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const StepTime = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: end;
+`;
+
+const StepInput = styled.input`
+  width: 30%;
+  height: 60px;
+  font-size: 28px;
+  border-radius: 15px;
+  padding: 2px 8px;
+`;
+
+const TimeInput = styled.input`
+  width: 15%;
+  height: 60px;
+  font-size: 28px;
+  border-radius: 15px;
+  padding: 2px 8px;
 `;
 
 function ModifyRecipe() {
@@ -58,14 +181,13 @@ function ModifyRecipe() {
   const [img, setImg] = useState('');
   const [imgPath, setImgPath] = useState('');
   const [imgUrl, setImgUrl] = useState('');
-  const [authorName, setAuthorName] = useState('');
   const [authorId, setAuthorId] = useState('');
   const userInfo = useContext(AuthContext);
   const userId = userInfo.uid;
   const userName = userInfo.name;
   // const [userName, setUserName] = useState('');
   // const [userId, setUserId] = useState('');
-
+  const fullTime = steps.reduce((accValue, step) => accValue + step.stepTime, 0);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -87,7 +209,6 @@ function ModifyRecipe() {
           setIngredients(recipeData.ingredients);
           setSteps(recipeData.steps);
           setComment(recipeData.comment);
-          setAuthorName(recipeData.authorName);
           setAuthorId(recipeData.authorId);
         },
       );
@@ -150,7 +271,7 @@ function ModifyRecipe() {
       title,
       titleKeywords,
       difficulty,
-      fullTime: steps.reduce((accValue, step) => accValue + step.stepTime, 0),
+      fullTime,
       mainImage: imgUrl,
       mainImagePath: imgPath,
       ingredients,
@@ -205,7 +326,7 @@ function ModifyRecipe() {
       title,
       titleKeywords,
       difficulty,
-      fullTime: steps.reduce((accValue, step) => accValue + step.stepTime, 0),
+      fullTime,
       mainImage: imgUrl,
       mainImagePath: imgPath,
       ingredients: parsedIngredients,
@@ -290,12 +411,12 @@ function ModifyRecipe() {
     const input = Number(e.target.value);
     if (Number.isNaN(input)) {
       newSteps[index].stepMinute = 0;
-      newSteps[index].stepTime = newSteps[index].stepMinute + newSteps[index].stepSecond;
+      newSteps[index].stepTime = newSteps[index].stepMinute * 60 + newSteps[index].stepSecond;
       setSteps(newSteps);
       return;
     }
     newSteps[index].stepMinute = Number(e.target.value);
-    newSteps[index].stepTime = newSteps[index].stepMinute + newSteps[index].stepSecond;
+    newSteps[index].stepTime = newSteps[index].stepMinute * 60 + newSteps[index].stepSecond;
     setSteps(newSteps);
   }
 
@@ -304,7 +425,7 @@ function ModifyRecipe() {
     const input = Number(e.target.value);
     if (Number.isNaN(input)) {
       newSteps[index].stepSecond = 0;
-      newSteps[index].stepTime = newSteps[index].stepMinute + newSteps[index].stepSecond;
+      newSteps[index].stepTime = newSteps[index].stepMinute * 60 + newSteps[index].stepSecond;
       setSteps(newSteps);
       return;
     }
@@ -370,129 +491,134 @@ function ModifyRecipe() {
 
   return (
     <>
-      <Div>{authorName}</Div>
-      <Div>
-        <div>食譜名稱</div>
-        <input
-          value={title}
-          onChange={(e) => { setTitle(e.target.value); setTitleKeyWords(e.target.value.split('')); }}
-          placeholder="請輸入食譜名稱..."
-        />
-        {authorId && userId !== authorId && title === oldTitle ? <div>請為您的食譜取個新名稱</div> : ''}
-      </Div>
-      <Div>
-        <div> 困難度</div>
-        <StarRating onChange={(i) => setDifficulty(i)} rating={difficulty} />
-      </Div>
-      <Div>
-        <div>
-          <label htmlFor="photo">
+      <Header />
+      <Background>
+        <TitleWrapper>
+          <LargeDiv>食譜名稱</LargeDiv>
+          <TitleInput
+            value={title}
+            onChange={(e) => { setTitle(e.target.value); setTitleKeyWords(e.target.value.split('')); }}
+            placeholder="請輸入食譜名稱..."
+          />
+          {authorId && userId !== authorId && title === oldTitle ? <div>請為您的食譜取個新名稱</div> : ''}
+        </TitleWrapper>
+        <HalfWrapper>
+          <HalfDiv>
+            <LargeDiv>困難度</LargeDiv>
+            <StarRating onChange={(i) => setDifficulty(i)} rating={difficulty} />
+          </HalfDiv>
+          <HalfDiv>
+            <LargeDiv>總時長</LargeDiv>
+            <LargeDiv>
+              {Math.floor(fullTime / 60) === 0 ? '' : `${Math.floor(fullTime / 60)}分鐘`}
+              {fullTime % 60 === 0 ? '' : `${fullTime % 60}秒鐘`}
+            </LargeDiv>
+          </HalfDiv>
+        </HalfWrapper>
+        <ImgWrapper>
+          <ImgDiv>
             <Img src={imgUrl || defaultImage} alt="stepImages" />
-            點擊上傳照片
-            <input
-              type="file"
-              accept="image/*"
-              style={{ display: 'none' }}
-              id="photo"
-              onChange={(e) => setImg(e.target.files[0])}
-            />
-          </label>
-        </div>
-      </Div>
-      <Div><div>食材</div></Div>
-      {ingredients.map((ingredient, index) => (
-        <div key={ingredient.id}>
-          <Div>
-            <div>食材品項</div>
-            <input
-              value={ingredient.ingredientsTitle}
-              onChange={(e) => { updateTitleValue(e, index); }}
-              placeholder="請輸入食材名稱..."
-            />
-          </Div>
-          <Div>
-            <div>食材重量</div>
-            <div>
-              <input
-                value={ingredient.ingredientsQuantity}
-                onChange={(e) => { updateQuantityValue(e, index); }}
-                placeholder="0"
-                type="number"
-                step="0.01"
+          </ImgDiv>
+          <Label htmlFor="photo">
+            點擊上傳圖片
+          </Label>
+          <input
+            type="file"
+            accept="image/*"
+            style={{ display: 'none' }}
+            id="photo"
+            onChange={(e) => setImg(e.target.files[0])}
+          />
+        </ImgWrapper>
+        <IngredientWrapper>
+          <LargeDiv>食材</LargeDiv>
+          {ingredients.map((ingredient, index) => (
+            <Div key={ingredient.id}>
+              <Input
+                value={ingredient.ingredientsTitle}
+                onChange={(e) => { updateTitleValue(e, index); }}
+                placeholder="請輸入食材名稱..."
               />
-              公克
+              <Quantity>
+                <QuantityInput
+                  value={ingredient.ingredientsQuantity}
+                  onChange={(e) => { updateQuantityValue(e, index); }}
+                  placeholder="0"
+                  type="number"
+                  step="0.01"
+                />
+                <LargeDiv>公克</LargeDiv>
+              </Quantity>
+              <button type="button" onClick={() => { deleteIngredients(index); }}>刪除食材</button>
+            </Div>
+          ))}
+        </IngredientWrapper>
+        <button type="button" onClick={addIngredients}>新增食材</button>
+        <StepWrapper>
+          <LargeDiv>步驟</LargeDiv>
+          {steps.map((step, index) => (
+            <div key={step.id}>
+              <StepTitleAndTime>
+                <StepInput
+                  value={step.stepTitle}
+                  onChange={(e) => { updateStepTitleValue(e, index); }}
+                  placeholder="請輸入步驟簡稱..."
+                />
+                <StepTime>
+                  <TimeInput
+                    value={steps[index].stepMinute}
+                    onChange={(e) => { updateStepMinuteValue(e, index); }}
+                    placeholder="0"
+                    type="number"
+                  />
+                  <LargeDiv>分</LargeDiv>
+                  <TimeInput
+                    value={steps[index].stepSecond}
+                    onChange={(e) => { updateStepSecondValue(e, index); }}
+                    placeholder="0"
+                    type="number"
+                  />
+                  <LargeDiv>秒</LargeDiv>
+                </StepTime>
+              </StepTitleAndTime>
+              <HalfDiv>
+                <TextArea
+                  value={steps[index].stepContent}
+                  onChange={(e) => { updateStepContentValue(e, index); }}
+                  placeholder="請描述步驟"
+                />
+              </HalfDiv>
+              <Div><div>步驟圖片</div></Div>
+              <Div>
+                <label htmlFor={step.id}>
+                  <Img src={steps[index].stepImgUrl || defaultImage} alt="stepImages" />
+                  點擊上傳照片
+                  <input
+                    type="file"
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    id={step.id}
+                    onChange={(e) => { UpdateImageValue(e, index); }}
+                  />
+                </label>
+              </Div>
+              <Div><button type="button" onClick={() => { DeleteSteps(index); }}>刪除步驟</button></Div>
             </div>
-          </Div>
-          <Div>
-            <button type="button" onClick={() => { deleteIngredients(index); }}>刪除食材</button>
-          </Div>
-        </div>
-      ))}
-      <button type="button" onClick={addIngredients}>新增食材</button>
-      <Div><div>步驟</div></Div>
-      {steps.map((step, index) => (
-        <div key={step.id}>
-          <Div>
-            <div>步驟簡稱</div>
-            <input
-              value={step.stepTitle}
-              onChange={(e) => { updateStepTitleValue(e, index); }}
-              placeholder="請輸入步驟簡稱..."
-            />
-          </Div>
-          <Div>
-            <div>步驟時間</div>
-            <input
-              value={steps[index].stepMinute}
-              onChange={(e) => { updateStepMinuteValue(e, index); }}
-              placeholder="0"
-              type="number"
-            />
-            分鐘
-            <input
-              value={steps[index].stepSecond}
-              onChange={(e) => { updateStepSecondValue(e, index); }}
-              placeholder="0"
-              type="number"
-            />
-            秒
-          </Div>
-          <Div>
-            <div>步驟敘述</div>
-            <TextArea
-              value={steps[index].stepContent}
-              onChange={(e) => { updateStepContentValue(e, index); }}
-              placeholder="請描述步驟"
-            />
-          </Div>
-          <Div><div>步驟圖片</div></Div>
-          <Div>
-            <label htmlFor={step.id}>
-              <Img src={steps[index].stepImgUrl || defaultImage} alt="stepImages" />
-              點擊上傳照片
-              <input
-                type="file"
-                accept="image/*"
-                style={{ display: 'none' }}
-                id={step.id}
-                onChange={(e) => { UpdateImageValue(e, index); }}
-              />
-            </label>
-          </Div>
-          <Div><button type="button" onClick={() => { DeleteSteps(index); }}>刪除步驟</button></Div>
-        </div>
-      ))}
-      <button type="button" onClick={addSteps}>新增步驟</button>
-      <Div>
-        <div>小撇步</div>
-        <TextArea
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          placeholder="有什麼我們可以注意的地方嗎？"
-        />
-      </Div>
-      <button type="button" onClick={submitData}>儲存食譜</button>
-      <ToastContainer />
+          ))}
+        </StepWrapper>
+        <button type="button" onClick={addSteps}>新增步驟</button>
+        <Div>
+          <div>小撇步</div>
+          <TextArea
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            placeholder="有什麼我們可以注意的地方嗎？"
+          />
+        </Div>
+        <button type="button" onClick={submitData}>儲存食譜</button>
+        <ToastContainer />
+      </Background>
+      <Footer />
     </>
   );
 }

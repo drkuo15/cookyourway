@@ -24,7 +24,7 @@ function Stars({
   return (
     <StarDiv style={{
       '--stars': stars,
-      '--size': `${size}px`,
+      '--size': `calc(${size}*100vw/1920)`,
       '--spacing': `${spacing}px`,
       '--fill': fill,
     }}
