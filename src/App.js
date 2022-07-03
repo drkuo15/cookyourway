@@ -10,8 +10,9 @@ import Cooking from './pages/Cooking';
 import ModifyRecipe from './pages/ModifyRecipe/ModifyRecipe';
 import ReadRecipe from './pages/ReadRecipe/readRecipe';
 import SearchRecipe from './pages/SearchRecipe/SearchRecipe';
-import Home from './pages/Home/home';
+import AuthHome from './pages/AuthHome/AuthHome';
 import Register from './pages/Register/Register';
+import UnAuthHome from './pages/UnAuthHome/UnAuthHome';
 import Login from './pages/LogIn/LogIn';
 import { auth, db } from './firestore/index';
 import AuthContext from './components/AuthContext';
@@ -55,9 +56,10 @@ function App() {
             <Route path="/modify_recipe" element={<ModifyRecipe />} />
             <Route path="/read_recipe" element={<ReadRecipe />} />
             <Route path="/search_recipe" element={<SearchRecipe />} />
-            <Route path="/home" element={<Home />} />
+            <Route path="/home" element={<AuthHome />} />
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/" element={<UnAuthHome />} />
           </Routes>
         </Router>
         <GlobalStyle />

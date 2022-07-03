@@ -86,7 +86,7 @@ const ContentAuthor = styled.div`
   font-size: calc(28*100vw/1920);
 `;
 
-function Home() {
+function AuthHome() {
   const userInfo = useContext(AuthContext);
   const [userId, setUserId] = useState('');
   const [userRecipes, setUserRecipes] = useState([]);
@@ -223,15 +223,6 @@ function Home() {
                   </ContentAuthor>
                 </ContentFirstRow>
                 <Stars stars={recommendRecipe.difficulty} size={48} spacing={2} fill="#EB811F" />
-                {/* {recommendRecipe.ingredients.map((ingredient) => (
-                  <div key={ingredient.id}>
-                    {ingredient.ingredientsTitle}
-                  </div>
-                ))}
-                {Math.floor(recommendRecipe.fullTime / 60)}
-                分
-                {recommendRecipe.fullTime % 60}
-                秒 */}
               </StyledLink>
             </ContentDiv>
           ))}
@@ -255,15 +246,6 @@ function Home() {
                   </ContentAuthor>
                 </ContentFirstRow>
                 <Stars stars={userRecipe.difficulty} size={48} spacing={2} fill="#EB811F" />
-                {/* {userRecipe.ingredients.map((ingredient) => (
-                  <div key={ingredient.id}>
-                    {ingredient.ingredientsTitle}
-                  </div>
-                ))}
-                {Math.floor(userRecipe.fullTime / 60)}
-                分
-                {userRecipe.fullTime % 60}
-                秒 */}
               </StyledLink>
             </ContentDiv>
           ))}
@@ -287,15 +269,6 @@ function Home() {
                   </ContentAuthor>
                 </ContentFirstRow>
                 <Stars stars={favoriteRecipe.difficulty} size={48} spacing={2} fill="#EB811F" />
-                {/* {favoriteRecipe.ingredients.map((ingredient) => (
-                  <div key={ingredient.id}>
-                    {ingredient.ingredientsTitle}
-                  </div>
-                ))}
-                {Math.floor(favoriteRecipe.fullTime / 60)}
-                分
-                {favoriteRecipe.fullTime % 60}
-                秒 */}
               </StyledLink>
             </ContentDiv>
           ))}
@@ -306,4 +279,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default AuthHome;

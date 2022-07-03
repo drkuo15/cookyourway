@@ -1,10 +1,6 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { signOut } from 'firebase/auth';
-import { useContext, useEffect, useState } from 'react';
 import logoImage from '../images/CookYourWay_logo_v1.png';
-import { auth } from '../firestore/index';
-import AuthContext from './AuthContext';
 
 const Background = styled.div`
   width: 100vw;
@@ -33,6 +29,10 @@ const ImgLink = styled(Link)`
   height: calc(64*100vw/1920);
 `;
 
+const StyledLink = styled(Link)`
+  text-decoration: none;
+`;
+
 const Img = styled.img`
   width: calc(64*100vw/1920);
   height: calc(64*100vw/1920);
@@ -43,17 +43,6 @@ const Title = styled.div`
   height: calc(64*100vw/1920);
   color: #EB811F;
   font-size: calc(48*100vw/1920);
-`;
-
-const SignOutButton = styled.button`
-  width: calc(200*100vw/1920);
-  height: calc(64*100vw/1920);
-  background-color: #FDFDFC;
-  cursor: pointer;
-  border-radius: calc(15*100vw/1920);
-  font-size: calc(28*100vw/1920);
-  color: #2B2A29;
-  border: 0;
 `;
 
 const DropBtn = styled.button`
@@ -68,54 +57,14 @@ const DropBtn = styled.button`
   display: flex;
   justify-content: center;
   align-items: center;
-`;
-
-const DropdownContentDiv = styled.div`
-  display: none;
-  position: absolute;
-  background-color: #f1f1f1;
-  min-width: calc(160*100vw/1920);
-  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-  z-index: 1;
-`;
-
-const DropdownDiv = styled.div`
-  position: relative;
-  display: inline - block;
-  &:hover ${DropBtn} {background-color: #584743; color: #FDFDFC;};
-  &:hover ${DropdownContentDiv} {display: block;};
+  &:hover {background-color: #584743; color: #FDFDFC;}
 `;
 
 const Padding = styled.div`
   height: calc(116*100vw/1920);
 `;
 
-function SignOut() {
-  const navigate = useNavigate();
-  function handleSignOut() {
-    signOut(auth).then(() => {
-      navigate('/login', { replace: true });
-      // Sign-out successful.
-    });
-  }
-
-  return (
-    <SignOutButton type="button" onClick={() => handleSignOut()}>登出</SignOutButton>
-  );
-}
-
 function Header() {
-  const userInfo = useContext(AuthContext);
-  const [userName, setUserName] = useState('');
-
-  useEffect(() => {
-    if (userInfo) {
-      setUserName(userInfo.name);
-    } else {
-      setUserName('');
-    }
-  }, [userInfo]);
-
   return (
     <>
       <Background>
@@ -126,12 +75,9 @@ function Header() {
           <Title>Cook Your Way</Title>
         </LeftDiv>
         <RightDiv>
-          <DropdownDiv>
-            <DropBtn>{userName}</DropBtn>
-            <DropdownContentDiv>
-              <SignOut />
-            </DropdownContentDiv>
-          </DropdownDiv>
+          <StyledLink to="/login">
+            <DropBtn>登入</DropBtn>
+          </StyledLink>
         </RightDiv>
       </Background>
       <Padding />
