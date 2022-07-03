@@ -179,6 +179,7 @@ function Register() {
         uid: result.user.uid,
         name,
         email,
+        myFavorites: [],
       });
       setData({
         name: '',
