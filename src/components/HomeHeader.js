@@ -45,6 +45,17 @@ const Title = styled.div`
   font-size: calc(48*100vw/1920);
 `;
 
+const CreateButton = styled.button`
+  width: calc(286*100vw/1920);
+  height: calc(64*100vw/1920);
+  background-color: #EB811F;
+  cursor: pointer;
+  border: 0;
+  border-radius: calc(15*100vw/1920);
+  font-size: calc(28*100vw/1920);
+  color: #2B2A29;
+`;
+
 const SignOutButton = styled.button`
   width: calc(200*100vw/1920);
   height: calc(64*100vw/1920);
@@ -101,10 +112,11 @@ function SignOut() {
 
   return (
     <SignOutButton type="button" onClick={() => handleSignOut()}>登出</SignOutButton>
+
   );
 }
 
-function Header() {
+function HomeHeader() {
   const userInfo = useContext(AuthContext);
   const [userName, setUserName] = useState('');
 
@@ -126,6 +138,9 @@ function Header() {
           <Title>Cook Your Way</Title>
         </LeftDiv>
         <RightDiv>
+          <Link to="/modify_recipe">
+            <CreateButton>創建食譜</CreateButton>
+          </Link>
           <DropdownDiv>
             <DropBtn>{userName}</DropBtn>
             <DropdownContentDiv>
@@ -139,4 +154,4 @@ function Header() {
   );
 }
 
-export default Header;
+export default HomeHeader;

@@ -186,6 +186,7 @@ const DoItYourSelfButton = styled.button`
   background-color: #EB811F50;
   border: 0;
   border-radius: calc(15*100vw/1920);
+  cursor: pointer;
 `;
 
 const TipsDiv = styled.div`

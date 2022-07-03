@@ -3,22 +3,29 @@ import styled from 'styled-components';
 import Counter from './Counter';
 import Player from './Music';
 import Recipe from './Recipe';
+import Footer from '../../components/Footer';
+import Header from '../../components/Header';
+
+const Wrapper = styled.div`
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+`;
 
 const LeftTimer = styled.div`
   display: flex;
   flex-direction: column;
-`;
-
-const Wrapper = styled.div`
-  display: flex;
   justify-content: center;
   align-items: center;
-  gap: 30px;
-  margin-top: 140px; 
+  width: calc(500*100vw/1920);
+  height: calc(830*100vw/1920);
+  background-color: #E5D2C0;
+  border-radius: calc(15*100vw/1920);
 `;
 
 const Title = styled.div`
-  font-size: 1.5rem;
+  font-size: calc(76*100vw/1920);
+  margin-bottom: calc(50*100vw/1920);
 `;
 
 const playlist = [
@@ -48,6 +55,7 @@ function Cooking() {
 
   return (
     <div>
+      <Header />
       <Wrapper>
         <LeftTimer>
           <Title>{title}</Title>
@@ -89,6 +97,7 @@ function Cooking() {
           setTitle={setTitle}
         />
       </Wrapper>
+      <Footer />
     </div>
   );
 }

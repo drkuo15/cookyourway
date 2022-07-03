@@ -1,6 +1,35 @@
 import React, { useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 import MusicDisc from '../../components/MusicDisc';
+
+const CounterWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const Time = styled.div`
+  font-size: calc(48*100vw/1920);
+`;
+
+const ButtonDiv = styled.div`
+  width: calc(400*100vw/1920);
+  display: flex;
+  justify-content: space-between;
+  margin-top: calc(50*100vw/1920);
+`;
+
+const Button = styled.button`
+  width: calc(175*100vw/1920);
+  height: calc(65*100vw/1920);
+  background-color: #584743;
+  border: 0;
+  border-radius: calc(15*100vw/1920);
+  color: #FDFDFC;
+  font-size: calc(28*100vw/1920);
+  cursor: pointer;
+`;
 
 // const playlist = ['https://firebasestorage.googleapis.com/v0/b/cook-your-way.appspot.com/o/tunetank.com_5423_lazy-bones_by_vital.mp3?alt=media&token=30cb614d-0230-482a-b83c-9c82bf77022e',
 //   'https://firebasestorage.googleapis.com/v0/b/cook-your-way.appspot.com/o/tunetank.com_5094_new-york-lounge_by_99instrumentals.mp3?alt=media&token=76e6a1cf-0e22-4544-960b-183231335faf',
@@ -54,14 +83,16 @@ function Counter({
   };
 
   return (
-    <div>
+    <CounterWrapper>
       <MusicDisc isCounting={isCounting} />
-      <h2>{`${Math.floor(time / 60) > 9 ? Math.floor(time / 60) : `0${Math.floor(time / 60)}`}: ${time % 60 < 10 ? `0${time % 60}` : time % 60}`}</h2>
-      <button type="button" onClick={toggleCounting}>
-        {isCounting ? '暫停倒數' : '開始倒數'}
-      </button>
-      <button type="button" onClick={resetTime}>重置時間</button>
-    </div>
+      <Time>{`${Math.floor(time / 60) > 9 ? Math.floor(time / 60) : `0${Math.floor(time / 60)}`} : ${time % 60 < 10 ? `0${time % 60}` : time % 60}`}</Time>
+      <ButtonDiv>
+        <Button type="button" onClick={toggleCounting}>
+          {isCounting ? '暫停倒數' : '開始倒數'}
+        </Button>
+        <Button type="button" onClick={resetTime}>重置時間</Button>
+      </ButtonDiv>
+    </CounterWrapper>
   );
 }
 

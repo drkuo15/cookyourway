@@ -5,39 +5,38 @@ import PropTypes from 'prop-types';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { db } from '../../firestore';
 
+const RecipeArea = styled.div`
+  width: calc(1300*100vw/1920);
+  height: calc(830*100vw/1920);
+  display: flex;
+  flex-direction: column;
+  margin-top: calc(60*100vw/1920);
+`;
+
 const Wrapper = styled.div`
   display: flex;
   justify-content: center;
+  align-items: center;
 `;
 
-const WrapperStepTitle = styled(Wrapper)`
-  justify-content: space-between;
-`;
-
-const RecipeArea = styled.div`
-  width: 900px;
-  height: 300px;
+const WrapperStep = styled.div`
   display: flex;
   flex-direction: column;
-`;
-
-const StepTitle = styled.div`
-  font-size: 1.5rem;
+  justify-content: flex-start;
+  align-items: center;
 `;
 
 const WrapperStepButton = styled(Wrapper)`
   justify-content: space-around;
-  margin-top: 20px;
 `;
 
 const StepsNav = styled(Wrapper)`
-  ${'' /* display: block; */}
-  width: 900px;
+  width: calc(1250*100vw/1920);
+  padding: calc(50*100vw/1920) calc(20*100vw/1920)
   margin: 0 auto;
-  padding: 50px 20px;
   text-align: center;
   overflow: hidden;
-  font-size: 1.5rem;
+  font-size: calc(48*100vw/1920);
   color: white;
 `;
 
@@ -45,46 +44,76 @@ const StepArea = styled.div`
   display: block;
   position: relative;
   float: left;
-  width: calc(100% / 3);
-  height: 40px;
-  line-height: 40px;
-  margin-right: 10px;
-  padding: 0 10px;
-  background-color: ${(props) => (props.selected ? '#EB811F' : '#584743')};;
-  border-radius: 4px;
+  width: calc(382*100vw/1920);
+  height: calc(142*100vw/1920);
+  line-height: calc(142*100vw/1920);
+  margin-right: calc(70*100vw/1920);
+  padding-left: calc(50*100vw/1920);
+  background-color: ${(props) => (props.selected ? '#EB811F' : '#584743')};
+  border-radius: calc(4*100vw/1920);
+  color: #FDFDFC;
+  ${'' /* overflow: scroll; */}
   &:before {
   content: "";
   position: absolute;
-  right: -9px;
+  right: calc(-65*100vw/1920);
   height: 0;
   width: 0;
-  border-top: 20px solid transparent;
-  border-bottom: 20px solid transparent;
-  border-left: 10px solid ${(props) => (props.selected ? '#EB811F' : '#584743')};;
-  border-radius: 4px;
+  border-top: calc(70*100vw/1920) solid transparent;
+  border-bottom: calc(70*100vw/1920) solid transparent;
+  border-left: calc(65*100vw/1920) solid ${(props) => (props.selected ? '#EB811F' : '#584743')};
+  border-radius: calc(4*100vw/1920);
   };
   &:after {
   content: "";
   position: absolute;
-  left: -1px;
+  left: calc(-1*100vw/1920);
   height: 0;
   width: 0;
-  border-top: 20px solid transparent;
-  border-bottom: 20px solid transparent;
-  border-left: 10px solid #fff;
-  border-radius: 4px;
+  border-top: calc(70*100vw/1920) solid transparent;
+  border-bottom: calc(70*100vw/1920) solid transparent;
+  border-left: calc(65*100vw/1920) solid #FDFDFC;
+  border-radius: calc(4*100vw/1920);
   };
+`;
+
+const StepDiv = styled.div`
+  margin-top: calc(50*100vw/1920);
+  width: calc(1250*100vw/1920);
+  height: calc(450*100vw/1920);
+  display: flex;
+  justify-content: space-around;
+`;
+
+const ExpectTime = styled.div`
+  font-size: calc(48*100vw/1920);
 `;
 
 const StepContent = styled.div`
   text-align: start;
-  margin-top: 20px;
+  margin-top: calc(20*100vw/1920);
+  font-size: calc(36*100vw/1920);
+  overflow: scroll;
 `;
 
 const Img = styled.img`
-width: 100px;
-height: 100px;
+  max-width: calc(600*100vw/1920);
+  max-height: calc(450*100vw/1920);
+  border-radius: calc(15*100vw/1920);
 `;
+
+const Button = styled.button`
+  width: calc(250*100vw/1920);
+  height: calc(65*100vw/1920);
+  background-color: #584743;
+  border: 0;
+  border-radius: calc(15*100vw/1920);
+  color: #FDFDFC;
+  margin-top: calc(50*100vw/1920);
+  font-size: calc(28*100vw/1920);
+  cursor: pointer;
+`;
+
 function Recipe({
   setInitialTime, stepIndex, setStepIndex, setStepsLength, setIsCounting, setTitle,
 }) {
@@ -128,6 +157,9 @@ function Recipe({
           .filter((_, index) => index <= stepIndex + 2)
           .map((step, index) => (
             <StepArea selected={index === 0} key={step.stepTitle}>
+              {stepIndex + index + 1}
+              .
+              {' '}
               {step.stepTitle}
             </StepArea>
           ));
@@ -136,6 +168,9 @@ function Recipe({
         return steps.filter((_, index) => index >= stepIndex - 2)
           .map((step, index) => (
             <StepArea selected={index === 2} key={step.stepTitle}>
+              {stepIndex + index - 1}
+              .
+              {' '}
               {step.stepTitle}
             </StepArea>
           ));
@@ -144,6 +179,9 @@ function Recipe({
         return steps.filter((_, index) => index <= (stepIndex + 1) && index >= (stepIndex - 1))
           .map(((step, index) => (
             <StepArea selected={index === 1} key={step.stepTitle}>
+              {stepIndex + index}
+              .
+              {' '}
               {step.stepTitle}
             </StepArea>
           )));
@@ -172,32 +210,28 @@ function Recipe({
       <StepsNav>
         {renderSwitch()}
       </StepsNav>
-      {steps.map((step, index) => (
-        <div key={step.stepTitle}>
-          <WrapperStepTitle>
-            <StepTitle>
-              {index + 1}
-              {step.stepTitle}
-            </StepTitle>
-            <div>
+      {steps.map((step) => (
+        <StepDiv key={step.stepTitle}>
+          <WrapperStep>
+            <ExpectTime>
               預計時間：
               {step.stepMinute ? `${step.stepMinute}分` : ''}
               {step.stepSecond ? `${step.stepSecond}秒` : ''}
-            </div>
-          </WrapperStepTitle>
-          <StepContent>
-            {step.stepContent}
-          </StepContent>
+            </ExpectTime>
+            <StepContent>
+              {step.stepContent}
+            </StepContent>
+          </WrapperStep>
           <Img src={step.stepImgUrl} alt="stepImage" />
-        </div>
+        </StepDiv>
       )).filter((_, index) => index === stepIndex)}
       <WrapperStepButton>
-        {stepIndex + 1 !== steps.length && !isPrevStep ? <button type="button" onClick={() => { setIsCounting(true); }}>開始料理</button> : <button type="button" onClick={() => { handlePrevStep(); }}>上一步</button>}
+        {stepIndex + 1 !== steps.length && !isPrevStep ? <Button type="button" onClick={() => { setIsCounting(true); }}>開始料理</Button> : <Button type="button" onClick={() => { handlePrevStep(); }}>上一步</Button>}
         {stepIndex + 1 === steps.length && !isNextStep ? (
-          <button type="button" onClick={() => { handleEnding(); }}>
+          <Button type="button" onClick={() => { handleEnding(); }}>
             結束料理
-          </button>
-        ) : <button type="button" onClick={() => { handleNextStep(); }}>下一步</button>}
+          </Button>
+        ) : <Button type="button" onClick={() => { handleNextStep(); }}>下一步</Button>}
       </WrapperStepButton>
     </RecipeArea>
   );

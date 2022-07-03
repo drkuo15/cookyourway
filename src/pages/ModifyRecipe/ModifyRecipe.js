@@ -14,11 +14,19 @@ import defaultImage from '../../images/upload.png';
 import StarRating from '../../components/Stars';
 import { ToastContainer, showCustomAlert } from '../../components/CustomAlert';
 import AuthContext from '../../components/AuthContext';
-import Header from '../../components/Header';
+// import Header from '../../components/Header';
 import Footer from '../../components/Footer';
+import ModifyRecipeHeader from '../../components/Header';
+import binImage from '../../images/bin.png';
+
+const IconImg = styled.img`
+  width: calc(56*100vw/1920);
+  height: calc(56*100vw/1920);
+`;
 
 const Img = styled.img`
-  width: auto;
+  width: calc(800*100vw/1920);
+  height: calc(600*100vw/1920); 
   max-width: 100%;
   max-height: 100%;
   display: block;
@@ -31,28 +39,28 @@ const Label = styled.label`
   width: 100%;
   height: 100%;
   background-color: transparent;
-  border-radius: 30px;
+  border-radius: calc(15*100vw/1920);
   text-align: center;
-  line-height: 400px;
+  line-height: calc(900*100vw/1920);
   color: #666;
   position: absolute;
   top: 0;
   right: 0;
-  letter-spacing: 2px;
-  font-size: 36px;
+  letter-spacing: calc(2*100vw/1920);
+  font-size: calc(36*100vw/1920);
 `;
 
 const ImgWrapper = styled.div`
-  width: 100%;
+  width: calc(800*100vw/1920);
+  height: calc(600*100vw/1920);
   position: relative;
   background-color: #ececec;
-  border-radius: 15px;
-  margin-top: 30px;
+  border-radius: calc(15*100vw/1920);
 `;
 
 const ImgDiv = styled.div`
-  width: 100%;
-  height: 250px;
+  width: calc(800*100vw/1920);
+  height: calc(600*100vw/1920);
 `;
 
 const Div = styled.div`
@@ -66,50 +74,81 @@ const TextArea = styled.textarea`
 `;
 
 const LargeDiv = styled.div`
-  font-size: 48px;
+  font-size: calc(48*100vw/1920);
   white-space: nowrap;
   display: flex;
   align-items: center;
 `;
 
 const Background = styled.div`
-  padding: 0 116px;
+  padding: 0 calc(116*100vw/1920);
 `;
 
 const TitleWrapper = styled(Div)`
-  margin-top: 40px;
+  margin-top:calc(40*100vw/1920);
 `;
 
 const TitleInput = styled.input`
-  width: 75%;
-  font-size: 48px;
-  border-radius: 15px
+  width: calc(1392*100vw/1920);
+  font-size: calc(48*100vw/1920);
+  border-radius: calc(15*100vw/1920);
+  padding: calc(2*100vw/1920) calc(8*100vw/1920);
 `;
 
 const HalfDiv = styled(Div)`
-  width: 47.5%;
+  width: calc(800*100vw/1920);
 `;
 
 const HalfWrapper = styled.div`
   display: flex;
-  gap: 5%;
-  margin-top: 60px;
+  gap: calc(88*100vw/1920);
+  margin-top: calc(60*100vw/1920);
 `;
 
 const IngredientWrapper = styled.div`
-  margin-top: 30px;
+    flex-direction: column;
+    background-color: #E5D2C0;
+    border-radius: calc(15*100vw/1920);
+    padding: calc(16*100vw/1920);
+    justify-content: start;
+    width: calc(800*100vw/1920);
+    height: calc(600*100vw/1920);
+`;
+
+const IngredientTitle = styled(LargeDiv)`
+  border-bottom: calc(2*100vw/1920)  #2B2A29 solid;
+  padding-bottom: calc(15*100vw/1920);
+`;
+
+const AllIngredientsDiv = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-top: calc(15*100vw/1920);
+  height: calc(300*100vw/1920);
+  overflow: scroll;
+`;
+
+const AddIngredientButton = styled.button`
+  width: calc(250*100vw/1920);
+  height: calc(65*100vw/1920);
+  background-color: #584743;
+  border: 0;
+  border-radius: calc(15*100vw/1920);
+  color: #FDFDFC;
+  font-size: calc(28*100vw/1920);
 `;
 
 const Input = styled.input`
-  width: 30%;
-  height: 60px;
-  font-size: 28px;
-  border-radius: 15px;
-  padding: 2px 8px;
+  width: calc(325*100vw/1920);
+  height: calc(56*100vw/1920);
+  font-size: calc(28*100vw/1920);
+  border-radius: calc(15*100vw/1920);
+  padding: calc(2*100vw/1920) calc(8*100vw/1920);
 `;
 
 const QuantityInput = styled(Input)`
-  width: 100%
+  width: calc(135*100vw/1920);
 `;
 
 const Quantity = styled.div`
@@ -118,12 +157,14 @@ const Quantity = styled.div`
   justify-content: center;
 `;
 
-// const Ingredient = styled.div`
-
-// `;
+const DeleteButton = styled.button`
+  height: calc(56 * 100vw / 1920);
+  background-color: transparent;
+  cursor: pointer;
+  border: 0;
+`;
 
 const StepWrapper = styled.div`
-  margin-top: 30px;
 `;
 
 const StepTitleAndTime = styled.div`
@@ -140,18 +181,18 @@ const StepTime = styled.div`
 
 const StepInput = styled.input`
   width: 30%;
-  height: 60px;
-  font-size: 28px;
-  border-radius: 15px;
-  padding: 2px 8px;
+  height: calc(60*100vw/1920);
+  font-size: calc(28*100vw/1920);
+  border-radius:calc(15*100vw/1920);
+  padding: calc(2*100vw/1920) calc(8*100vw/1920);
 `;
 
 const TimeInput = styled.input`
   width: 15%;
-  height: 60px;
-  font-size: 28px;
-  border-radius: 15px;
-  padding: 2px 8px;
+  height: calc(60*100vw/1920);
+  font-size: calc(28*100vw/1920);
+  border-radius: calc(15*100vw/1920);
+  padding: calc(2*100vw/1920) calc(8*100vw/1920);
 `;
 
 function ModifyRecipe() {
@@ -491,7 +532,7 @@ function ModifyRecipe() {
 
   return (
     <>
-      <Header />
+      <ModifyRecipeHeader />
       <Background>
         <TitleWrapper>
           <LargeDiv>食譜名稱</LargeDiv>
@@ -515,45 +556,51 @@ function ModifyRecipe() {
             </LargeDiv>
           </HalfDiv>
         </HalfWrapper>
-        <ImgWrapper>
-          <ImgDiv>
-            <Img src={imgUrl || defaultImage} alt="stepImages" />
-          </ImgDiv>
-          <Label htmlFor="photo">
-            點擊上傳圖片
-          </Label>
-          <input
-            type="file"
-            accept="image/*"
-            style={{ display: 'none' }}
-            id="photo"
-            onChange={(e) => setImg(e.target.files[0])}
-          />
-        </ImgWrapper>
-        <IngredientWrapper>
-          <LargeDiv>食材</LargeDiv>
-          {ingredients.map((ingredient, index) => (
-            <Div key={ingredient.id}>
-              <Input
-                value={ingredient.ingredientsTitle}
-                onChange={(e) => { updateTitleValue(e, index); }}
-                placeholder="請輸入食材名稱..."
-              />
-              <Quantity>
-                <QuantityInput
-                  value={ingredient.ingredientsQuantity}
-                  onChange={(e) => { updateQuantityValue(e, index); }}
-                  placeholder="0"
-                  type="number"
-                  step="0.01"
-                />
-                <LargeDiv>公克</LargeDiv>
-              </Quantity>
-              <button type="button" onClick={() => { deleteIngredients(index); }}>刪除食材</button>
-            </Div>
-          ))}
-        </IngredientWrapper>
-        <button type="button" onClick={addIngredients}>新增食材</button>
+        <HalfWrapper>
+          <ImgWrapper>
+            <ImgDiv>
+              <Img src={imgUrl || defaultImage} alt="stepImages" />
+            </ImgDiv>
+            <Label htmlFor="photo">
+              點擊上傳圖片
+            </Label>
+            <input
+              type="file"
+              accept="image/*"
+              style={{ display: 'none' }}
+              id="photo"
+              onChange={(e) => setImg(e.target.files[0])}
+            />
+          </ImgWrapper>
+          <IngredientWrapper>
+            <IngredientTitle>食材</IngredientTitle>
+            <AllIngredientsDiv>
+              {ingredients.map((ingredient, index) => (
+                <Div key={ingredient.id}>
+                  <Input
+                    value={ingredient.ingredientsTitle}
+                    onChange={(e) => { updateTitleValue(e, index); }}
+                    placeholder="請輸入食材名稱..."
+                  />
+                  <Quantity>
+                    <QuantityInput
+                      value={ingredient.ingredientsQuantity}
+                      onChange={(e) => { updateQuantityValue(e, index); }}
+                      placeholder="0"
+                      type="number"
+                      step="0.01"
+                    />
+                    <LargeDiv>公克</LargeDiv>
+                  </Quantity>
+                  <DeleteButton type="button" onClick={() => { deleteIngredients(index); }}>
+                    <IconImg src={binImage} alt="deleteImage" />
+                  </DeleteButton>
+                </Div>
+              ))}
+            </AllIngredientsDiv>
+            <AddIngredientButton type="button" onClick={() => { addIngredients(); }}>新增食材</AddIngredientButton>
+          </IngredientWrapper>
+        </HalfWrapper>
         <StepWrapper>
           <LargeDiv>步驟</LargeDiv>
           {steps.map((step, index) => (

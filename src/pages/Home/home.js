@@ -10,29 +10,80 @@ import AuthContext from '../../components/AuthContext';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 
-const Img = styled.img`
-  width: 100px;
-  height: 100px;
-`;
-
-const StyledLink = styled(Link)`
-  text-decoration: none;
-  color: inherit;
-`;
-
 const SearchInput = styled.input`
-  width: calc(1282/1920 * 100vw);
-  height: 64px;
-  border: 1px #2B2A29 solid;
-  border-radius: 15px;
-  font-size: 28px;
+  width: calc(1282*100vw/1920);
+  height: calc(64*100vw/1920);
+  border: calc(1*100vw/1920) #2B2A29 solid;
+  border-radius: calc(15*100vw/1920);
+  font-size: calc(28*100vw/1920);
+  text-align: center;
 `;
 
 const SearchDiv = styled.div`
   display: flex;
   justify-content: center;
-  margin-top: 48px;
-  margin-bottom: 68px;
+  margin-top: calc(48*100vw/1920);
+  margin-bottom: calc(68*100vw/1920);
+`;
+
+const SectionWithBackground = styled.div`
+  width: 100vw;
+  height: calc(850*100vw/1920);
+  background-color: #F7EFE7;
+`;
+
+const Section = styled.div`
+  width: 100vw;
+  height: calc(850*100vw/1920);
+`;
+
+const SectionTitle = styled.div`
+  font-size: calc(76*100vw/1920);
+  padding: calc(40*100vw/1920) 0 calc(45*100vw/1920) calc(158*100vw/1920);
+`;
+
+const ContentWrapper = styled.div`
+  display: flex;
+  justify-content: space-around;
+`;
+
+const ContentDiv = styled.div`
+  display: flex;
+  justify-content: space-around;
+  width: calc(520*100vw/1920);
+  height: calc(600*100vw/1920);
+  background-color: #E5D2C0;
+  border-radius: calc(15*100vw/1920);
+`;
+
+const StyledLink = styled(Link)`
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+`;
+
+const Img = styled.img`
+  width: calc(492*100vw/1920);
+  max-height: calc(369*100vw/1920);
+  border-radius: calc(15*100vw/1920);
+`;
+
+const ContentFirstRow = styled.div`
+  width: calc(520*100vw/1920);
+  display: flex;
+  justify-content: space-around;
+  align-items: baseline;
+`;
+
+const ContentTitle = styled.div`
+  font-size: calc(48*100vw/1920);
+`;
+
+const ContentAuthor = styled.div`
+  font-size: calc(28*100vw/1920);
 `;
 
 function Home() {
@@ -156,73 +207,100 @@ function Home() {
           }}
         />
       </SearchDiv>
-      <div>推薦食譜</div>
-      {recommendRecipes.map((recommendRecipe) => (
-        <div key={recommendRecipe.recipeId}>
-          <StyledLink to={`/read_recipe?id=${recommendRecipe.recipeId}`}>
-            <Img src={recommendRecipe.mainImage} alt="食譜封面照" />
-            {recommendRecipe.title}
-            by
-            {recommendRecipe.authorName}
-            <Stars stars={recommendRecipe.difficulty} size={20} spacing={2} fill="#EB811F" />
-            {recommendRecipe.ingredients.map((ingredient) => (
-              <div key={ingredient.id}>
-                {ingredient.ingredientsTitle}
-              </div>
-            ))}
-            {Math.floor(recommendRecipe.fullTime / 60)}
-            分
-            {recommendRecipe.fullTime % 60}
-            秒
-          </StyledLink>
-        </div>
-      ))}
-      <div>我的食譜</div>
-      {userRecipeIndex >= 1
-        ? <button type="button" onClick={showPrevRecipe}>上一張</button> : ''}
-      {userRecipes.slice(userRecipeIndex, userRecipeIndex + 3).map((userRecipe) => (
-        <div key={userRecipe.recipeId}>
-          <StyledLink to={`/read_recipe?id=${userRecipe.recipeId}`}>
-            <Img src={userRecipe.mainImage} alt="食譜封面照" />
-            {userRecipe.title}
-            by
-            {userRecipe.authorName}
-            <Stars stars={userRecipe.difficulty} size={20} spacing={2} fill="#EB811F" />
-            {userRecipe.ingredients.map((ingredient) => (
-              <div key={ingredient.id}>
-                {ingredient.ingredientsTitle}
-              </div>
-            ))}
-            {Math.floor(userRecipe.fullTime / 60)}
-            分
-            {userRecipe.fullTime % 60}
-            秒
-          </StyledLink>
-        </div>
-      ))}
-      {userRecipeIndex <= userRecipes.length - 4
-        ? <button type="button" onClick={showNextRecipe}>下一張</button> : ''}
-      <div>最愛食譜</div>
-      {favoriteRecipes.map((favoriteRecipe) => (
-        <div key={favoriteRecipe.recipeId}>
-          <StyledLink to={`/read_recipe?id=${favoriteRecipe.recipeId}`}>
-            <Img src={favoriteRecipe.mainImage} alt="食譜封面照" />
-            {favoriteRecipe.title}
-            by
-            {favoriteRecipe.authorName}
-            <Stars stars={favoriteRecipe.difficulty} size={20} spacing={2} fill="#EB811F" />
-            {favoriteRecipe.ingredients.map((ingredient) => (
-              <div key={ingredient.id}>
-                {ingredient.ingredientsTitle}
-              </div>
-            ))}
-            {Math.floor(favoriteRecipe.fullTime / 60)}
-            分
-            {favoriteRecipe.fullTime % 60}
-            秒
-          </StyledLink>
-        </div>
-      ))}
+      <SectionWithBackground>
+        <SectionTitle>推薦食譜</SectionTitle>
+        <ContentWrapper>
+          {recommendRecipes.map((recommendRecipe) => (
+            <ContentDiv key={recommendRecipe.recipeId}>
+              <StyledLink to={`/read_recipe?id=${recommendRecipe.recipeId}`}>
+                <Img src={recommendRecipe.mainImage} alt="食譜封面照" />
+                <ContentFirstRow>
+                  <ContentTitle>{recommendRecipe.title}</ContentTitle>
+                  <ContentAuthor>
+                    by
+                    {' '}
+                    {recommendRecipe.authorName}
+                  </ContentAuthor>
+                </ContentFirstRow>
+                <Stars stars={recommendRecipe.difficulty} size={48} spacing={2} fill="#EB811F" />
+                {/* {recommendRecipe.ingredients.map((ingredient) => (
+                  <div key={ingredient.id}>
+                    {ingredient.ingredientsTitle}
+                  </div>
+                ))}
+                {Math.floor(recommendRecipe.fullTime / 60)}
+                分
+                {recommendRecipe.fullTime % 60}
+                秒 */}
+              </StyledLink>
+            </ContentDiv>
+          ))}
+        </ContentWrapper>
+      </SectionWithBackground>
+      <Section>
+        <SectionTitle>我的食譜</SectionTitle>
+        {userRecipeIndex >= 1
+          ? <button type="button" onClick={showPrevRecipe}>上一張</button> : ''}
+        <ContentWrapper>
+          {userRecipes.slice(userRecipeIndex, userRecipeIndex + 3).map((userRecipe) => (
+            <ContentDiv key={userRecipe.recipeId}>
+              <StyledLink to={`/read_recipe?id=${userRecipe.recipeId}`}>
+                <Img src={userRecipe.mainImage} alt="食譜封面照" />
+                <ContentFirstRow>
+                  <ContentTitle>{userRecipe.title}</ContentTitle>
+                  <ContentAuthor>
+                    by
+                    {' '}
+                    {userRecipe.authorName}
+                  </ContentAuthor>
+                </ContentFirstRow>
+                <Stars stars={userRecipe.difficulty} size={48} spacing={2} fill="#EB811F" />
+                {/* {userRecipe.ingredients.map((ingredient) => (
+                  <div key={ingredient.id}>
+                    {ingredient.ingredientsTitle}
+                  </div>
+                ))}
+                {Math.floor(userRecipe.fullTime / 60)}
+                分
+                {userRecipe.fullTime % 60}
+                秒 */}
+              </StyledLink>
+            </ContentDiv>
+          ))}
+        </ContentWrapper>
+        {userRecipeIndex <= userRecipes.length - 4
+          ? <button type="button" onClick={showNextRecipe}>下一張</button> : ''}
+      </Section>
+      <SectionWithBackground>
+        <SectionTitle>最愛食譜</SectionTitle>
+        <ContentWrapper>
+          {favoriteRecipes.map((favoriteRecipe) => (
+            <ContentDiv key={favoriteRecipe.recipeId}>
+              <StyledLink to={`/read_recipe?id=${favoriteRecipe.recipeId}`}>
+                <Img src={favoriteRecipe.mainImage} alt="食譜封面照" />
+                <ContentFirstRow>
+                  <ContentTitle>{favoriteRecipe.title}</ContentTitle>
+                  <ContentAuthor>
+                    by
+                    {' '}
+                    {favoriteRecipe.authorName}
+                  </ContentAuthor>
+                </ContentFirstRow>
+                <Stars stars={favoriteRecipe.difficulty} size={48} spacing={2} fill="#EB811F" />
+                {/* {favoriteRecipe.ingredients.map((ingredient) => (
+                  <div key={ingredient.id}>
+                    {ingredient.ingredientsTitle}
+                  </div>
+                ))}
+                {Math.floor(favoriteRecipe.fullTime / 60)}
+                分
+                {favoriteRecipe.fullTime % 60}
+                秒 */}
+              </StyledLink>
+            </ContentDiv>
+          ))}
+        </ContentWrapper>
+      </SectionWithBackground>
       <Footer />
     </>
   );
