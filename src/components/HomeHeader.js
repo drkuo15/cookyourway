@@ -16,6 +16,7 @@ const Background = styled.div`
   padding: calc(26*100vw/1920);
   position: fixed;
   top: 0;
+  z-index: 100;
 `;
 
 const LeftDiv = styled.div`
