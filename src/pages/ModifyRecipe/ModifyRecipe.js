@@ -16,7 +16,7 @@ import { ToastContainer, showCustomAlert } from '../../components/CustomAlert';
 import AuthContext from '../../components/AuthContext';
 // import Header from '../../components/Header';
 import Footer from '../../components/Footer';
-import ModifyRecipeHeader from '../../components/Header';
+import AuthHeader from '../../components/AuthHeader';
 import binImage from '../../images/bin.png';
 
 const IconImg = styled.img`
@@ -532,7 +532,7 @@ function ModifyRecipe() {
 
   return (
     <>
-      <ModifyRecipeHeader />
+      <AuthHeader />
       <Background>
         <TitleWrapper>
           <LargeDiv>食譜名稱</LargeDiv>

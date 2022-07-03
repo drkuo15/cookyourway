@@ -132,7 +132,7 @@ function HomeHeader() {
     <>
       <Background>
         <LeftDiv>
-          <ImgLink to="/">
+          <ImgLink to="/home">
             <Img src={logoImage} alt="logoImage" />
           </ImgLink>
           <Title>Cook Your Way</Title>

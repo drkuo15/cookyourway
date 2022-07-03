@@ -55,7 +55,7 @@ function App() {
             <Route path="/modify_recipe" element={<ModifyRecipe />} />
             <Route path="/read_recipe" element={<ReadRecipe />} />
             <Route path="/search_recipe" element={<SearchRecipe />} />
-            <Route path="/" element={<Home />} />
+            <Route path="/home" element={<Home />} />
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
           </Routes>

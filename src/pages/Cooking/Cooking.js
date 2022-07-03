@@ -4,7 +4,7 @@ import Counter from './Counter';
 import Player from './Music';
 import Recipe from './Recipe';
 import Footer from '../../components/Footer';
-import Header from '../../components/Header';
+import AuthHeader from '../../components/AuthHeader';
 
 const Wrapper = styled.div`
   display: flex;
@@ -55,7 +55,7 @@ function Cooking() {
 
   return (
     <div>
-      <Header />
+      <AuthHeader />
       <Wrapper>
         <LeftTimer>
           <Title>{title}</Title>

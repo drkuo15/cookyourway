@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { db } from '../../firestore';
 import Stars from '../../components/DisplayStars';
-import Header from '../../components/Header';
+import HomeHeader from '../../components/HomeHeader';
 // import Footer from '../../components/Footer';
 
 const Img = styled.img`
@@ -49,7 +49,7 @@ function SearchRecipe() {
   }, [searchName]);
   return (
     <>
-      <Header />
+      <HomeHeader />
       <input
         type="search"
         placeholder="請輸入食譜名稱"

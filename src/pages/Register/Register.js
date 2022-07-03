@@ -1,6 +1,6 @@
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { doc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../../firestore';
@@ -8,6 +8,7 @@ import CenterTopHeader from '../../components/CenterTopHeader';
 import FoodBackground from '../../components/FoodBackgroud';
 import Footer from '../../components/Footer';
 import helpImage from '../../images/help_center_FILL0_wght400_GRAD0_opsz48.svg';
+import { ToastContainer, showCustomAlert } from '../../components/CustomAlert';
 // import googleImage from '../../images/google.svg';
 // import metaImage from '../../images/meta.png';
 
@@ -146,6 +147,7 @@ const ErrorMsg = styled.p`
 `;
 
 function Register() {
+  const navigate = useNavigate();
   const [data, setData] = useState({
     name: '',
     email: '',
@@ -185,6 +187,8 @@ function Register() {
         error: null,
         loading: false,
       });
+      showCustomAlert('您已註冊成功，即將轉跳登入頁面');
+      setTimeout(() => { navigate('/login', { replace: true }); }, 4000);
     } catch (err) {
       setData({ ...data, error: err.message, loading: false });
     }
@@ -243,6 +247,7 @@ function Register() {
         </RegisterBox>
       </Wrapper>
       <FoodBackground />
+      <ToastContainer />
       <Footer />
     </section>
   );

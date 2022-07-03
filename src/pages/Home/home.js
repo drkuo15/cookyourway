@@ -7,7 +7,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { db } from '../../firestore';
 import Stars from '../../components/DisplayStars';
 import AuthContext from '../../components/AuthContext';
-import Header from '../../components/Header';
+import HomeHeader from '../../components/HomeHeader';
 import Footer from '../../components/Footer';
 
 const SearchInput = styled.input`
@@ -195,7 +195,7 @@ function Home() {
   };
   return (
     <>
-      <Header />
+      <HomeHeader />
       <SearchDiv>
         <SearchInput
           type="search"

@@ -177,7 +177,7 @@ function Login() {
         error: null,
         loading: false,
       });
-      navigate('/', { replace: true });
+      navigate('/home', { replace: true });
     } catch (err) {
       setData({ ...data, error: err.message, loading: false });
     }
