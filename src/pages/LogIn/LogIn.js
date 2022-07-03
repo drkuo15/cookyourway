@@ -165,7 +165,7 @@ function Login() {
     e.preventDefault();
     setData({ ...data, error: null, loading: true });
     if (!email || !password) {
-      setData({ ...data, error: 'All fields are required' });
+      setData({ ...data, error: '所有欄位都需要填寫呦！' });
       return;
     }
     try {
