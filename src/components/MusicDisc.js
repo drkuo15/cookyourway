@@ -37,98 +37,98 @@ const littleWiggle = keyframes`
 
 const PlayerButton = styled.div`
   position: absolute;
-  height: 20px;
-  width: 20px;
+  height: calc(1.5*20*100vw/1920);
+  width: calc(1.5*20*100vw/1920);
   background: #E5D2C0;
-  border: 3px solid #343638;
-  right: 15px;
-  bottom: 15px;
+  border: calc(1.5*3*100vw/1920) solid #343638;
+  right: calc(1.5*15*100vw/1920);
+  bottom: calc(1.5*15*100vw/1920);
   border-radius: 50%;
 `;
 
 const Player = styled.div`
-  height: 195px;
-  width: 220px;
+  height: calc(1.5*195*100vw/1920);
+  width: calc(1.5*220*100vw/1920);
   position: relative;
-  margin: 100px auto 0 auto;
+  margin: calc(48*100vw/1920) auto calc(64*100vw/1920) auto;
   background: #EB811F;
-  border: 3px solid #E5D2C0;
-  border-radius: 8px;
+  border: calc(1.5*3*100vw/1920) solid #E5D2C0;
+  border-radius: calc(1.5*8*100vw/1920);
 `;
 
 const Disc = styled.svg`
   position: absolute;
-  top: 20px;
-  left: 20px;
-  height: 150px;
-  width: 150px;
+  top: calc(1.5*20*100vw/1920);
+  left: calc(1.5*20*100vw/1920);
+  height: calc(1.5*150*100vw/1920);
+  width: calc(1.5*150*100vw/1920);
   border-radius: 50%;
   background: #343638;
-  border: 5px solid #EB811F;
-  box-shadow: 0 0 0 3px #E5D2C0;
+  border: calc(1.5*5*100vw/1920) solid #EB811F;
+  box-shadow: 0 0 0 calc(1.5*3*100vw/1920) #E5D2C0;
   animation: ${(props) => (props.isCounting ? spin : '')} 1s linear infinite;
 `;
 
 const Eye = styled.div`
   content: "";
   position: absolute;
-  height: 15px;
-  width: 15px;
+  height: calc(1.5*15*100vw/1920);
+  width: calc(1.5*15*100vw/1920);
   background: #EB811F;
   border-radius: 50%;
-  border: 3px solid #343638;
-  box-shadow: 0 0 0 15px #E5D2C0;
-  top: 88px;
-  left: 88px;
+  border: calc(1.5*3*100vw/1920) solid #343638;
+  box-shadow: 0 0 0 calc(1.5*15*100vw/1920) #E5D2C0;
+  top: calc(1.5*88*100vw/1920);
+  left: calc(1.5*88*100vw/1920);
   z-index: 5;
 `;
 
 const StylusBase = styled.div`
-  height: 20px;
-  width: 20px;
+  height: calc(1.5*20*100vw/1920);
+  width: calc(1.5*20*100vw/1920);
   background: #343638;
   position: absolute;
-  right: 20px;
-  top: 20px;
+  right: calc(1.5*20*100vw/1920);
+  top: calc(1.5*20*100vw/1920);
   border-radius: 50%;
-  border: 3px solid #EB811F;
-  box-shadow: 0 0 0 3px #343638;
+  border: calc(1.5*3*100vw/1920) solid #EB811F;
+  box-shadow: 0 0 0 calc(1.5*3*100vw/1920) #343638;
   transform: rotate(14deg);
   animation: ${(props) => (props.isCounting ? bigWiggle : '')} 500ms infinite linear;
   &:after {
     content: "";
     position: absolute;
-    top: 6px;
+    top: calc(1.5*6*100vw/1920);
     left: 50%;
-    border-radius: 3px;
-    margin-left: -3px;
-    width: 6px;
-    height: 80px;
+    border-radius: calc(1.5*3*100vw/1920);
+    margin-left: -calc(1.5*3*100vw/1920);
+    width: calc(1.5*6*100vw/1920);
+    height: calc(1.5*80*100vw/1920);
     background: #E5D2C0;
-    box-shadow: 2px 2px 10px -1px #333;
+    box-shadow: calc(1.5*2*100vw/1920) calc(1.5*2*100vw/1920) calc(1.5*10*100vw/1920) -calc(1.5*1*100vw/1920) #333;
   }
 `;
 
 const Stylus = styled.div`
   background: #E5D2C0;
-  height: 12px;
-  width: 18px;
+  height: calc(1.5*12*100vw/1920);
+  width: calc(1.5*18*100vw/1920);
   position: absolute;
-  right: 55px;
-  top: 102px;
-  border-radius: 2px;
+  right: calc(1.5*55*100vw/1920);
+  top: calc(1.5*102*100vw/1920);
+  border-radius: calc(1.5*2*100vw/1920);
   transform: rotate(-15deg);
-  box-shadow: 2px 2px 10px 0px #333;
+  box-shadow: calc(1.5*2*100vw/1920) calc(1.5*2*100vw/1920) calc(1.5*10*100vw/1920) 0px #333;
   animation: ${(props) => (props.isCounting ? littleWiggle : '')} 500ms infinite linear;
   &:after {
     content: "";
     position: absolute;
-    left: 18px;
-    height: 6px;
-    width: 8px;
-    top: 3px;
+    left: calc(1.5*18*100vw/1920);
+    height: calc(1.5*6*100vw/1920);
+    width: calc(1.5*8*100vw/1920);
+    top: calc(1.5*3*100vw/1920);
     background: #E5D2C0;
-    border-radius: 0 6px 6px 0;
+    border-radius: 0 calc(1.5*6*100vw/1920) calc(1.5*6*100vw/1920) 0;
   }
 `;
 
