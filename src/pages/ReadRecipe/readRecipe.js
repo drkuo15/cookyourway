@@ -41,10 +41,10 @@ const StepImg = styled.img`
 `;
 
 const TitleWrapper = styled(Div)`
-  width: calc(500*100vw/1920);
+  justify-content: center;
   align-items: end;
-  margin: auto;
   margin-top: calc(38*100vw/1920);
+  gap: calc(36*100vw/1920);
 `;
 
 const ExtraLargeDiv = styled.div`
@@ -152,6 +152,7 @@ const StepWrapper = styled.div`
 
 const StepTitleContentWrapper = styled.div`
   height: calc(650*100vw/1920);
+  width: calc(1400*100vw/1920);
 `;
 
 const StepTitleAndTimeDiv = styled(Div)`
@@ -162,8 +163,8 @@ const StepTitleAndTimeDiv = styled(Div)`
 
 const StepContentDiv = styled(LargeDiv)`
   font-size: calc(36*100vw/1920);
-  width: calc(800*100vw/1920);
-  height: calc(500*100vw/1920);
+  width: calc(700*100vw/1920);
+  height: calc(450*100vw/1920);
   overflow: scroll;
   display: flex;
   align-items: center;
@@ -254,6 +255,7 @@ function ReadRecipe() {
   const [authorId, setAuthorId] = useState('');
   const [fullTime, setFulltime] = useState(0);
   const location = useLocation();
+  const [loading, setLoading] = useState(true);
 
   // 當userInfo存在時，取得uid
   useEffect(() => {
@@ -281,6 +283,7 @@ function ReadRecipe() {
         setAuthorName(recipeData.authorName);
         setAuthorId(recipeData.authorId);
         setFulltime(recipeData.fullTime);
+        setLoading(false);
       },
     );
     return unsubscribe;
@@ -319,6 +322,10 @@ function ReadRecipe() {
       setMyFavorites(updatedMyFavorite);
       updateDoc(UserRef, { myFavorites: updatedMyFavorite });
     }
+  }
+
+  if (loading) {
+    return <div>Loading...</div>;
   }
 
   return (

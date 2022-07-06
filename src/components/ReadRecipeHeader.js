@@ -56,7 +56,7 @@ const ModifyRecipeButton = styled.button`
   border: 0;
   border-radius: calc(15*100vw/1920);
   font-size: calc(28*100vw/1920);
-  color: #2B2A29;
+  color: #FDFDFC;
 `;
 
 const LikeButton = styled.button`

@@ -24,6 +24,7 @@ const WrapperStep = styled.div`
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
+  width: calc(600*100vw/1920);
 `;
 
 const WrapperStepButton = styled(Wrapper)`
@@ -56,7 +57,7 @@ const StepArea = styled.div`
   &:before {
   content: "";
   position: absolute;
-  right: calc(-65*100vw/1920);
+  right: calc(-62.5*100vw/1920);
   height: 0;
   width: 0;
   border-top: calc(70*100vw/1920) solid transparent;
@@ -67,7 +68,8 @@ const StepArea = styled.div`
   &:after {
   content: "";
   position: absolute;
-  left: calc(-1*100vw/1920);
+  ${'' /* left: calc(-1*100vw/1920); */}
+  left: 0;
   height: 0;
   width: 0;
   border-top: calc(70*100vw/1920) solid transparent;

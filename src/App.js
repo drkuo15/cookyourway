@@ -16,19 +16,22 @@ import UnAuthHome from './pages/UnAuthHome/UnAuthHome';
 import Login from './pages/LogIn/LogIn';
 import { auth, db } from './firestore/index';
 import AuthContext from './components/AuthContext';
+import NoMatch from './pages/NoMatch/NoMatch';
 
 const GlobalStyle = createGlobalStyle`
   * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Roboto';
+    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI","Roboto","Oxygen","Ubuntu","Cantarell","Fira Sans","Droid Sans","Helvetica Neue",sans-serif;
     color: #2B2A29;
   }
 `;
 
 function App() {
   const [userInfo, setUserInfo] = useState('');
+  // const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -39,13 +42,20 @@ function App() {
           const docSnap = await getDoc(userRef);
           return docSnap.data();
         };
-        getUserData().then((data) => setUserInfo(data));
+        getUserData().then((data) => {
+          setUserInfo(data);
+          // setLoading(false);
+        });
       } else {
         // 清除使用者資料
         setUserInfo(user);
       }
     });
   }, []);
+
+  // if (loading) {
+  //   return <div>Loading...</div>;
+  // }
 
   return (
     <div>
@@ -60,6 +70,7 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
             <Route path="/" element={<UnAuthHome />} />
+            <Route path="*" element={<NoMatch />} />
           </Routes>
         </Router>
         <GlobalStyle />

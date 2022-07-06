@@ -45,7 +45,7 @@ const SearchDiv = styled.div`
 const SectionWithBackground = styled.div`
   width: 100vw;
   height: calc(850*100vw/1920);
-  background-color: #F7EFE7;
+  ${'' /* background-color: #F7EFE7; */}
   position: relative;
 `;
 
@@ -56,8 +56,18 @@ const Section = styled.div`
 `;
 
 const SectionTitle = styled.div`
-  font-size: calc(76*100vw/1920);
-  padding: calc(40*100vw/1920) 0 calc(45*100vw/1920) calc(158*100vw/1920);
+  font-size: calc(48*100vw/1920);
+  padding: calc(40*100vw/1920) 0 calc(40*100vw/1920) calc(129*100vw/1920);
+  position: relative;
+  &:after{
+    content: "";
+    position: absolute;
+    bottom: -20px;
+    left: 20px;
+    width: 60px;
+    height: 6px;
+    background-color: #fec740;
+  }
 `;
 
 const ContentWrapper = styled.div`
@@ -69,7 +79,7 @@ const ContentWrapper = styled.div`
 const ContentDiv = styled.div`
   display: flex;
   justify-content: space-around;
-  width: calc(520*100vw/1920);
+  width: calc(500*100vw/1920);
   height: calc(600*100vw/1920);
   background-color: #E5D2C0;
   border-radius: calc(15*100vw/1920);
@@ -78,31 +88,48 @@ const ContentDiv = styled.div`
 const StyledLink = styled(Link)`
   text-decoration: none;
   color: inherit;
-  display: flex;
+  ${'' /* display: flex;
   flex-direction: column;
-  justify-content: space-evenly;
-  align-items: center;
+  align-items: center; */}
 `;
 
 const Img = styled.img`
-  width: calc(492*100vw/1920);
-  max-height: calc(369*100vw/1920);
+  width: calc(500*100vw/1920);
+  ${'' /* max-height: calc(369*100vw/1920); */}
+  height: calc(350*100vw/1920);
   border-radius: calc(15*100vw/1920);
+  transform: scale(1,1);
+  transition: 1s;
+  &:hover {
+    transform: scale(1.1,1.1);
+  }
+`;
+
+const ImgDiv = styled.div`
+  width: calc(500*100vw/1920);
+  height: calc(350*100vw/1920);
+  overflow: hidden;
 `;
 
 const ContentFirstRow = styled.div`
-  width: calc(520*100vw/1920);
+  width: 100%;
   display: flex;
+  flex-direction: column;
   justify-content: space-around;
   align-items: baseline;
+  padding: calc(15*100vw/1920);
 `;
 
 const ContentTitle = styled.div`
   font-size: calc(48*100vw/1920);
+  font-weight: 700;
 `;
 
 const ContentAuthor = styled.div`
   font-size: calc(28*100vw/1920);
+  margin-top: calc(20*100vw/1920);
+  margin-left: calc(4*100vw/1920);
+  margin-bottom: calc(20*100vw/1920);
 `;
 
 const PrevArrowImage = styled.img`
@@ -139,6 +166,33 @@ const DefaultText = styled.div`
   align-items: center;
 `;
 
+const RightArrow = styled.button`
+    position: absolute;
+    outline: 0;
+    transition: all .2s;
+    border-radius: 35px;
+    border: 0;
+    background: rgba(0,0,0,.5);
+    width: calc(75*100vw/1920);
+    height: calc(75*100vw/1920);
+    bottom: calc(300*100vw/1920);
+    opacity: 1;
+    cursor: pointer;
+    &:hover{
+      background-color: #EB811F;
+    }
+    ${'' /* &:before{
+    font-size: 20px;
+    color: #fff;
+    display: block;
+    font-family: revicons;
+    text-align: center;
+    z-index: 2;
+    position: relative;
+    content: "";
+    } */}
+`;
+
 function AuthHome() {
   const userInfo = useContext(AuthContext);
   const [userId, setUserId] = useState('');
@@ -152,6 +206,7 @@ function AuthHome() {
   const [favoriteRecipeIndex, setFavoriteRecipeIndex] = useState(0);
   const [searchName, setSearchName] = useState('');
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
 
   // 當userInfo存在時，取得uid
   useEffect(() => {
@@ -214,6 +269,7 @@ function AuthHome() {
       );
       const filterRecipeArray = queryRecipeArray.filter((recipe) => recipe.authorId !== userId);
       setRecommendRecipes(filterRecipeArray);
+      setLoading(false);
     });
   }, [averageDifficulty, userId]);
 
@@ -268,6 +324,10 @@ function AuthHome() {
     setFavoriteRecipeIndex((prev) => prev - 1);
   };
 
+  if (loading) {
+    return <div>loading...</div>;
+  }
+
   return (
     <>
       <HomeHeader />
@@ -289,20 +349,24 @@ function AuthHome() {
         {recommendRecipeIndex >= 1
           ? <PrevArrowImage src={leftImage} alt="leftImage" onClick={showRecommendPrevRecipe} />
           : <PrevArrowDiv />}
+        <RightArrow />
         <ContentWrapper>
           {recommendRecipes.slice(recommendRecipeIndex, recommendRecipeIndex + 3)
             .map((recommendRecipe) => (
               <ContentDiv key={recommendRecipe.recipeId}>
                 <StyledLink to={`/read_recipe?id=${recommendRecipe.recipeId}`}>
-                  <Img src={recommendRecipe.mainImage} alt="食譜封面照" />
+                  <ImgDiv>
+                    <Img src={recommendRecipe.mainImage} alt="食譜封面照" />
+                  </ImgDiv>
                   <ContentFirstRow>
                     <ContentTitle>{recommendRecipe.title}</ContentTitle>
                     <ContentAuthor>
                       by
+                      {' '}
                       {recommendRecipe.authorName}
                     </ContentAuthor>
+                    <Stars stars={recommendRecipe.difficulty} size={40} spacing={2} fill="#BE0028" />
                   </ContentFirstRow>
-                  <Stars stars={recommendRecipe.difficulty} size={48} spacing={2} fill="#EB811F" />
                 </StyledLink>
               </ContentDiv>
             ))}
@@ -321,7 +385,9 @@ function AuthHome() {
             .map((userRecipe) => (
               <ContentDiv key={userRecipe.recipeId}>
                 <StyledLink to={`/read_recipe?id=${userRecipe.recipeId}`}>
-                  <Img src={userRecipe.mainImage} alt="食譜封面照" />
+                  <ImgDiv>
+                    <Img src={userRecipe.mainImage} alt="食譜封面照" />
+                  </ImgDiv>
                   <ContentFirstRow>
                     <ContentTitle>{userRecipe.title}</ContentTitle>
                     <ContentAuthor>
@@ -329,8 +395,8 @@ function AuthHome() {
                       {' '}
                       {userRecipe.authorName}
                     </ContentAuthor>
+                    <Stars stars={userRecipe.difficulty} size={40} spacing={2} fill="#BE0028" />
                   </ContentFirstRow>
-                  <Stars stars={userRecipe.difficulty} size={48} spacing={2} fill="#EB811F" />
                 </StyledLink>
               </ContentDiv>
             ))
@@ -351,7 +417,9 @@ function AuthHome() {
             .map((favoriteRecipe) => (
               <ContentDiv key={favoriteRecipe.recipeId}>
                 <StyledLink to={`/read_recipe?id=${favoriteRecipe.recipeId}`}>
-                  <Img src={favoriteRecipe.mainImage} alt="食譜封面照" />
+                  <ImgDiv>
+                    <Img src={favoriteRecipe.mainImage} alt="食譜封面照" />
+                  </ImgDiv>
                   <ContentFirstRow>
                     <ContentTitle>{favoriteRecipe.title}</ContentTitle>
                     <ContentAuthor>
@@ -359,8 +427,8 @@ function AuthHome() {
                       {' '}
                       {favoriteRecipe.authorName}
                     </ContentAuthor>
+                    <Stars stars={favoriteRecipe.difficulty} size={40} spacing={2} fill="#BE0028" />
                   </ContentFirstRow>
-                  <Stars stars={favoriteRecipe.difficulty} size={48} spacing={2} fill="#EB811F" />
                 </StyledLink>
               </ContentDiv>
             )) : <DefaultText>尚未收藏任何食譜</DefaultText>}

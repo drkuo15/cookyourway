@@ -138,7 +138,7 @@ const AllIngredientsDiv = styled.div`
   flex-direction: column;
   justify-content: start;
   gap: calc(10*100vw/1920);
-  margin-top: calc(15*100vw/1920);
+  padding-top: calc(15*100vw/1920);
   font-size: calc(36*100vw/1920);
   flex-grow: 1;
   overflow-y: auto;
@@ -175,7 +175,6 @@ const DeleteButton = styled.button`
   background-color: transparent;
   cursor: pointer;
   border: 0;
-  padding-top: calc(18 * 100vw / 1920);
 `;
 
 const IconImg = styled.img`
@@ -365,13 +364,13 @@ const CommentTextArea = styled(TextArea)`
   height: calc(150*100vw/1920);
 `;
 
-const BottonSaveDiv = styled.div`
+const ButtonSaveDiv = styled.div`
   display: flex;
   justify-content: center;
   margin-bottom: calc(50*100vw/1920);
 `;
 
-const BottonSaveButton = styled.button`
+const ButtonSaveButton = styled.button`
   width: calc(300*100vw/1920);
   height: calc(68*100vw/1920);
   font-size: calc(36*100vw/1920);
@@ -429,7 +428,7 @@ function MotionLine() {
 
 function AlwaysScrollToBottom({ ingredients }) {
   const elementRef = useRef();
-  useEffect(() => elementRef.current.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'end' }), [ingredients]);
+  useEffect(() => elementRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'end' }), [ingredients]);
   return <div ref={elementRef} />;
 }
 
@@ -466,7 +465,7 @@ function ModifyRecipe() {
   const userName = userInfo.name;
   // const [userName, setUserName] = useState('');
   // const [userId, setUserId] = useState('');
-  const fullTime = steps.reduce((accValue, step) => accValue + step.stepTime, 0);
+  const fullTime = steps.reduce((accValue, step) => accValue + Number(step.stepTime), 0);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -544,6 +543,14 @@ function ModifyRecipe() {
       return ingredientObjTemp;
     });
 
+    const parsedSteps = [...steps];
+    parsedSteps.forEach((stepObject) => {
+      const stepObjTemp = stepObject;
+      stepObjTemp.stepMinute = Number(stepObjTemp.stepMinute);
+      stepObjTemp.stepSecond = Number(stepObjTemp.stepSecond);
+      stepObjTemp.stepTime = Number(stepObjTemp.stepTime);
+    });
+
     const newRecipeData = {
       recipeId: docId,
       createTime: new Date(),
@@ -597,6 +604,14 @@ function ModifyRecipe() {
       const ingredientObjTemp = ingredientObj;
       ingredientObjTemp.ingredientsQuantity = Number(ingredientObj.ingredientsQuantity);
       return ingredientObjTemp;
+    });
+
+    const parsedSteps = [...steps];
+    parsedSteps.forEach((stepObject) => {
+      const stepObjTemp = stepObject;
+      stepObjTemp.stepMinute = Number(stepObjTemp.stepMinute);
+      stepObjTemp.stepSecond = Number(stepObjTemp.stepSecond);
+      stepObjTemp.stepTime = Number(stepObjTemp.stepTime);
     });
 
     const newRecipeData = {
@@ -687,28 +702,14 @@ function ModifyRecipe() {
 
   function updateStepMinuteValue(e, index) {
     const newSteps = [...steps];
-    const input = Number(e.target.value);
-    if (Number.isNaN(input)) {
-      newSteps[index].stepMinute = 0;
-      newSteps[index].stepTime = newSteps[index].stepMinute * 60 + newSteps[index].stepSecond;
-      setSteps(newSteps);
-      return;
-    }
-    newSteps[index].stepMinute = Number(e.target.value);
+    newSteps[index].stepMinute = e.target.value;
     newSteps[index].stepTime = newSteps[index].stepMinute * 60 + newSteps[index].stepSecond;
     setSteps(newSteps);
   }
 
   function updateStepSecondValue(e, index) {
     const newSteps = [...steps];
-    const input = Number(e.target.value);
-    if (Number.isNaN(input)) {
-      newSteps[index].stepSecond = 0;
-      newSteps[index].stepTime = newSteps[index].stepMinute * 60 + newSteps[index].stepSecond;
-      setSteps(newSteps);
-      return;
-    }
-    newSteps[index].stepSecond = Number(e.target.value);
+    newSteps[index].stepSecond = e.target.value;
     newSteps[index].stepTime = newSteps[index].stepMinute * 60 + newSteps[index].stepSecond;
     setSteps(newSteps);
   }
@@ -831,7 +832,8 @@ function ModifyRecipe() {
                       onChange={(e) => { updateQuantityValue(e, index); }}
                       placeholder="0"
                       type="number"
-                      step="0.01"
+                      step="0.1"
+                      min="0"
                     />
                     <Div>公克</Div>
                   </Quantity>
@@ -876,6 +878,7 @@ function ModifyRecipe() {
                       onChange={(e) => { updateStepMinuteValue(e, index); }}
                       placeholder="0"
                       type="number"
+                      min="0"
                     />
                     <LargeDiv>分</LargeDiv>
                     <TimeInput
@@ -883,6 +886,7 @@ function ModifyRecipe() {
                       onChange={(e) => { updateStepSecondValue(e, index); }}
                       placeholder="0"
                       type="number"
+                      min="0"
                     />
                     <LargeDiv>秒</LargeDiv>
                   </StepTimeDiv>
@@ -926,9 +930,9 @@ function ModifyRecipe() {
             />
           </CommentContentDiv>
         </CommentDiv>
-        <BottonSaveDiv>
-          <BottonSaveButton type="button" onClick={() => { submitData(); }}>儲存食譜</BottonSaveButton>
-        </BottonSaveDiv>
+        <ButtonSaveDiv>
+          <ButtonSaveButton type="button" onClick={() => { submitData(); }}>儲存食譜</ButtonSaveButton>
+        </ButtonSaveDiv>
         <RightSaveButton onClick={() => { submitData(); }}>儲存食譜</RightSaveButton>
         <ToastContainer />
       </Background>
@@ -938,7 +942,7 @@ function ModifyRecipe() {
 }
 
 AlwaysScrollToBottom.propTypes = {
-  ingredients: PropTypes.arrayOf.isRequired,
+  ingredients: PropTypes.arrayOf(PropTypes.objectOf).isRequired,
 };
 
 export default ModifyRecipe;

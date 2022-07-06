@@ -70,7 +70,6 @@ const ＭanualSignIn = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: space-around;
-  font-size: calc(28*100vw/1920);
   height: calc(320*100vw/1920);
 `;
 
@@ -82,6 +81,7 @@ const ManualInput = styled.input`
   border: 0;
   color: #2B2A29;
   background-color: #FDFDFC;
+  font-size: calc(28*100vw/1920);
 `;
 
 const LoginButton = styled.div`
@@ -148,7 +148,9 @@ const ErrorMsg = styled.p`
 function Login() {
   const [data, setData] = useState({
     email: '',
+    // email: '123@gmail.com',
     password: '',
+    // password: 123456,
     error: null,
     loading: false,
   });
@@ -168,19 +170,18 @@ function Login() {
       setData({ ...data, error: '所有欄位都需要填寫呦！' });
       return;
     }
-    try {
-      setPersistence(auth, browserSessionPersistence)
-        .then(() => signInWithEmailAndPassword(auth, email, password));
-      setData({
-        email: '',
-        password: '',
-        error: null,
-        loading: false,
-      });
-      navigate('/home', { replace: true });
-    } catch (err) {
-      setData({ ...data, error: err.message, loading: false });
-    }
+    setPersistence(auth, browserSessionPersistence)
+      .then(() => signInWithEmailAndPassword(auth, email, password))
+      .then(() => {
+        setData({
+          email: '',
+          password: '',
+          error: null,
+          loading: false,
+        });
+        navigate('/home', { replace: true });
+      })
+      .catch((err) => { setData({ ...data, error: err.message, loading: false }); });
   };
   return (
     <section>

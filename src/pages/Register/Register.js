@@ -71,7 +71,6 @@ const ＭanualRegister = styled.div`
   align-items: center;
   justify-content: space-around;
   ${'' /* gap: calc(28*100vw/1920); */}
-  font-size: calc(28*100vw/1920);
   height: calc(400*100vw/1920);
 `;
 
@@ -83,6 +82,7 @@ const ManualInput = styled.input`
   border: 0;
   color: #2B2A29;
   background-color: #FDFDFC;
+  font-size: calc(28*100vw/1920);
 `;
 
 const RegisterButton = styled.div`
