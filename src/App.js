@@ -1,4 +1,3 @@
-import './App.css';
 import {
   Routes, Route, BrowserRouter as Router,
 } from 'react-router-dom';
@@ -24,7 +23,6 @@ const GlobalStyle = createGlobalStyle`
     padding: 0;
     box-sizing: border-box;
     font-family: -apple-system,BlinkMacSystemFont,"Segoe UI","Roboto","Oxygen","Ubuntu","Cantarell","Fira Sans","Droid Sans","Helvetica Neue",sans-serif;
-    color: #2B2A29;
   }
 `;
 

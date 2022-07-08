@@ -1,8 +1,10 @@
-import { useState, useEffect, useContext } from 'react';
+import {
+  useState, useEffect, useContext, useRef,
+} from 'react';
 import {
   collection, query, where, getDocs, onSnapshot, doc,
 } from 'firebase/firestore';
-import styled from 'styled-components';
+import styled from 'styled-components/macro';
 import { Link, useNavigate } from 'react-router-dom';
 import { db } from '../../firestore';
 import Stars from '../../components/DisplayStars';
@@ -10,8 +12,17 @@ import AuthContext from '../../components/AuthContext';
 import HomeHeader from '../../components/HomeHeader';
 import Footer from '../../components/Footer';
 import searchImage from '../../images/search_FILL0_wght400_GRAD0_opsz48.svg';
-import leftImage from '../../images/chevron_left_FILL0_wght400_GRAD0_opsz48.svg';
-import rightImage from '../../images/chevron_right_FILL0_wght400_GRAD0_opsz48.svg';
+import Loading from '../../components/Loading';
+import nextIcon from '../../images/next.png';
+import beforeIcon from '../../images/before.png';
+import mandarin from '../../images/fruits/mandarin.jpg';
+import pineapple from '../../images/fruits/pineapple.jpg';
+import strawberry from '../../images/fruits/strawberry.jpg';
+import blueberry from '../../images/fruits/blueberry.jpg';
+
+const Background = styled.div`
+  padding-bottom: calc(80*100vw/1920);
+`;
 
 const SearchInput = styled.input`
   width: calc(1282*100vw/1920);
@@ -44,35 +55,37 @@ const SearchDiv = styled.div`
 
 const SectionWithBackground = styled.div`
   width: 100vw;
-  height: calc(850*100vw/1920);
+  ${'' /* height: calc(850*100vw/1920); */}
   ${'' /* background-color: #F7EFE7; */}
   position: relative;
 `;
 
 const Section = styled.div`
   width: 100vw;
-  height: calc(850*100vw/1920);
+  ${'' /* height: calc(850*100vw/1920); */}
   position: relative;
 `;
 
 const SectionTitle = styled.div`
-  font-size: calc(48*100vw/1920);
-  padding: calc(40*100vw/1920) 0 calc(40*100vw/1920) calc(129*100vw/1920);
+  font-size: calc(40*100vw/1920);
+  padding: calc(80*100vw/1920) 0 calc(40*100vw/1920) calc(129*100vw/1920);
   position: relative;
-  &:after{
+  font-weight: 400;
+  ${'' /* &:after{
     content: "";
     position: absolute;
     bottom: -20px;
     left: 20px;
     width: 60px;
     height: 6px;
-    background-color: #fec740;
-  }
+    background-color:  #fec740;
+    opacity: 0.5;
+  } */}
 `;
 
 const ContentWrapper = styled.div`
   display: flex;
-  gap: calc(51*100vw/1920);
+  gap: calc(81*100vw/1920);
   padding: 0 calc(129*100vw/1920);
 `;
 
@@ -121,8 +134,8 @@ const ContentFirstRow = styled.div`
 `;
 
 const ContentTitle = styled.div`
-  font-size: calc(48*100vw/1920);
-  font-weight: 700;
+  font-size: calc(36*100vw/1920);
+  font-weight: 600;
 `;
 
 const ContentAuthor = styled.div`
@@ -130,31 +143,6 @@ const ContentAuthor = styled.div`
   margin-top: calc(20*100vw/1920);
   margin-left: calc(4*100vw/1920);
   margin-bottom: calc(20*100vw/1920);
-`;
-
-const PrevArrowImage = styled.img`
-  width: calc(143*100vw/1920);
-  height: calc(143*100vw/1920);
-  display: inline-block;
-  position: absolute;
-  bottom: calc(300*100vw/1920);
-  cursor: pointer;
-`;
-
-const PrevArrowDiv = styled.div`
-  width: calc(143*100vw/1920);
-  height: calc(143*100vw/1920);
-  display: inline-block;
-  position: absolute;
-  bottom: calc(300*100vw/1920);
-`;
-
-const NextArrowImage = styled(PrevArrowImage)`
-  right: 0;
-`;
-
-const NextArrowDiv = styled(PrevArrowDiv)`
-  right: 0;
 `;
 
 const DefaultText = styled.div`
@@ -166,31 +154,93 @@ const DefaultText = styled.div`
   align-items: center;
 `;
 
-const RightArrow = styled.button`
+const LeftArrow = styled.button`
+    display: flex;
+    align-items: center;
+    justify-content: center;
     position: absolute;
     outline: 0;
     transition: all .2s;
     border-radius: 35px;
     border: 0;
     background: rgba(0,0,0,.5);
+    ${'' /* background: #E5D2C080; */}
     width: calc(75*100vw/1920);
     height: calc(75*100vw/1920);
-    bottom: calc(300*100vw/1920);
+    bottom: calc(350*100vw/1920);
+    left: calc(80*100vw/1920);
     opacity: 1;
     cursor: pointer;
+    z-index: 100;
+    box-shadow: 0px 0px 3px #fdfdfc;
     &:hover{
       background-color: #EB811F;
     }
-    ${'' /* &:before{
-    font-size: 20px;
-    color: #fff;
-    display: block;
-    font-family: revicons;
-    text-align: center;
-    z-index: 2;
+`;
+
+const RightArrow = styled(LeftArrow)`
+    right: calc(80*100vw/1920);
+    left: auto;
+`;
+
+const ArrowIcon = styled.img`
+  width: calc(40*100vw/1920);
+  height: calc(40*100vw/1920);
+`;
+
+const StarRow = styled.div`
+  font-size: calc(20*100vw/1920);
+  color: #808080;
+`;
+
+const Selections = styled.div`
+  display: flex;
+  gap: calc(81*100vw/1920);
+  padding: 0 calc(129*100vw/1920);
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  grid-column-gap: 20px;
+  grid-row-gap: 20px;
+`;
+
+const Selective = styled.div`
+    height: 150px;
+    background-color: #e4e6e9;
+    background-position: 50%;
+    background-repeat: no-repeat;
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
     position: relative;
+    cursor: pointer;
+    background-image: url(${(props) => (props.mainImage)})
+
+`;
+
+const SelectiveContext = styled.div`
+  color: #fff;
+  font-size: 2em;
+  font-weight: 500;
+  letter-spacing: 2px;
+  z-index: 100;
+  &::after{
     content: "";
-    } */}
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,.403921568627451);
+    position: absolute;
+    border-radius: 5px;
+    top: 0;
+    left: 0;
+    transition: all .2s;
+  }
+  &:hover{
+    &::after{
+      background-color: rgba(0,0,0,.06274509803921569);
+    }
+  }
 `;
 
 function AuthHome() {
@@ -204,9 +254,16 @@ function AuthHome() {
   const [myFavorites, setMyFavorites] = useState([]);
   const [favoriteRecipes, setFavoriteRecipes] = useState([]);
   const [favoriteRecipeIndex, setFavoriteRecipeIndex] = useState(0);
+  const [allRecipes, setAllRecipes] = useState([]);
+  const [allRecipeIndex, setAllRecipeIndex] = useState(0);
   const [searchName, setSearchName] = useState('');
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+
+  const allRef = useRef(null);
+  const recommendRef = useRef(null);
+  const userRef = useRef(null);
+  const favoriteRef = useRef(null);
 
   // 當userInfo存在時，取得uid
   useEffect(() => {
@@ -216,6 +273,20 @@ function AuthHome() {
       setUserId('');
     }
   }, [userInfo]);
+
+  // 抓出所有食譜
+  useEffect(() => {
+    const recipeRef = collection(db, 'recipes');
+    let queryDataArray = [];
+    getDocs(recipeRef).then((querySnapshot) => {
+      querySnapshot.forEach(
+        (document) => {
+          queryDataArray = [...queryDataArray, document.data()];
+        },
+      );
+      setAllRecipes(queryDataArray);
+    });
+  }, [userId]);
 
   // 抓出我的食譜
   useEffect(() => {
@@ -324,119 +395,191 @@ function AuthHome() {
     setFavoriteRecipeIndex((prev) => prev - 1);
   };
 
+  const showAllNextRecipe = () => {
+    setAllRecipeIndex((prev) => prev + 1);
+  };
+
+  const showAllPrevRecipe = () => {
+    setAllRecipeIndex((prev) => prev - 1);
+  };
+
+  const scrollToRef = (ref) => { ref.current.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'end' }); };
+
   if (loading) {
-    return <div>loading...</div>;
+    return (
+      <>
+        <HomeHeader />
+        <Loading />
+      </>
+    );
   }
 
   return (
     <>
       <HomeHeader />
-      <SearchDiv>
-        <SearchInput
-          type="search"
-          placeholder="請輸入食譜名稱"
-          onKeyPress={(e) => {
-            if (e.key === 'Enter') {
-              navigate({ pathname: '/search_recipe', search: `?q=${e.target.value}` });
-            }
-          }}
-          onChange={(e) => { setSearchName(e.target.value); }}
-        />
-        <SearchImg src={searchImage} alt="searchImage" onClick={() => { navigate({ pathname: '/search_recipe', search: `?q=${searchName}` }); }} />
-      </SearchDiv>
-      <SectionWithBackground>
-        <SectionTitle>推薦食譜</SectionTitle>
-        {recommendRecipeIndex >= 1
-          ? <PrevArrowImage src={leftImage} alt="leftImage" onClick={showRecommendPrevRecipe} />
-          : <PrevArrowDiv />}
-        <RightArrow />
-        <ContentWrapper>
-          {recommendRecipes.slice(recommendRecipeIndex, recommendRecipeIndex + 3)
-            .map((recommendRecipe) => (
-              <ContentDiv key={recommendRecipe.recipeId}>
-                <StyledLink to={`/read_recipe?id=${recommendRecipe.recipeId}`}>
-                  <ImgDiv>
-                    <Img src={recommendRecipe.mainImage} alt="食譜封面照" />
-                  </ImgDiv>
-                  <ContentFirstRow>
-                    <ContentTitle>{recommendRecipe.title}</ContentTitle>
-                    <ContentAuthor>
-                      by
-                      {' '}
-                      {recommendRecipe.authorName}
-                    </ContentAuthor>
-                    <Stars stars={recommendRecipe.difficulty} size={40} spacing={2} fill="#BE0028" />
-                  </ContentFirstRow>
-                </StyledLink>
-              </ContentDiv>
-            ))}
-        </ContentWrapper>
-        {recommendRecipeIndex <= recommendRecipes.length - 4
-          ? <NextArrowImage src={rightImage} alt="rightImage" onClick={showRecommendNextRecipe} />
-          : <NextArrowDiv />}
-      </SectionWithBackground>
-      <Section>
-        <SectionTitle>我的食譜</SectionTitle>
-        {userRecipeIndex >= 1
-          ? <PrevArrowImage src={leftImage} alt="leftImage" onClick={showUserPrevRecipe} />
-          : <PrevArrowDiv />}
-        <ContentWrapper>
-          {userRecipes.length !== 0 ? userRecipes.slice(userRecipeIndex, userRecipeIndex + 3)
-            .map((userRecipe) => (
-              <ContentDiv key={userRecipe.recipeId}>
-                <StyledLink to={`/read_recipe?id=${userRecipe.recipeId}`}>
-                  <ImgDiv>
-                    <Img src={userRecipe.mainImage} alt="食譜封面照" />
-                  </ImgDiv>
-                  <ContentFirstRow>
-                    <ContentTitle>{userRecipe.title}</ContentTitle>
-                    <ContentAuthor>
-                      by
-                      {' '}
-                      {userRecipe.authorName}
-                    </ContentAuthor>
-                    <Stars stars={userRecipe.difficulty} size={40} spacing={2} fill="#BE0028" />
-                  </ContentFirstRow>
-                </StyledLink>
-              </ContentDiv>
-            ))
-            : <DefaultText>尚未建立任何食譜</DefaultText>}
-        </ContentWrapper>
-        {userRecipeIndex <= userRecipes.length - 4
-          ? <NextArrowImage src={rightImage} alt="rightImage" onClick={showUserNextRecipe} />
-          : <NextArrowDiv />}
-      </Section>
-      <SectionWithBackground>
-        <SectionTitle>最愛食譜</SectionTitle>
-        {favoriteRecipeIndex >= 1
-          ? <PrevArrowImage src={leftImage} alt="leftImage" onClick={showFavoritePrevRecipe} />
-          : <PrevArrowDiv />}
-        <ContentWrapper>
-          {userRecipes.length !== 0 ? favoriteRecipes
-            .slice(favoriteRecipeIndex, favoriteRecipeIndex + 3)
-            .map((favoriteRecipe) => (
-              <ContentDiv key={favoriteRecipe.recipeId}>
-                <StyledLink to={`/read_recipe?id=${favoriteRecipe.recipeId}`}>
-                  <ImgDiv>
-                    <Img src={favoriteRecipe.mainImage} alt="食譜封面照" />
-                  </ImgDiv>
-                  <ContentFirstRow>
-                    <ContentTitle>{favoriteRecipe.title}</ContentTitle>
-                    <ContentAuthor>
-                      by
-                      {' '}
-                      {favoriteRecipe.authorName}
-                    </ContentAuthor>
-                    <Stars stars={favoriteRecipe.difficulty} size={40} spacing={2} fill="#BE0028" />
-                  </ContentFirstRow>
-                </StyledLink>
-              </ContentDiv>
-            )) : <DefaultText>尚未收藏任何食譜</DefaultText>}
-        </ContentWrapper>
-        {favoriteRecipeIndex <= favoriteRecipes.length - 4
-          ? <NextArrowImage src={rightImage} alt="rightImage" onClick={showFavoriteNextRecipe} />
-          : <NextArrowDiv />}
-      </SectionWithBackground>
+      <Background>
+        <SearchDiv>
+          <SearchInput
+            type="search"
+            placeholder="請輸入食譜名稱"
+            onKeyPress={(e) => {
+              if (e.key === 'Enter') {
+                navigate({ pathname: '/search_recipe', search: `?q=${e.target.value}` });
+              }
+            }}
+            onChange={(e) => { setSearchName(e.target.value); }}
+          />
+          <SearchImg src={searchImage} alt="searchImage" onClick={() => { navigate({ pathname: '/search_recipe', search: `?q=${searchName}` }); }} />
+        </SearchDiv>
+        <Selections>
+          <Selective onClick={() => { scrollToRef(allRef); }} mainImage={strawberry}>
+            <SelectiveContext>全部料理</SelectiveContext>
+          </Selective>
+          <Selective onClick={() => { scrollToRef(recommendRef); }} mainImage={mandarin}>
+            <SelectiveContext>推薦料理</SelectiveContext>
+          </Selective>
+          <Selective onClick={() => { scrollToRef(userRef); }} mainImage={pineapple}>
+            <SelectiveContext>我的料理</SelectiveContext>
+          </Selective>
+          <Selective onClick={() => { scrollToRef(favoriteRef); }} mainImage={blueberry}>
+            <SelectiveContext>最愛料理</SelectiveContext>
+          </Selective>
+        </Selections>
+        <Section ref={allRef}>
+          <SectionTitle>所有食譜</SectionTitle>
+          {allRecipeIndex >= 1
+            ? <LeftArrow onClick={showAllPrevRecipe}><ArrowIcon src={beforeIcon} alt="beforeNavigateIcon" /></LeftArrow>
+            : ''}
+          <ContentWrapper>
+            {allRecipes.slice(allRecipeIndex, allRecipeIndex + 3)
+              .map((allRecipe) => (
+                <ContentDiv key={allRecipe.recipeId}>
+                  <StyledLink to={`/read_recipe?id=${allRecipe.recipeId}`}>
+                    <ImgDiv>
+                      <Img src={allRecipe.mainImage} alt="食譜封面照" />
+                    </ImgDiv>
+                    <ContentFirstRow>
+                      <ContentTitle>{allRecipe.title}</ContentTitle>
+                      <ContentAuthor>
+                        by
+                        {' '}
+                        {allRecipe.authorName}
+                      </ContentAuthor>
+                      <StarRow>
+                        <Stars stars={allRecipe.difficulty} size={40} spacing={2} fill="#BE0028" />
+                        (難度)
+                      </StarRow>
+                    </ContentFirstRow>
+                  </StyledLink>
+                </ContentDiv>
+              ))}
+          </ContentWrapper>
+          {allRecipeIndex <= allRecipes.length - 4
+            ? <RightArrow onClick={showAllNextRecipe}><ArrowIcon src={nextIcon} alt="nextIconImage" /></RightArrow>
+            : ''}
+        </Section>
+        <SectionWithBackground ref={recommendRef}>
+          <SectionTitle>推薦食譜</SectionTitle>
+          {recommendRecipeIndex >= 1
+            ? <LeftArrow onClick={showRecommendPrevRecipe}><ArrowIcon src={beforeIcon} alt="beforeNavigateIcon" /></LeftArrow>
+            : ''}
+          <ContentWrapper>
+            {recommendRecipes.slice(recommendRecipeIndex, recommendRecipeIndex + 3)
+              .map((recommendRecipe) => (
+                <ContentDiv key={recommendRecipe.recipeId}>
+                  <StyledLink to={`/read_recipe?id=${recommendRecipe.recipeId}`}>
+                    <ImgDiv>
+                      <Img src={recommendRecipe.mainImage} alt="食譜封面照" />
+                    </ImgDiv>
+                    <ContentFirstRow>
+                      <ContentTitle>{recommendRecipe.title}</ContentTitle>
+                      <ContentAuthor>
+                        by
+                        {' '}
+                        {recommendRecipe.authorName}
+                      </ContentAuthor>
+                      <StarRow>
+                        <Stars stars={recommendRecipe.difficulty} size={40} spacing={2} fill="#BE0028" />
+                        (難度)
+                      </StarRow>
+                    </ContentFirstRow>
+                  </StyledLink>
+                </ContentDiv>
+              ))}
+          </ContentWrapper>
+          {recommendRecipeIndex <= recommendRecipes.length - 4
+            ? <RightArrow onClick={showRecommendNextRecipe}><ArrowIcon src={nextIcon} alt="nextIconImage" /></RightArrow>
+            : ''}
+        </SectionWithBackground>
+        <Section ref={userRef}>
+          <SectionTitle>我的食譜</SectionTitle>
+          {userRecipeIndex >= 1
+            ? <LeftArrow onClick={showUserPrevRecipe}><ArrowIcon src={beforeIcon} alt="beforeNavigateIcon" /></LeftArrow>
+            : ''}
+          <ContentWrapper>
+            {userRecipes.length !== 0 ? userRecipes.slice(userRecipeIndex, userRecipeIndex + 3)
+              .map((userRecipe) => (
+                <ContentDiv key={userRecipe.recipeId}>
+                  <StyledLink to={`/read_recipe?id=${userRecipe.recipeId}`}>
+                    <ImgDiv>
+                      <Img src={userRecipe.mainImage} alt="食譜封面照" />
+                    </ImgDiv>
+                    <ContentFirstRow>
+                      <ContentTitle>{userRecipe.title}</ContentTitle>
+                      <ContentAuthor>
+                        by
+                        {' '}
+                        {userRecipe.authorName}
+                      </ContentAuthor>
+                      <StarRow>
+                        <Stars stars={userRecipe.difficulty} size={40} spacing={2} fill="#BE0028" />
+                        (難度)
+                      </StarRow>
+                    </ContentFirstRow>
+                  </StyledLink>
+                </ContentDiv>
+              ))
+              : <DefaultText>尚未建立任何食譜</DefaultText>}
+          </ContentWrapper>
+          {userRecipeIndex <= userRecipes.length - 4
+            ? <RightArrow onClick={showUserNextRecipe}><ArrowIcon src={nextIcon} alt="nextIconImage" /></RightArrow>
+            : ''}
+        </Section>
+        <SectionWithBackground ref={favoriteRef}>
+          <SectionTitle>最愛食譜</SectionTitle>
+          {favoriteRecipeIndex >= 1
+            ? <LeftArrow onClick={showFavoritePrevRecipe}><ArrowIcon src={beforeIcon} alt="beforeNavigateIcon" /></LeftArrow>
+            : ''}
+          <ContentWrapper>
+            {favoriteRecipes.length !== 0 ? favoriteRecipes
+              .slice(favoriteRecipeIndex, favoriteRecipeIndex + 3)
+              .map((favoriteRecipe) => (
+                <ContentDiv key={favoriteRecipe.recipeId}>
+                  <StyledLink to={`/read_recipe?id=${favoriteRecipe.recipeId}`}>
+                    <ImgDiv>
+                      <Img src={favoriteRecipe.mainImage} alt="食譜封面照" />
+                    </ImgDiv>
+                    <ContentFirstRow>
+                      <ContentTitle>{favoriteRecipe.title}</ContentTitle>
+                      <ContentAuthor>
+                        by
+                        {' '}
+                        {favoriteRecipe.authorName}
+                      </ContentAuthor>
+                      <StarRow>
+                        <Stars stars={favoriteRecipe.difficulty} size={40} spacing={2} fill="#BE0028" />
+                        (難度)
+                      </StarRow>
+                    </ContentFirstRow>
+                  </StyledLink>
+                </ContentDiv>
+              )) : <DefaultText>尚未收藏任何食譜</DefaultText>}
+          </ContentWrapper>
+          {favoriteRecipeIndex <= favoriteRecipes.length - 4
+            ? <RightArrow onClick={showFavoriteNextRecipe}><ArrowIcon src={nextIcon} alt="nextIconImage" /></RightArrow>
+            : ''}
+        </SectionWithBackground>
+      </Background>
       <Footer />
     </>
   );

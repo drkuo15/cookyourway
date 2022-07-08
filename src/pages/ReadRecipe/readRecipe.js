@@ -13,6 +13,7 @@ import AuthContext from '../../components/AuthContext';
 import Footer from '../../components/Footer';
 import ReadRecipeHeader from '../../components/ReadRecipeHeader';
 import tipImage from '../../images/tips.png';
+import Loading from '../../components/Loading';
 
 const Background = styled.div`
   padding: 0 calc(116*100vw/1920);
@@ -325,7 +326,9 @@ function ReadRecipe() {
   }
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <Loading />
+    );
   }
 
   return (

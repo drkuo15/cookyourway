@@ -23,7 +23,8 @@ const WrapperStep = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  align-items: center;
+  ${'' /* align-items: center; */}
+  gap: calc(50*100vw/1920);
   width: calc(600*100vw/1920);
 `;
 
@@ -41,6 +42,12 @@ const StepsNav = styled(Wrapper)`
   color: white;
 `;
 
+// const load = keyframes`
+//   100% {
+//       transform: translateX(-66.6666%);
+//     }
+// `;
+
 const StepArea = styled.div`
   display: block;
   position: relative;
@@ -52,8 +59,10 @@ const StepArea = styled.div`
   padding-left: calc(50*100vw/1920);
   background-color: ${(props) => (props.selected ? '#EB811F' : '#584743')};
   border-radius: calc(4*100vw/1920);
+  font-size: calc(36*100vw/1920);
   color: #FDFDFC;
-  ${'' /* overflow: scroll; */}
+  ${'' /* animation: ${load} 5s linear infinite;
+  overflow: scroll; */}
   &:before {
   content: "";
   position: absolute;
@@ -88,13 +97,16 @@ const StepDiv = styled.div`
 `;
 
 const ExpectTime = styled.div`
-  font-size: calc(48*100vw/1920);
+  font-size: calc(28*100vw/1920);
+  width: 100%;
+  text-align: end;
 `;
 
 const StepContent = styled.div`
   text-align: start;
   margin-top: calc(20*100vw/1920);
   font-size: calc(36*100vw/1920);
+  font-size: calc(40*100vw/1920);
   overflow: scroll;
 `;
 
@@ -215,14 +227,14 @@ function Recipe({
       {steps.map((step) => (
         <StepDiv key={step.stepTitle}>
           <WrapperStep>
+            <StepContent>
+              {step.stepContent}
+            </StepContent>
             <ExpectTime>
               預計時間：
               {step.stepMinute ? `${step.stepMinute}分` : ''}
               {step.stepSecond ? `${step.stepSecond}秒` : ''}
             </ExpectTime>
-            <StepContent>
-              {step.stepContent}
-            </StepContent>
           </WrapperStep>
           <Img src={step.stepImgUrl} alt="stepImage" />
         </StepDiv>

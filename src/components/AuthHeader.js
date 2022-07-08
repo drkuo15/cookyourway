@@ -65,10 +65,11 @@ const DropBtn = styled.button`
   border-radius: calc(15*100vw/1920);
   font-size: calc(28*100vw/1920);
   color: #2B2A29;
-  border: calc(3*100vw/1920)  #2B2A29 solid;
+  border: 0;
   display: flex;
   justify-content: center;
   align-items: center;
+  box-shadow: 0px 0px 3px #e0e0e0;
 `;
 
 const DropdownContentDiv = styled.div`

@@ -28,7 +28,7 @@ const LeftTimer = styled.div`
 `;
 
 const Title = styled.div`
-  font-size: calc(60*100vw/1920);
+  font-size: calc(48*100vw/1920);
   margin-bottom: calc(50*100vw/1920);
 `;
 
