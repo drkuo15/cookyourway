@@ -229,7 +229,7 @@ const SelectiveContext = styled.div`
     content: "";
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,.403921568627451);
+    background-color: rgba(0,0,0,.203921568627451);
     position: absolute;
     border-radius: 5px;
     top: 0;

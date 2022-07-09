@@ -1,11 +1,8 @@
 import React, { useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/macro';
-import { PlayCircle } from '@styled-icons/material-rounded';
+import { PlayCircle, PauseCircle, ReplayCircleFilled } from '@styled-icons/material-rounded';
 import MusicDisc from '../../components/MusicDisc';
-import pauseImg from '../../images/musicSVG/pause_FILL0_wght400_GRAD0_opsz48.svg';
-import playImg from '../../images/musicSVG/play_circle_FILL0_wght400_GRAD0_opsz48.svg';
-import replayImg from '../../images/musicSVG/replay_FILL0_wght400_GRAD0_opsz48.svg';
 
 const CounterWrapper = styled.div`
   display: flex;
@@ -33,10 +30,10 @@ const Button = styled.button`
   cursor: pointer;
 `;
 
-const Img = styled.img`
-  width: calc(65*100vw/1920);
-  height: calc(65*100vw/1920);
-`;
+// const Img = styled.img`
+//   width: calc(65*100vw/1920);
+//   height: calc(65*100vw/1920);
+// `;
 
 const Icon = styled.span`
   width: calc(65*100vw/1920);
@@ -47,7 +44,7 @@ const Icon = styled.span`
     height: calc(65*100vw/1920);
   }
   & > svg:hover {
-    color:  #EB811F;
+    color:#EB811F;
   }
 `;
 // const playlist = ['https://firebasestorage.googleapis.com/v0/b/cook-your-way.appspot.com/o/tunetank.com_5423_lazy-bones_by_vital.mp3?alt=media&token=30cb614d-0230-482a-b83c-9c82bf77022e',
@@ -107,11 +104,10 @@ function Counter({
       <ButtonDiv>
         <Button type="button" onClick={toggleCounting}>
           {/* {isCounting ? '暫停倒數' : '開始倒數'} */}
-          {isCounting ? <Img src={pauseImg} alt="Pause" /> : <Img src={playImg} alt="Play" />}
+          {isCounting ? <Icon><PauseCircle /></Icon> : <Icon><PlayCircle /></Icon>}
         </Button>
-        <Icon><PlayCircle /></Icon>
         <Time>{`${Math.floor(time / 60) > 9 ? Math.floor(time / 60) : `0${Math.floor(time / 60)}`} : ${time % 60 < 10 ? `0${time % 60}` : time % 60}`}</Time>
-        <Button type="button" onClick={resetTime}><Img src={replayImg} alt="Replay" /></Button>
+        <Button type="button" onClick={resetTime}><Icon><ReplayCircleFilled /></Icon></Button>
       </ButtonDiv>
     </CounterWrapper>
   );

@@ -1,6 +1,9 @@
 import { doc, getDoc } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
-import styled from 'styled-components';
+import styled from 'styled-components/macro';
+import {
+  West, East, OutdoorGrill, LocalDining,
+} from '@styled-icons/material-rounded';
 import PropTypes from 'prop-types';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { db } from '../../firestore';
@@ -29,7 +32,9 @@ const WrapperStep = styled.div`
 `;
 
 const WrapperStepButton = styled(Wrapper)`
-  justify-content: space-around;
+  justify-content: space-between;
+  width: calc(1250*100vw/1920);
+  margin-top: calc(50*100vw/1920);
 `;
 
 const StepsNav = styled(Wrapper)`
@@ -116,18 +121,38 @@ const Img = styled.img`
   border-radius: calc(15*100vw/1920);
 `;
 
-const Button = styled.button`
-  width: calc(250*100vw/1920);
-  height: calc(65*100vw/1920);
-  background-color: #584743;
-  border: 0;
-  border-radius: calc(15*100vw/1920);
-  color: #FDFDFC;
-  margin-top: calc(50*100vw/1920);
-  font-size: calc(28*100vw/1920);
-  cursor: pointer;
-`;
+// const Button = styled.button`
+//   width: calc(250*100vw/1920);
+//   height: calc(65*100vw/1920);
+//   background-color: #584743;
+//   border: 0;
+//   border-radius: calc(15*100vw/1920);
+//   color: #FDFDFC;
+//   margin-top: calc(50*100vw/1920);
+//   font-size: calc(28*100vw/1920);
+//   cursor: pointer;
+// `;
 
+const Icon = styled.span`
+  ${'' /* width: calc(100*100vw/1920);
+  height: calc(100*100vw/1920); */}
+  cursor: pointer;
+  font-size: calc(40*100vw/1920);
+  ${'' /* font-size: 18px; */}
+  display: flex;
+  align-items: end;
+  &:hover {
+    color:#EB811F
+  }
+  & > svg{
+    width: calc(60*100vw/1920);
+    ${'' /* width: 24px; */}
+    height: calc(60*100vw/1920);
+  }
+  & > svg:hover {
+    color:#EB811F;
+  }
+`;
 function Recipe({
   setInitialTime, stepIndex, setStepIndex, setStepsLength, setIsCounting, setTitle,
 }) {
@@ -240,12 +265,22 @@ function Recipe({
         </StepDiv>
       )).filter((_, index) => index === stepIndex)}
       <WrapperStepButton>
-        {stepIndex + 1 !== steps.length && !isPrevStep ? <Button type="button" onClick={() => { setIsCounting(true); }}>開始料理</Button> : <Button type="button" onClick={() => { handlePrevStep(); }}>上一步</Button>}
+        {stepIndex + 1 !== steps.length && !isPrevStep
+          ? (
+            <Icon onClick={() => { setIsCounting(true); }}>
+              <OutdoorGrill />
+              開始料理
+            </Icon>
+          )
+          : <Icon onClick={() => { handlePrevStep(); }}><West /></Icon>}
+        {/* <Button type="button" onClick={() => { handlePrevStep(); }}>上一步</Button>} */}
         {stepIndex + 1 === steps.length && !isNextStep ? (
-          <Button type="button" onClick={() => { handleEnding(); }}>
+          <Icon onClick={() => { handleEnding(); }}>
+            <LocalDining />
             結束料理
-          </Button>
-        ) : <Button type="button" onClick={() => { handleNextStep(); }}>下一步</Button>}
+          </Icon>
+        ) : <Icon onClick={() => { handleNextStep(); }}><East /></Icon>}
+        {/* <Button type="button" onClick={() => { handleNextStep(); }}>下一步</Button> */}
       </WrapperStepButton>
     </RecipeArea>
   );

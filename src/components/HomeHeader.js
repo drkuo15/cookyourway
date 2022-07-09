@@ -72,7 +72,6 @@ const ButtonLink = styled(Link)`
 const SignOutButton = styled.button`
   width: calc(200*100vw/1920);
   height: calc(64*100vw/1920);
-  background-color: #FDFDFC;
   background: transparent;
   cursor: pointer;
   border-radius: calc(15*100vw/1920);

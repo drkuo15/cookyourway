@@ -40,7 +40,7 @@ class StarRating extends React.Component {
           {stars.map((star) => (
             <span
               key={star}
-              style={{ cursor: 'pointer', fontSize: '3rem', color: '#EB811F' }}
+              style={{ cursor: 'pointer', fontSize: 'calc(48*100vw/1920)', color: '#BE0028' }}
               onClick={() => { this.changeRating(star); }}
               role="presentation"
               onKeyPress={this.handleKeyPress}

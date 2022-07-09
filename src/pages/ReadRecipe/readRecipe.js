@@ -1,10 +1,11 @@
 import { useState, useEffect, useContext } from 'react';
-import styled from 'styled-components';
+import styled from 'styled-components/macro';
 import { doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { Link, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { motion, useAnimation } from 'framer-motion'; // npm i react-intersection-observer framer-motion
 import { useInView } from 'react-intersection-observer';
+import { IosShare } from '@styled-icons/material-rounded';
 import { db } from '../../firestore';
 import Stars from '../../components/DisplayStars';
 import defaultImage from '../../images/upload.png';
@@ -24,9 +25,9 @@ const Div = styled.div`
   justify-content: space-between;
 `;
 
-const LogoImg = styled.img`
-  width: calc(70*100vw/1920);
-  height: calc(70*100vw/1920);
+const TipImg = styled.img`
+  width: calc(60*100vw/1920);
+  height: calc(60*100vw/1920);
 `;
 
 const Img = styled.img`
@@ -46,10 +47,13 @@ const TitleWrapper = styled(Div)`
   align-items: end;
   margin-top: calc(38*100vw/1920);
   gap: calc(36*100vw/1920);
+  margin-bottom: calc(50*100vw/1920);
+
 `;
 
 const ExtraLargeDiv = styled.div`
   font-size: calc(76*100vw/1920);
+  font-weight: 500;
 `;
 
 const LargeDiv = styled.div`
@@ -57,7 +61,7 @@ const LargeDiv = styled.div`
 `;
 
 const MediumLargeDiv = styled.div`
-  font-size: calc(36*100vw/1920);
+  font-size: calc(32*100vw/1920);
   margin: calc(20*100vw/1920);
 `;
 
@@ -68,16 +72,21 @@ const MediumDiv = styled.div`
 const ContentWrapper = styled.div`
   display: flex;
   gap: calc(88*100vw/1920);
-  margin-top: calc(60*100vw/1920);
+  align-items: center;
+  margin-bottom: calc(50*100vw/1920);
 `;
 
 const ContentDiv = styled.div`
   width: calc(800*100vw/1920);
   display: flex;
   justify-content: space-between;
+  align-items: baseline;
 `;
 
-const IngredientContentDiv = styled(ContentDiv)`
+const IngredientContentDiv = styled.div`
+  width: calc(800*100vw/1920);
+  display: flex;
+  justify-content: space-between;
   flex-direction: column;
   background-color: #E5D2C0;
   border-radius: calc(15*100vw/1920);
@@ -85,12 +94,13 @@ const IngredientContentDiv = styled(ContentDiv)`
   justify-content: start;
   width: calc(800*100vw/1920);
   height: calc(600*100vw/1920);
-  margin-bottom: calc(50*100vw/1920);
 `;
 
 const IngredientTitleDiv = styled(Div)`
   border-bottom: calc(2*100vw/1920)  #2B2A29 solid;
   padding-bottom: calc(15*100vw/1920);
+  padding-left: calc(15*100vw/1920);
+  padding-right: calc(15*100vw/1920);
 `;
 
 const AllIngredientsDiv = styled.div`
@@ -99,19 +109,6 @@ const AllIngredientsDiv = styled.div`
   justify-content: space-between;
   margin-top: calc(15*100vw/1920);
   overflow: scroll;
-`;
-
-const ExportButton = styled.div`
-  width: calc(150*100vw/1920);
-  height: calc(64*100vw/1920);
-  color: #FDFDFC;
-  background-color: #584743;
-  border-radius: calc(15*100vw/1920);
-  font-size: calc(28*100vw/1920);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
 `;
 
 const StepCircleDiv = styled.div`
@@ -166,6 +163,7 @@ const StepContentDiv = styled(LargeDiv)`
   font-size: calc(36*100vw/1920);
   width: calc(700*100vw/1920);
   height: calc(450*100vw/1920);
+  line-height: calc(50*100vw/1920);
   overflow: scroll;
   display: flex;
   align-items: center;
@@ -179,21 +177,25 @@ const StepContentAndImgDiv = styled(Div)`
 const DoItYourSelfButton = styled.button`
   position:fixed;
   right: 1.5%;
-  top: 50%;
+  top: 40%;
   white-space: normal;
   word-wrap: break-word;
   width: calc(50*100vw/1920);
-  height: calc(286*100vw/1920);
+  height: calc(200*100vw/1920);
   font-size: calc(28*100vw/1920);
-  background-color: #EB811F50;
+  background-color: #EB811F;
+  color: #FDFDFC;
   border: 0;
   border-radius: calc(15*100vw/1920);
   cursor: pointer;
+  &:hover{
+  background-color:#fa8921;
+  }
 `;
 
 const TipsDiv = styled.div`
   display: flex;
-  align-items: center;
+  align-items: end;
 `;
 
 const CommentDiv = styled.div`
@@ -209,6 +211,19 @@ const CommentContentDiv = styled.div`
   font-size: calc(36*100vw/1920);
   padding-left: calc(220*100vw/1920);
   margin-top: calc(25*100vw/1920);
+  line-height: calc(64*100vw/1920);
+`;
+
+const CommentTitleSpan = styled.span`
+  font-size: calc(36*100vw/1920);
+  font-weight: 500;
+`;
+
+const Mark = styled.mark`
+  display: inline-block;
+  line-height: 0;
+  padding-bottom: 0.5em;
+  background-color: #fec740;
 `;
 
 // https://blog.logrocket.com/react-scroll-animations-framer-motion/
@@ -242,6 +257,22 @@ function MotionLine() {
   );
 }
 
+const Icon = styled.span`
+  cursor: pointer;
+  font-size: calc(40*100vw/1920);
+  display: flex;
+  align-items: end;
+  &:hover {
+    color: #808080;
+  }
+  & > svg{
+    width: calc(50*100vw/1920);
+    height: calc(50*100vw/1920);
+  }
+  & > svg:hover {
+    color: #808080;
+  }
+`;
 function ReadRecipe() {
   const userInfo = useContext(AuthContext);
   const [userId, setUserId] = useState('');
@@ -295,11 +326,11 @@ function ReadRecipe() {
   function exportIngredients() {
     if (navigator.share) {
       navigator.share({
-        title: `${title}食材內容`,
-        text: `${title}食材內容:${copyText}`,
+        title: `【 ${title} 】 食材內容`,
+        text: `【 ${title} 】 食材內容: \n ${copyText}`,
       });
     } else {
-      navigator.clipboard.writeText(`【 ${title} 】  食材內容: \n ${copyText}`);
+      navigator.clipboard.writeText(`【 ${title} 】食材內容: \n ${copyText}`);
       navigator.clipboard.readText().then((text) => showCustomAlert(`已成功複製\n${text}`));
     }
   }
@@ -327,7 +358,17 @@ function ReadRecipe() {
 
   if (loading) {
     return (
-      <Loading />
+      <>
+        <ReadRecipeHeader
+          authorId={authorId}
+          userId={userId}
+          addToFavorites={() => { addToFavorites(); }}
+          removeFromFavorites={() => { removeFromFavorites(); }}
+          myFavorites={myFavorites}
+          currentRecipeId={currentRecipeId}
+        />
+        <Loading />
+      </>
     );
   }
 
@@ -346,13 +387,14 @@ function ReadRecipe() {
           <ExtraLargeDiv>{title}</ExtraLargeDiv>
           <MediumDiv>
             by
+            {' '}
             {authorName}
           </MediumDiv>
         </TitleWrapper>
         <ContentWrapper>
           <ContentDiv>
             <LargeDiv>難易度</LargeDiv>
-            <Stars stars={difficulty} size={48} spacing={2} fill="#EB811F" />
+            <Stars stars={difficulty} size={48} spacing={2} fill="#BE0028" />
           </ContentDiv>
           <ContentDiv>
             <LargeDiv>總時長</LargeDiv>
@@ -367,7 +409,7 @@ function ReadRecipe() {
           <IngredientContentDiv>
             <IngredientTitleDiv>
               <LargeDiv>食材</LargeDiv>
-              <ExportButton type="button" onClick={() => exportIngredients()}>匯出食材</ExportButton>
+              <Icon onClick={() => exportIngredients()}><IosShare /></Icon>
             </IngredientTitleDiv>
             <AllIngredientsDiv>
               {ingredients.map((ingredient) => (
@@ -375,6 +417,7 @@ function ReadRecipe() {
                   <MediumLargeDiv>{ingredient.ingredientsTitle}</MediumLargeDiv>
                   <MediumLargeDiv>
                     {ingredient.ingredientsQuantity}
+                    {' '}
                     公克
                   </MediumLargeDiv>
                 </Div>
@@ -409,8 +452,10 @@ function ReadRecipe() {
         ))}
         <CommentDiv>
           <TipsDiv>
-            <LogoImg src={tipImage} alt="tipImage" />
-            <LargeDiv>小秘訣</LargeDiv>
+            <TipImg src={tipImage} alt="tipImage" />
+            <CommentTitleSpan>
+              <Mark>小秘訣</Mark>
+            </CommentTitleSpan>
           </TipsDiv>
           <CommentContentDiv>
             {comment}

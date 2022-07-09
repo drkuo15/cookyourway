@@ -67,7 +67,7 @@ function Cooking() {
 
   return (
     <div>
-      <AuthHeader />
+      <AuthHeader setIsCounting={setIsCounting} />
       <Wrapper>
         <LeftTimer>
           <Title>{title}</Title>
