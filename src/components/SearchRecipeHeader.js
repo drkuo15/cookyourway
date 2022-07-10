@@ -4,6 +4,7 @@ import { signOut } from 'firebase/auth';
 import { useContext, useEffect, useState } from 'react';
 import logoImage from '../images/CookYourWay_logo_v1.png';
 import { auth } from '../firestore/index';
+import { devices } from '../utils/StyleUtils';
 import AuthContext from './AuthContext';
 import chefImage from '../images/chef.png';
 
@@ -18,27 +19,44 @@ const Background = styled.div`
   position: fixed;
   top: 0;
   z-index: 100;
+  @media ${devices.Tablet} {
+    height: calc(320*100vw/1920);
+  }
 `;
 
 const LeftDiv = styled.div`
   gap: calc(26*100vw/1920);
   display: flex;
   align-items: center;
+  @media ${devices.Tablet} {
+    gap: calc(60*100vw/1920);
+  }
 `;
 
 const RightDiv = styled(LeftDiv)`
   gap: calc(20*100vw/1920);
+  @media ${devices.Tablet} {
+    gap: calc(50*100vw/1920);
+  }
 `;
 
 const ImgLink = styled(Link)`
   width: calc(64*100vw/1920);
   height: calc(64*100vw/1920);
   display: flex;
+  @media ${devices.Tablet} {
+    width: calc(180*100vw/1920);
+    height: calc(180*100vw/1920);
+  }
 `;
 
 const Img = styled.img`
   width: calc(64*100vw/1920);
   height: calc(64*100vw/1920);
+  @media ${devices.Tablet} {
+    width: calc(180*100vw/1920);
+    height: calc(180*100vw/1920);
+  }
 `;
 
 const Title = styled.div`
@@ -46,6 +64,11 @@ const Title = styled.div`
   height: calc(64*100vw/1920);
   color: #EB811F;
   font-size: calc(48*100vw/1920);
+  @media ${devices.Tablet} {
+    width: calc(1000*100vw/1920);
+    height: calc(200*100vw/1920);
+    font-size: calc(120*100vw/1920);
+  }
 `;
 
 const CreateButton = styled.button`
@@ -60,6 +83,11 @@ const CreateButton = styled.button`
   &:hover{
   background-color:#fa8921;
   }
+  @media ${devices.Tablet} {
+    width: calc(300*100vw/1920);
+    height: calc(150*100vw/1920);
+    font-size: calc(70*100vw/1920);
+  }
 `;
 
 const ButtonLink = styled(Link)`
@@ -67,6 +95,10 @@ const ButtonLink = styled(Link)`
   height: calc(64*100vw/1920);
   display: flex;
   text-decoration: none;
+  @media ${devices.Tablet} {
+    width: calc(300*100vw/1920);
+    height: calc(150*100vw/1920);
+  }
 `;
 
 const SignOutButton = styled.button`
@@ -78,6 +110,11 @@ const SignOutButton = styled.button`
   font-size: calc(28*100vw/1920);
   color: #2B2A29;
   border: 0;
+  @media ${devices.Tablet} {
+    width: calc(300*100vw/1920);
+    height: calc(150*100vw/1920);
+    font-size: calc(70*100vw/1920);
+  }
 `;
 
 const MemberPhoto = styled.img`
@@ -90,6 +127,10 @@ const MemberPhoto = styled.img`
   align-items: center;
   box-shadow: 0px 0px 3px #e0e0e0;
   object-fit: cover;
+  @media ${devices.Tablet} {
+    width: calc(180*100vw/1920);
+    height: calc(180*100vw/1920);
+  }
 `;
 
 const MemberWord = styled.div`
@@ -105,6 +146,11 @@ const MemberWord = styled.div`
   justify-content: center;
   align-items: center;
   box-shadow: 0px 0px 3px #e0e0e0;
+  @media ${devices.Tablet} {
+    width: calc(180*100vw/1920);
+    height: calc(180*100vw/1920);
+    font-size: calc(70*100vw/1920);
+  }
 `;
 
 // const DropBtn = styled.button`
@@ -160,6 +206,9 @@ const DropdownDiv = styled.div`
 
 const Padding = styled.div`
   height: calc(116*100vw/1920);
+  @media ${devices.Tablet} {
+    height: calc(320*100vw/1920);
+  }
 `;
 
 function SignOut() {

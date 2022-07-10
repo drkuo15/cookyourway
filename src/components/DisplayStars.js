@@ -1,12 +1,13 @@
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { devices } from '../utils/StyleUtils';
 
 const StarDiv = styled.div`
   --percent: calc(var(--stars) / 5 * 100%);
   display: inline-block;
   &:before{
   content: "★★★★★";
-  font-size: var(--size);
+  font-size: calc(var(--size)*100vw/1920);
   letter-spacing: var(--spacing);
   background: linear-gradient(
     90deg,
@@ -16,6 +17,9 @@ const StarDiv = styled.div`
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   }
+  @media ${devices.Tablet} {
+    font-size: calc(var(--size)*2.5*100vw/1920);
+  }
 `;
 
 function Stars({
@@ -24,7 +28,7 @@ function Stars({
   return (
     <StarDiv style={{
       '--stars': stars,
-      '--size': `calc(${size}*100vw/1920)`,
+      '--size': size,
       '--spacing': `${spacing}px`,
       '--fill': fill,
     }}
