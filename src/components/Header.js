@@ -63,8 +63,9 @@ const Title = styled.div`
   font-size: calc(48*100vw/1920);
   @media ${devices.Tablet} {
     width: calc(1000*100vw/1920);
-    height: calc(200*100vw/1920);
+    height: calc(180*100vw/1920);
     font-size: calc(120*100vw/1920);
+    padding-top: calc(20*100vw/1920);
   }
 `;
 

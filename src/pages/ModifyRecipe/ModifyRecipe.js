@@ -541,6 +541,8 @@ function ModifyRecipe() {
       );
       return unsubscribe;
     }
+    setLoading(false);
+
     return undefined;
   }, [location]);
 
