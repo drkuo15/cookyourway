@@ -65,7 +65,7 @@ const LoginBox = styled.div`
 //   background-color: #B3B3AC;
 // `;
 
-const ＭanualSignIn = styled.div`
+const ManualSignIn = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -78,10 +78,15 @@ const ManualInput = styled.input`
   height: calc(72*100vw/1920);
   text-align: center;
   border-radius: calc(15*100vw/1920);
-  border: 0;
   color: #2B2A29;
   background-color: #FDFDFC;
   font-size: calc(28*100vw/1920);
+  outline :0;
+  border: calc(2.5*100vw/1920) solid #B3B3AC;
+  padding: calc(2*100vw/1920) calc(8*100vw/1920);
+  &:focus {
+    border-color: #EB811F;
+  }
 `;
 
 const LoginButton = styled.div`
@@ -96,6 +101,9 @@ const LoginButton = styled.div`
   border-radius: calc(15*100vw/1920);
   cursor: pointer;
   z-index: 10;
+  &:hover{
+  background-color:#fa8921;
+  }
 `;
 
 const VerticalLine = styled.div`
@@ -105,25 +113,22 @@ const VerticalLine = styled.div`
   opacity: 0.5;
 `;
 
-const Question = styled.div`
+const Question = styled(Link)`
   display: flex;
   flex-direction: column;
   align-items: center;
   font-size: calc(48*100vw/1920);
   cursor: help;
   opacity: 0.3;
+  z-index: 10;
+  text-decoration: none;
+  color: inherit;
   &:hover {opacity: 1;};
 `;
 
 const HelpImg = styled.img`
   width: calc(384*100vw/1920);
   height: calc(384*100vw/1920);
-`;
-
-const ButtonLink = styled(Link)`
-  text-decoration: none;
-  color: inherit;
-  z-index: 10;
 `;
 
 const RegisterButton = styled.div`
@@ -138,6 +143,7 @@ const RegisterButton = styled.div`
   border-radius: calc(15*100vw/1920);
   cursor: pointer;
   z-index: 10;
+  &:hover {background-color: #4c3732;}
 `;
 
 const ErrorMsg = styled.p`
@@ -147,10 +153,10 @@ const ErrorMsg = styled.p`
 
 function Login() {
   const [data, setData] = useState({
-    email: '',
-    // email: '123@gmail.com',
-    password: '',
-    // password: 123456,
+    // email: '',
+    email: '123@gmail.com',
+    // password: '',
+    password: 123456,
     error: null,
     loading: false,
   });
@@ -199,7 +205,7 @@ function Login() {
             </SSOSignIn>
           </SSOs>
           <HorizontalLine /> */}
-          <ＭanualSignIn>
+          <ManualSignIn>
             <ManualInput
               type="text"
               name="email"
@@ -218,15 +224,13 @@ function Login() {
               {loading ? '登入中...' : '登入'}
             </LoginButton>
             {error && <ErrorMsg>{error}</ErrorMsg>}
-          </ＭanualSignIn>
+          </ManualSignIn>
         </LoginBox>
         <VerticalLine />
-        <Question>
+        <Question to="/register">
           還沒註冊過嗎？
-          <HelpImg src={helpImage} alt="" />
-          <ButtonLink to="/register">
-            <RegisterButton>註冊</RegisterButton>
-          </ButtonLink>
+          <HelpImg src={helpImage} alt="helpImage" />
+          <RegisterButton>註冊</RegisterButton>
         </Question>
       </Wrapper>
       <FoodBackground />

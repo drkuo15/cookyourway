@@ -39,10 +39,8 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  ${'' /* align-items: flex-start; */}
   width: calc(804*100vw/1920);
   height: calc(890*100vw/1920)
-  ${'' /* gap: calc(95*100vw/1920); */}
 `;
 
 const Floating = keyframes`
@@ -62,7 +60,6 @@ const RegisterBox = styled.div`
   width: calc(804*100vw/1920);
   height: calc(572*100vw/1920);
   border-radius: calc(15*100vw/1920);
-  ${'' /* gap: calc(28*100vw/1920); */}
   position: relative; 
   z-index: 10;
   overflow: hidden;
@@ -85,12 +82,11 @@ const RegisterBox = styled.div`
   }
 `;
 
-const ＭanualRegister = styled.div`
+const ManualRegister = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-around;
-  ${'' /* gap: calc(28*100vw/1920); */}
   height: calc(400*100vw/1920);
 `;
 
@@ -123,6 +119,9 @@ const RegisterButton = styled.div`
   border-radius: calc(15*100vw/1920);
   cursor: pointer;
   z-index: 10;
+  &:hover{
+  background-color:#fa8921;
+  }
 `;
 
 const ErrorMsg = styled.p`
@@ -202,7 +201,7 @@ function UnAuthHome() {
             </SSORegister>
           </SSOs>
           <HorizontalLine /> */}
-            <ＭanualRegister>
+            <ManualRegister>
               <ManualInput
                 type="text"
                 name="name"
@@ -228,7 +227,7 @@ function UnAuthHome() {
                 {loading ? '帳號註冊中...' : '註冊'}
               </RegisterButton>
               {error && <ErrorMsg>{error}</ErrorMsg>}
-            </ＭanualRegister>
+            </ManualRegister>
           </RegisterBox>
         </Wrapper>
       </Background>
