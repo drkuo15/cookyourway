@@ -13,7 +13,9 @@ import music4 from '../../music/music4.mp3';
 const Wrapper = styled.div`
   display: flex;
   justify-content: space-around;
-  align-items: center;
+  align-items: flex-start;
+  margin-top: calc(60*100vw/1920);
+  margin-bottom: calc(60*100vw/1920);
 `;
 
 const LeftTimer = styled.div`
@@ -22,7 +24,7 @@ const LeftTimer = styled.div`
   justify-content: center;
   align-items: center;
   width: calc(500*100vw/1920);
-  height: calc(830*100vw/1920);
+  height: calc(730*100vw/1920);
   background-color: #E5D2C0;
   border-radius: calc(15*100vw/1920);
 `;

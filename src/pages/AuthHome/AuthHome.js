@@ -22,6 +22,7 @@ import blueberry from '../../images/fruits/blueberry.jpg';
 
 const Background = styled.div`
   padding-bottom: calc(80*100vw/1920);
+  color: #2B2A29;
 `;
 
 const SearchInput = styled.input`
@@ -81,6 +82,13 @@ const SectionTitle = styled.div`
     background-color:  #fec740;
     opacity: 0.5;
   } */}
+`;
+
+const Mark = styled.mark`
+  display: inline-block;
+  line-height: 0;
+  padding-bottom: 0.5em;
+  background-color: #fec74099;
 `;
 
 const ContentWrapper = styled.div`
@@ -446,7 +454,9 @@ function AuthHome() {
           </Selective>
         </Selections>
         <Section ref={allRef}>
-          <SectionTitle>所有食譜</SectionTitle>
+          <SectionTitle>
+            <Mark>所有料理</Mark>
+          </SectionTitle>
           {allRecipeIndex >= 1
             ? <LeftArrow onClick={showAllPrevRecipe}><ArrowIcon src={beforeIcon} alt="beforeNavigateIcon" /></LeftArrow>
             : ''}
@@ -479,7 +489,9 @@ function AuthHome() {
             : ''}
         </Section>
         <SectionWithBackground ref={recommendRef}>
-          <SectionTitle>推薦食譜</SectionTitle>
+          <SectionTitle>
+            <Mark>推薦料理</Mark>
+          </SectionTitle>
           {recommendRecipeIndex >= 1
             ? <LeftArrow onClick={showRecommendPrevRecipe}><ArrowIcon src={beforeIcon} alt="beforeNavigateIcon" /></LeftArrow>
             : ''}
@@ -512,7 +524,9 @@ function AuthHome() {
             : ''}
         </SectionWithBackground>
         <Section ref={userRef}>
-          <SectionTitle>我的食譜</SectionTitle>
+          <SectionTitle>
+            <Mark>我的料理</Mark>
+          </SectionTitle>
           {userRecipeIndex >= 1
             ? <LeftArrow onClick={showUserPrevRecipe}><ArrowIcon src={beforeIcon} alt="beforeNavigateIcon" /></LeftArrow>
             : ''}
@@ -546,7 +560,9 @@ function AuthHome() {
             : ''}
         </Section>
         <SectionWithBackground ref={favoriteRef}>
-          <SectionTitle>最愛食譜</SectionTitle>
+          <SectionTitle>
+            <Mark>最愛料理</Mark>
+          </SectionTitle>
           {favoriteRecipeIndex >= 1
             ? <LeftArrow onClick={showFavoritePrevRecipe}><ArrowIcon src={beforeIcon} alt="beforeNavigateIcon" /></LeftArrow>
             : ''}

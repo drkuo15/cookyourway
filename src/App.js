@@ -28,7 +28,6 @@ const GlobalStyle = createGlobalStyle`
 
 function App() {
   const [userInfo, setUserInfo] = useState('');
-  // const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
@@ -42,7 +41,6 @@ function App() {
         };
         getUserData().then((data) => {
           setUserInfo(data);
-          // setLoading(false);
         });
       } else {
         // 清除使用者資料
@@ -50,10 +48,6 @@ function App() {
       }
     });
   }, []);
-
-  // if (loading) {
-  //   return <div>Loading...</div>;
-  // }
 
   return (
     <div>
