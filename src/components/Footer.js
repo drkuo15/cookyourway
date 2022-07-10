@@ -15,7 +15,7 @@ const Background = styled.div`
 function Footer() {
   return (
     <Background>
-      Copyright © 2022 David Kuo All rights reserved.
+      Copyright © 2022 Cook Your Way All rights reserved.
     </Background>
 
   );

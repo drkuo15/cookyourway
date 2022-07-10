@@ -46,18 +46,24 @@ const Title = styled.div`
 `;
 
 const DropBtn = styled.button`
-  width: calc(200*100vw/1920);
+  width: calc(150*100vw/1920);
   height: calc(64*100vw/1920);
-  background-color: #FDFDFC;
+  background-color: transparent;
   cursor: pointer;
   border-radius: calc(15*100vw/1920);
   font-size: calc(28*100vw/1920);
+  font-weight: 500;
   color: #2B2A29;
-  border: calc(3*100vw/1920)  #2B2A29 solid;
+  border: 0;
+  border-bottom: calc(5*100vw/1920) #EB811F solid;
   display: flex;
   justify-content: center;
   align-items: center;
-  &:hover {background-color: #584743; color: #FDFDFC;}
+  &:hover { 
+    box-shadow: 0 2px 2px -2px #EB811F ;
+    color: #000000;
+  }
+
 `;
 
 const Padding = styled.div`
