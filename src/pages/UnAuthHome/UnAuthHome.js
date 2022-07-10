@@ -4,9 +4,9 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { doc, setDoc } from 'firebase/firestore';
 import mainImage from '../../images/healthy.jpg';
-import Footer from '../../components/Footer';
 import Header from '../../components/Header';
 import { auth, db } from '../../firestore';
+import { devices } from '../../utils/StyleUtils';
 import { ToastContainer, showCustomAlert } from '../../components/CustomAlert';
 import backgroundImg from '../../images/BG.svg';
 
@@ -15,6 +15,10 @@ const Background = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  @media ${devices.Tablet} {
+    flex-direction: column;
+    margin-top: calc(75*100vw/1920);
+  }
 `;
 
 const HomeImage = styled.img`
@@ -22,25 +26,39 @@ const HomeImage = styled.img`
   height: calc(890*100vw/1920);
   border-radius: calc(15*100vw/1920);
   object-fit: cover;
+  @media ${devices.Tablet} {
+    width: calc(1650*100vw/1920);
+    height: calc(1912*100vw/1920);
+    flex-direction: column;
+  }
 `;
 
 const Title = styled.div`
   font-size: calc(76*100vw/1920);
   font-weight: 500;
+  @media ${devices.Tablet} {
+    font-size: calc(190*100vw/1920);
+  }
 `;
 
 const SubTitle = styled.div`
   font-size: calc(40*100vw/1920);
   letter-spacing: calc(3*100vw/1920);
-
+  @media ${devices.Tablet} {
+    font-size: calc(100*100vw/1920);
+  }
 `;
 
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: space-around;
   width: calc(804*100vw/1920);
-  height: calc(890*100vw/1920)
+  height: calc(890*100vw/1920);
+  @media ${devices.Tablet} {
+    width: calc(1650*100vw/1920);
+    height: calc(1912*100vw/1920);
+  }
 `;
 
 const Floating = keyframes`
@@ -80,6 +98,14 @@ const RegisterBox = styled.div`
     animation-iteration-count: infinite;
     animation-timing-function: ease-in-out;
   }
+  @media ${devices.Tablet} {
+    width: calc(1650*100vw/1920);
+    height: calc(1144*100vw/1920);
+    &::before {
+      width: calc(1650*100vw/1920);
+      height: calc(1144*100vw/1920);
+    }
+  }
 `;
 
 const ManualRegister = styled.div`
@@ -88,6 +114,9 @@ const ManualRegister = styled.div`
   align-items: center;
   justify-content: space-around;
   height: calc(400*100vw/1920);
+  @media ${devices.Tablet} {
+    height: calc(800*100vw/1920);
+  }
 `;
 
 const ManualInput = styled.input`
@@ -104,6 +133,11 @@ const ManualInput = styled.input`
   padding: calc(2*100vw/1920) calc(8*100vw/1920);
   &:focus {
     border-color: #EB811F;
+  }
+  @media ${devices.Tablet} {
+    width: calc(1120*100vw/1920);
+    height: calc(144*100vw/1920);
+    font-size: calc(70*100vw/1920);
   }
 `;
 
@@ -122,11 +156,20 @@ const RegisterButton = styled.div`
   &:hover{
   background-color:#fa8921;
   }
+  @media ${devices.Tablet} {
+    width: calc(664*100vw/1920);
+    height: calc(144*100vw/1920);
+    line-height: calc(144*100vw/1920);
+    font-size: calc(70*100vw/1920);
+  }
 `;
 
 const ErrorMsg = styled.p`
   font-size: calc(24*100vw/1920);
   color: red;
+  @media ${devices.Tablet} {
+    font-size: calc(60*100vw/1920);
+  }
 `;
 
 function UnAuthHome() {
@@ -232,7 +275,6 @@ function UnAuthHome() {
         </Wrapper>
       </Background>
       <ToastContainer />
-      <Footer />
     </>
   );
 }

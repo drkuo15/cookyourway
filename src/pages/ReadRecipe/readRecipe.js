@@ -11,7 +11,6 @@ import Stars from '../../components/DisplayStars';
 import defaultImage from '../../images/upload.png';
 import { ToastContainer, showCustomAlert } from '../../components/CustomAlert';
 import AuthContext from '../../components/AuthContext';
-import Footer from '../../components/Footer';
 import ReadRecipeHeader from '../../components/ReadRecipeHeader';
 import tipImage from '../../images/tips.png';
 import Loading from '../../components/Loading';
@@ -466,7 +465,6 @@ function ReadRecipe() {
         </Link>
         <ToastContainer />
       </Background>
-      <Footer />
     </>
   );
 }

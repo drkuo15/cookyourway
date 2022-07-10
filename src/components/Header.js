@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import { devices } from '../utils/StyleUtils';
 import logoImage from '../images/CookYourWay_logo_v1.png';
 
 const Background = styled.div`
@@ -12,21 +13,34 @@ const Background = styled.div`
   padding: calc(26*100vw/1920);
   position: fixed;
   top: 0;
+  @media ${devices.Tablet} {
+    height: calc(320*100vw/1920);
+  }
 `;
 
 const LeftDiv = styled.div`
   gap: calc(26*100vw/1920);
   display: flex;
   align-items: center;
+  @media ${devices.Tablet} {
+    gap: calc(60*100vw/1920);
+  }
 `;
 
 const RightDiv = styled(LeftDiv)`
   gap: calc(20*100vw/1920);
+  @media ${devices.Tablet} {
+    gap: calc(50*100vw/1920);
+  }
 `;
 
 const ImgLink = styled(Link)`
   width: calc(64*100vw/1920);
   height: calc(64*100vw/1920);
+  @media ${devices.Tablet} {
+    width: calc(180*100vw/1920);
+    height: calc(180*100vw/1920);
+  }
 `;
 
 const StyledLink = styled(Link)`
@@ -36,6 +50,10 @@ const StyledLink = styled(Link)`
 const Img = styled.img`
   width: calc(64*100vw/1920);
   height: calc(64*100vw/1920);
+  @media ${devices.Tablet} {
+    width: calc(180*100vw/1920);
+    height: calc(180*100vw/1920);
+  }
 `;
 
 const Title = styled.div`
@@ -43,6 +61,11 @@ const Title = styled.div`
   height: calc(64*100vw/1920);
   color: #EB811F;
   font-size: calc(48*100vw/1920);
+  @media ${devices.Tablet} {
+    width: calc(1000*100vw/1920);
+    height: calc(200*100vw/1920);
+    font-size: calc(120*100vw/1920);
+  }
 `;
 
 const DropBtn = styled.button`
@@ -63,11 +86,18 @@ const DropBtn = styled.button`
     box-shadow: 0 2px 2px -2px #EB811F ;
     color: #000000;
   }
-
+  @media ${devices.Tablet} {
+    width: calc(200*100vw/1920);
+    height: calc(150*100vw/1920);
+    font-size: calc(70*100vw/1920);
+  }
 `;
 
 const Padding = styled.div`
   height: calc(116*100vw/1920);
+  @media ${devices.Tablet} {
+    height: calc(320*100vw/1920);
+  }
 `;
 
 function Header() {

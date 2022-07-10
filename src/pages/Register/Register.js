@@ -6,7 +6,6 @@ import { doc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../../firestore';
 import CenterTopHeader from '../../components/CenterTopHeader';
 import FoodBackground from '../../components/FoodBackgroud';
-import Footer from '../../components/Footer';
 import helpImage from '../../images/help_center_FILL0_wght400_GRAD0_opsz48.svg';
 import { ToastContainer, showCustomAlert } from '../../components/CustomAlert';
 // import googleImage from '../../images/google.svg';
@@ -249,7 +248,6 @@ function Register() {
       </Wrapper>
       <FoodBackground />
       <ToastContainer />
-      <Footer />
     </section>
   );
 }

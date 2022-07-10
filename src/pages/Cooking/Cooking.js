@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import Counter from './Counter';
 import Player from './Music';
 import Recipe from './Recipe';
-import Footer from '../../components/Footer';
 import AuthHeader from '../../components/AuthHeader';
 import music1 from '../../music/music1.mp3';
 import music2 from '../../music/music2.mp3';
@@ -111,7 +110,6 @@ function Cooking() {
           setTitle={setTitle}
         />
       </Wrapper>
-      <Footer />
     </div>
   );
 }

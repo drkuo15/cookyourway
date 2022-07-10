@@ -5,13 +5,11 @@ import {
   collection, query, where, getDocs, onSnapshot, doc,
 } from 'firebase/firestore';
 import styled from 'styled-components/macro';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { db } from '../../firestore';
 import Stars from '../../components/DisplayStars';
 import AuthContext from '../../components/AuthContext';
-import HomeHeader from '../../components/HomeHeader';
-import Footer from '../../components/Footer';
-import searchImage from '../../images/search_FILL0_wght400_GRAD0_opsz48.svg';
+import AuthHomeHeader from '../../components/AuthHomeHeader';
 import Loading from '../../components/Loading';
 import nextIcon from '../../images/next.png';
 import beforeIcon from '../../images/before.png';
@@ -25,34 +23,34 @@ const Background = styled.div`
   color: #2B2A29;
 `;
 
-const SearchInput = styled.input`
-  width: calc(1282*100vw/1920);
-  height: calc(64*100vw/1920);
-  border: calc(1*100vw/1920) #2B2A29 solid;
-  border-radius: calc(15*100vw/1920);
-  font-size: calc(28*100vw/1920);
-  text-align: center;
-  &::-webkit-search-decoration,
-  &::-webkit-search-cancel-button,
-  &::-webkit-search-results-button,
-  &::-webkit-search-results-decoration { display: none; }
-`;
+// const SearchInput = styled.input`
+//   width: calc(1282*100vw/1920);
+//   height: calc(64*100vw/1920);
+//   border: calc(1*100vw/1920) #2B2A29 solid;
+//   border-radius: calc(15*100vw/1920);
+//   font-size: calc(28*100vw/1920);
+//   text-align: center;
+//   &::-webkit-search-decoration,
+//   &::-webkit-search-cancel-button,
+//   &::-webkit-search-results-button,
+//   &::-webkit-search-results-decoration { display: none; }
+// `;
 
-const SearchImg = styled.img`
-  width: calc(58*100vw/1920);
-  height: calc(58*100vw/1920);
-  position: absolute;
-  right: calc(330*100vw/1920);
-  cursor: pointer;
-`;
+// const SearchImg = styled.img`
+//   width: calc(58*100vw/1920);
+//   height: calc(58*100vw/1920);
+//   position: absolute;
+//   right: calc(330*100vw/1920);
+//   cursor: pointer;
+// `;
 
-const SearchDiv = styled.div`
-  display: flex;
-  justify-content: center;
-  margin-top: calc(48*100vw/1920);
-  margin-bottom: calc(68*100vw/1920);
-  position: relative;
-`;
+// const SearchDiv = styled.div`
+//   display: flex;
+//   justify-content: center;
+//   margin-top: calc(48*100vw/1920);
+//   margin-bottom: calc(68*100vw/1920);
+//   position: relative;
+// `;
 
 const SectionWithBackground = styled.div`
   width: 100vw;
@@ -72,16 +70,6 @@ const SectionTitle = styled.div`
   padding: calc(80*100vw/1920) 0 calc(40*100vw/1920) calc(129*100vw/1920);
   position: relative;
   font-weight: 400;
-  ${'' /* &:after{
-    content: "";
-    position: absolute;
-    bottom: -20px;
-    left: 20px;
-    width: 60px;
-    height: 6px;
-    background-color:  #fec740;
-    opacity: 0.5;
-  } */}
 `;
 
 const Mark = styled.mark`
@@ -109,14 +97,10 @@ const ContentDiv = styled.div`
 const StyledLink = styled(Link)`
   text-decoration: none;
   color: inherit;
-  ${'' /* display: flex;
-  flex-direction: column;
-  align-items: center; */}
 `;
 
 const Img = styled.img`
   width: calc(500*100vw/1920);
-  ${'' /* max-height: calc(369*100vw/1920); */}
   height: calc(350*100vw/1920);
   border-radius: calc(15*100vw/1920);
   transform: scale(1,1);
@@ -172,7 +156,6 @@ const LeftArrow = styled.button`
     border-radius: 35px;
     border: 0;
     background: rgba(0,0,0,.5);
-    ${'' /* background: #E5D2C080; */}
     width: calc(75*100vw/1920);
     height: calc(75*100vw/1920);
     bottom: calc(350*100vw/1920);
@@ -209,6 +192,7 @@ const Selections = styled.div`
   grid-template-columns: repeat(2,1fr);
   grid-column-gap: 20px;
   grid-row-gap: 20px;
+  margin-top: calc(60*100vw/1920);
 `;
 
 const Selective = styled.div`
@@ -264,8 +248,6 @@ function AuthHome() {
   const [favoriteRecipeIndex, setFavoriteRecipeIndex] = useState(0);
   const [allRecipes, setAllRecipes] = useState([]);
   const [allRecipeIndex, setAllRecipeIndex] = useState(0);
-  const [searchName, setSearchName] = useState('');
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
 
   const allRef = useRef(null);
@@ -416,7 +398,7 @@ function AuthHome() {
   if (loading) {
     return (
       <>
-        <HomeHeader />
+        <AuthHomeHeader />
         <Loading />
       </>
     );
@@ -424,21 +406,8 @@ function AuthHome() {
 
   return (
     <>
-      <HomeHeader />
+      <AuthHomeHeader />
       <Background>
-        <SearchDiv>
-          <SearchInput
-            type="search"
-            placeholder="請輸入食譜名稱"
-            onKeyPress={(e) => {
-              if (e.key === 'Enter') {
-                navigate({ pathname: '/search_recipe', search: `?q=${e.target.value}` });
-              }
-            }}
-            onChange={(e) => { setSearchName(e.target.value); }}
-          />
-          <SearchImg src={searchImage} alt="searchImage" onClick={() => { navigate({ pathname: '/search_recipe', search: `?q=${searchName}` }); }} />
-        </SearchDiv>
         <Selections>
           <Selective onClick={() => { scrollToRef(allRef); }} mainImage={strawberry}>
             <SelectiveContext>全部料理</SelectiveContext>
@@ -455,7 +424,7 @@ function AuthHome() {
         </Selections>
         <Section ref={allRef}>
           <SectionTitle>
-            <Mark>所有料理</Mark>
+            <Mark>全部料理</Mark>
           </SectionTitle>
           {allRecipeIndex >= 1
             ? <LeftArrow onClick={showAllPrevRecipe}><ArrowIcon src={beforeIcon} alt="beforeNavigateIcon" /></LeftArrow>
@@ -596,7 +565,6 @@ function AuthHome() {
             : ''}
         </SectionWithBackground>
       </Background>
-      <Footer />
     </>
   );
 }

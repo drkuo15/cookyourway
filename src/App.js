@@ -4,7 +4,7 @@ import {
 import { useEffect, useState } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
-import { createGlobalStyle } from 'styled-components';
+import styled, { createGlobalStyle } from 'styled-components';
 import Cooking from './pages/Cooking';
 import ModifyRecipe from './pages/ModifyRecipe/ModifyRecipe';
 import ReadRecipe from './pages/ReadRecipe/readRecipe';
@@ -16,6 +16,7 @@ import Login from './pages/LogIn/LogIn';
 import { auth, db } from './firestore/index';
 import AuthContext from './components/AuthContext';
 import NoMatch from './pages/NoMatch/NoMatch';
+import Footer from './components/Footer';
 
 const GlobalStyle = createGlobalStyle`
   * {
@@ -24,6 +25,10 @@ const GlobalStyle = createGlobalStyle`
     box-sizing: border-box;
     font-family: -apple-system,BlinkMacSystemFont,"Segoe UI","Roboto","Oxygen","Ubuntu","Cantarell","Fira Sans","Droid Sans","Helvetica Neue",sans-serif;
   }
+`;
+
+const BodyDiv = styled.div`
+  min-height: calc(100vh - 7.5vh);
 `;
 
 function App() {
@@ -50,24 +55,27 @@ function App() {
   }, []);
 
   return (
-    <div>
-      <AuthContext.Provider value={userInfo}>
-        <Router>
-          <Routes>
-            <Route path="/cooking" element={<Cooking />} />
-            <Route path="/modify_recipe" element={<ModifyRecipe />} />
-            <Route path="/read_recipe" element={<ReadRecipe />} />
-            <Route path="/search_recipe" element={<SearchRecipe />} />
-            <Route path="/home" element={<AuthHome />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/" element={<UnAuthHome />} />
-            <Route path="*" element={<NoMatch />} />
-          </Routes>
-        </Router>
-        <GlobalStyle />
-      </AuthContext.Provider>
-    </div>
+    <>
+      <BodyDiv>
+        <AuthContext.Provider value={userInfo}>
+          <Router>
+            <Routes>
+              <Route path="/cooking" element={<Cooking />} />
+              <Route path="/modify_recipe" element={<ModifyRecipe />} />
+              <Route path="/read_recipe" element={<ReadRecipe />} />
+              <Route path="/search_recipe" element={<SearchRecipe />} />
+              <Route path="/home" element={<AuthHome />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/" element={<UnAuthHome />} />
+              <Route path="*" element={<NoMatch />} />
+            </Routes>
+          </Router>
+          <GlobalStyle />
+        </AuthContext.Provider>
+      </BodyDiv>
+      <Footer />
+    </>
   );
 }
 

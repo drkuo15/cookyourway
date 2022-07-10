@@ -7,7 +7,6 @@ import styled from 'styled-components';
 import { auth } from '../../firestore/index';
 import CenterTopHeader from '../../components/CenterTopHeader';
 import FoodBackground from '../../components/FoodBackgroud';
-import Footer from '../../components/Footer';
 import helpImage from '../../images/help_center_FILL0_wght400_GRAD0_opsz48.svg';
 // import googleImage from '../../images/google.svg';
 // import metaImage from '../../images/meta.png';
@@ -234,7 +233,6 @@ function Login() {
         </Question>
       </Wrapper>
       <FoodBackground />
-      <Footer />
     </section>
   );
 }

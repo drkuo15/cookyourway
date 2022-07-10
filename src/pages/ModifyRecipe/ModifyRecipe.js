@@ -19,7 +19,6 @@ import defaultImage from '../../images/upload.png';
 import StarRating from '../../components/Stars';
 import { ToastContainer, showCustomAlert } from '../../components/CustomAlert';
 import AuthContext from '../../components/AuthContext';
-import Footer from '../../components/Footer';
 import AuthHeader from '../../components/AuthHeader';
 import binImage from '../../images/bin.png';
 import tipImage from '../../images/tips.png';
@@ -975,7 +974,6 @@ function ModifyRecipe() {
         <RightSaveButton onClick={() => { submitData(); }}>儲存食譜</RightSaveButton>
         <ToastContainer />
       </Background>
-      <Footer />
     </>
   );
 }

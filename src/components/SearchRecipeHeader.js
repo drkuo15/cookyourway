@@ -173,7 +173,6 @@ function SignOut() {
 
   return (
     <SignOutButton type="button" onClick={() => handleSignOut()}>登出</SignOutButton>
-
   );
 }
 
