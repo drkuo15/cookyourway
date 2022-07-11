@@ -272,10 +272,12 @@ const Icon = styled.span`
     color: #808080;
   }
 `;
-function ReadRecipe() {
+function ReadRecipe({ setUserInfo }) {
   const userInfo = useContext(AuthContext);
-  const [userId, setUserId] = useState('');
-  const [myFavorites, setMyFavorites] = useState([]);
+  const userId = userInfo?.uid || '';
+  const myFavorites = userInfo?.myFavorites || [];
+  // const [userId, setUserId] = useState('');
+  // const [myFavorites, setMyFavorites] = useState([]);
   const [title, setTitle] = useState('');
   const [difficulty, setDifficulty] = useState(1);
   const [ingredients, setIngredients] = useState([]);
@@ -288,16 +290,22 @@ function ReadRecipe() {
   const location = useLocation();
   const [loading, setLoading] = useState(true);
 
+  const setMyFavorites = (newMyFavorites) => {
+    setUserInfo({ ...userInfo, myFavorites: newMyFavorites });
+  };
+
   // 當userInfo存在時，取得uid
-  useEffect(() => {
-    if (userInfo) {
-      setUserId(userInfo.uid);
-      setMyFavorites(userInfo.myFavorites);
-    } else {
-      setUserId('');
-      setMyFavorites([]);
-    }
-  }, [userInfo]);
+  // useEffect(() => {
+  //   if (userInfo) {
+  //     setUserId(userInfo.uid);
+  //     if (myFavorites.length === 0) {
+  //       setMyFavorites(userInfo.myFavorites);
+  //     }
+  //     return;
+  //   }
+  //   setUserId('');
+  //   setMyFavorites([]);
+  // }, [userInfo, myFavorites.length]);
 
   const currentRecipeId = location.search.split('=')[1];
   useEffect(() => {
@@ -468,6 +476,10 @@ function ReadRecipe() {
     </>
   );
 }
+
+ReadRecipe.propTypes = {
+  setUserInfo: PropTypes.func.isRequired,
+};
 
 Stars.propTypes = {
   stars: PropTypes.number.isRequired,

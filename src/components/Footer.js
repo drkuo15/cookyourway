@@ -4,7 +4,6 @@ import { devices } from '../utils/StyleUtils';
 const Background = styled.div`
   width: 100vw;
   height: 7.5vh;
-  margin-top: -calc(116*100vw/1920);
   background-color: #343638;
   color: #FDFDFC;
   font-size: calc(20*100vw/1920);

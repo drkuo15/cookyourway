@@ -18,7 +18,7 @@ const StarDiv = styled.div`
   -webkit-text-fill-color: transparent;
   }
   @media ${devices.Tablet} {
-    font-size: calc(var(--size)*2.5*100vw/1920);
+    &:before{font-size: calc(var(--size)*1.8*100vw/1920)};
   }
 `;
 

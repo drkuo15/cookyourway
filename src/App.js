@@ -33,7 +33,12 @@ const BodyDiv = styled.div`
 
 function App() {
   const [userInfo, setUserInfo] = useState('');
+  // const [userId, setUserId] = useState('');
+  // const [userFavorites, setUserFavorites] = useState([]);
+  // // 再將資料傳入Context;
+  // const userInformation = [userId, userFavorites];
 
+  // onAuthStateChange 只會管理登入登出，與userId相關，應該只用來管理uid
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -54,6 +59,30 @@ function App() {
     });
   }, []);
 
+  // useEffect(() => {
+  //   onAuthStateChanged(auth, (user) => {
+  //     if (user) {
+  //       // 取得uid，再利用uid設定userId
+  //       const { uid } = user;
+  //       setUserId(uid);
+  //     }
+  //   });
+  // }, []);
+
+  // // 至於資料的更新應該用onSnapShot，當使用者登入，取得uid之後，
+  // useEffect(() => {
+  //   if (!userId) return undefined;
+  //   // onSnapshot(userDoc=> setUserData(newData));
+  //   const unsubscribe = onSnapshot(
+  //     doc(db, 'users', userId),
+  //     (document) => {
+  //       const userData = document.data();
+  //       setUserFavorites(userData.myFavorites);
+  //     },
+  //   );
+  //   return unsubscribe;
+  // }, [userId]);
+
   return (
     <>
       <BodyDiv>
@@ -62,7 +91,7 @@ function App() {
             <Routes>
               <Route path="/cooking" element={<Cooking />} />
               <Route path="/modify_recipe" element={<ModifyRecipe />} />
-              <Route path="/read_recipe" element={<ReadRecipe />} />
+              <Route path="/read_recipe" element={<ReadRecipe setUserInfo={setUserInfo} />} />
               <Route path="/search_recipe" element={<SearchRecipe />} />
               <Route path="/home" element={<AuthHome />} />
               <Route path="/register" element={<Register />} />

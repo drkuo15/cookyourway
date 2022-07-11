@@ -11,7 +11,7 @@ import { ToastContainer, showCustomAlert } from '../../components/CustomAlert';
 import backgroundImg from '../../images/BG.svg';
 
 const Background = styled.div`
-  padding: calc(44*100vw/1920) calc(116*100vw/1920) calc(29*100vw/1920) calc(116*100vw/1920);
+  padding: calc(44*100vw/1920) calc(116*100vw/1920) calc(44*100vw/1920) calc(116*100vw/1920);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -52,7 +52,7 @@ const SubTitle = styled.div`
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
+  justify-content: space-between;
   width: calc(804*100vw/1920);
   height: calc(890*100vw/1920);
   @media ${devices.Tablet} {

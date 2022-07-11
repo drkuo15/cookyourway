@@ -42,6 +42,7 @@ const Icon = styled.span`
   & > svg{
     width: calc(65*100vw/1920);
     height: calc(65*100vw/1920);
+    color: #2B2A29;
   }
   & > svg:hover {
     color:#EB811F;
