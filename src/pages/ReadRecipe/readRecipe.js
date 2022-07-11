@@ -294,9 +294,11 @@ const CommentContentDiv = styled.div`
   padding-left: calc(220*100vw/1920);
   margin-top: calc(25*100vw/1920);
   line-height: calc(64*100vw/1920);
+  overflow: auto;
   @media ${devices.Tablet} {
-    margin-top: calc(90*100vw/1920);
+    margin-top: calc(60*100vw/1920);
     font-size: calc(72*100vw/1920);
+    line-height: calc(100*100vw/1920);
   }
 `;
 
