@@ -7,6 +7,7 @@ import { motion, useAnimation } from 'framer-motion'; // npm i react-intersectio
 import { useInView } from 'react-intersection-observer';
 import { IosShare } from '@styled-icons/material-rounded';
 import { db } from '../../firestore';
+import { devices } from '../../utils/StyleUtils';
 import Stars from '../../components/DisplayStars';
 import defaultImage from '../../images/upload.png';
 import { ToastContainer, showCustomAlert } from '../../components/CustomAlert';
@@ -27,18 +28,30 @@ const Div = styled.div`
 const TipImg = styled.img`
   width: calc(60*100vw/1920);
   height: calc(60*100vw/1920);
+  @media ${devices.Tablet} {
+    width: calc(90*100vw/1920);
+    height: calc(90*100vw/1920);
+  }
 `;
 
 const Img = styled.img`
   width: calc(800*100vw/1920);
   height: calc(600*100vw/1920);
-  border-radius: calc(15*100vw/1920)
+  border-radius: calc(15*100vw/1920);
+  @media ${devices.Tablet} {
+    width: calc(1600*100vw/1920);
+    height: calc(1200*100vw/1920);
+  }
 `;
 
 const StepImg = styled.img`
   width: calc(600*100vw/1920);
   height: calc(450*100vw/1920);
-  border-radius: calc(15*100vw/1920)
+  border-radius: calc(15*100vw/1920);
+  @media ${devices.Tablet} {
+    width: calc(900*100vw/1920);
+    height: calc(675*100vw/1920);
+  }
 `;
 
 const TitleWrapper = styled(Div)`
@@ -47,25 +60,40 @@ const TitleWrapper = styled(Div)`
   margin-top: calc(38*100vw/1920);
   gap: calc(36*100vw/1920);
   margin-bottom: calc(50*100vw/1920);
-
+  @media ${devices.Tablet} {
+    flex-direction: column;
+    align-items: center;
+  }
 `;
 
 const ExtraLargeDiv = styled.div`
   font-size: calc(76*100vw/1920);
   font-weight: 500;
+  @media ${devices.Tablet} {
+    font-size: calc(152*100vw/1920);
+  }
 `;
 
 const LargeDiv = styled.div`
   font-size: calc(48*100vw/1920);
+  @media ${devices.Tablet} {
+    font-size: calc(96*100vw/1920);
+  }
 `;
 
 const MediumLargeDiv = styled.div`
   font-size: calc(32*100vw/1920);
   margin: calc(20*100vw/1920);
+  @media ${devices.Tablet} {
+    font-size: calc(72*100vw/1920);
+  }
 `;
 
 const MediumDiv = styled.div`
   font-size: calc(28*100vw/1920);
+  @media ${devices.Tablet} {
+    font-size: calc(56*100vw/1920);
+  }
 `;
 
 const ContentWrapper = styled.div`
@@ -73,6 +101,10 @@ const ContentWrapper = styled.div`
   gap: calc(88*100vw/1920);
   align-items: center;
   margin-bottom: calc(50*100vw/1920);
+  @media ${devices.Tablet} {
+    flex-direction: column;
+    align-items: center;
+  }
 `;
 
 const ContentDiv = styled.div`
@@ -80,6 +112,9 @@ const ContentDiv = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: baseline;
+  @media ${devices.Tablet} {
+    width: calc(1600*100vw/1920);
+  }
 `;
 
 const IngredientContentDiv = styled.div`
@@ -91,8 +126,11 @@ const IngredientContentDiv = styled.div`
   border-radius: calc(15*100vw/1920);
   padding: calc(16*100vw/1920);
   justify-content: start;
-  width: calc(800*100vw/1920);
   height: calc(600*100vw/1920);
+  @media ${devices.Tablet} {
+    width: calc(1600*100vw/1920);
+    height: calc(1200*100vw/1920);
+  }
 `;
 
 const IngredientTitleDiv = styled(Div)`
@@ -108,6 +146,9 @@ const AllIngredientsDiv = styled.div`
   justify-content: space-between;
   margin-top: calc(15*100vw/1920);
   overflow: scroll;
+  @media ${devices.Tablet} {
+    margin-top: calc(50*100vw/1920);
+  }
 `;
 
 const StepCircleDiv = styled.div`
@@ -117,6 +158,9 @@ const StepCircleDiv = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  @media ${devices.Tablet} {
+    width: calc(300*100vw/1920);
+  }
 `;
 
 const Circle = styled.div`
@@ -130,12 +174,20 @@ const Circle = styled.div`
   text-align: center;
   justify-content: center;
   align-items: center;
+  @media ${devices.Tablet} {
+    width: calc(200*100vw/1920);
+    height: calc(200*100vw/1920);
+    font-size: calc(96*100vw/1920);
+  }
 `;
 
 const Line = styled.div`
   width: calc(2.5*100vw/1920);
   height: calc(625*100vw/1920);
   background-color: #2B2A29;
+  @media ${devices.Tablet} {
+    height: calc(1000*100vw/1920);
+  }
 `;
 
 const BlankLine = styled(Line)`
@@ -145,11 +197,18 @@ const BlankLine = styled(Line)`
 const StepWrapper = styled.div`
   display: flex;
   justify-content: space-between;
+  @media ${devices.Tablet} {
+    justify-content: center;
+  }
 `;
 
 const StepTitleContentWrapper = styled.div`
   height: calc(650*100vw/1920);
   width: calc(1400*100vw/1920);
+  @media ${devices.Tablet} {
+    width: calc(1300*100vw/1920);
+    height: calc(1000*100vw/1920);
+  }
 `;
 
 const StepTitleAndTimeDiv = styled(Div)`
@@ -166,11 +225,24 @@ const StepContentDiv = styled(LargeDiv)`
   overflow: scroll;
   display: flex;
   align-items: center;
+  @media ${devices.Tablet} {
+    width: calc(1300*100vw/1920);
+    height: calc(300*100vw/1920);
+    font-size: calc(72*100vw/1920);
+    line-height: calc(100*100vw/1920);
+    overflow-y: scroll;
+    white-space: nowrap;
+  }
 `;
 
 const StepContentAndImgDiv = styled(Div)`
   align-items: center;
   margin-top: calc(36*100vw/1920);
+  @media ${devices.Tablet} {
+    margin-top: calc(5*100vw/1920);
+    flex-direction: column;
+    justify-content: center;
+  }
 `;
 
 const DoItYourSelfButton = styled.button`
@@ -190,6 +262,11 @@ const DoItYourSelfButton = styled.button`
   &:hover{
   background-color:#fa8921;
   }
+  @media ${devices.Tablet} {
+    width: calc(100*100vw/1920);
+    height: calc(400*100vw/1920);
+    font-size: calc(60*100vw/1920);
+  }
 `;
 
 const TipsDiv = styled.div`
@@ -204,6 +281,12 @@ const CommentDiv = styled.div`
   background-color: #E5D2C050;
   border-radius: calc(15*100vw/1920);
   margin-bottom: calc(90*100vw/1920);
+  @media ${devices.Tablet} {
+    padding: calc(60*100vw/1920);
+    margin-top: calc(90*100vw/1920);
+    width: 100%;
+    height: calc(600*100vw/1920);
+  }
 `;
 
 const CommentContentDiv = styled.div`
@@ -211,11 +294,18 @@ const CommentContentDiv = styled.div`
   padding-left: calc(220*100vw/1920);
   margin-top: calc(25*100vw/1920);
   line-height: calc(64*100vw/1920);
+  @media ${devices.Tablet} {
+    margin-top: calc(90*100vw/1920);
+    font-size: calc(72*100vw/1920);
+  }
 `;
 
 const CommentTitleSpan = styled.span`
   font-size: calc(36*100vw/1920);
   font-weight: 500;
+  @media ${devices.Tablet} {
+    font-size: calc(72*100vw/1920);
+  }
 `;
 
 const Mark = styled.mark`
@@ -270,6 +360,12 @@ const Icon = styled.span`
   }
   & > svg:hover {
     color: #808080;
+  }
+  @media ${devices.Tablet} {
+    & > svg{
+    width: calc(110*100vw/1920);
+    height: calc(110*100vw/1920);
+  }
   }
 `;
 function ReadRecipe({ setUserInfo }) {
