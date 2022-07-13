@@ -6,7 +6,7 @@ import {
 } from 'firebase/firestore';
 import {
   getDownloadURL, uploadBytes, ref,
-  deleteObject,
+  // deleteObject,
 } from 'firebase/storage';
 import styled from 'styled-components/macro';
 import { v4 } from 'uuid';
@@ -697,12 +697,28 @@ function ModifyRecipe() {
   const [imgUrl, setImgUrl] = useState('');
   const [authorId, setAuthorId] = useState('');
   const userInfo = useContext(AuthContext);
-  const userId = userInfo.uid;
-  const userName = userInfo.name;
+  const userId = userInfo?.uid || '';
+  const userName = userInfo?.name || '';
   const fullTime = steps.reduce((accValue, step) => accValue + Number(step.stepTime), 0);
   const navigate = useNavigate();
   const location = useLocation();
   const [loading, setLoading] = useState(true);
+  const [checkingUser, setCheckingUser] = useState(true);
+
+  // 判斷是否登入
+  // 第一次render尚未收到onAuthStateChange資料為空字串
+  // 第二次render拿到資料，若未登入是null，如果登入則可以拿到userId
+  useEffect(() => {
+    if (userInfo === '') {
+      setCheckingUser(true);
+    }
+    if (userInfo === null) {
+      navigate({ pathname: '/' });
+    }
+    if (userId) {
+      setCheckingUser(false);
+    }
+  }, [navigate, userId, userInfo]);
 
   // 取得當前食譜id的資料，放入編輯列
   useEffect(() => {
@@ -741,9 +757,9 @@ function ModifyRecipe() {
           storage,
           `recipe/${new Date().getTime()} - ${img.name}`,
         );
-        if (imgPath) {
-          await deleteObject(ref(storage, imgPath));
-        }
+        // if (imgPath) {
+        //   await deleteObject(ref(storage, imgPath));
+        // }
         const snap = await uploadBytes(imgRef, img);
         const url = await getDownloadURL(ref(storage, snap.ref.fullPath));
         setImgUrl(url);
@@ -926,14 +942,19 @@ function ModifyRecipe() {
   function updateStepMinuteValue(e, index) {
     const newSteps = [...steps];
     newSteps[index].stepMinute = e.target.value;
-    newSteps[index].stepTime = newSteps[index].stepMinute * 60 + newSteps[index].stepSecond;
+    newSteps[index].stepTime = Number(newSteps[index].stepMinute) * 60
+      + Number(newSteps[index].stepSecond);
     setSteps(newSteps);
   }
 
   function updateStepSecondValue(e, index) {
     const newSteps = [...steps];
     newSteps[index].stepSecond = e.target.value;
-    newSteps[index].stepTime = newSteps[index].stepMinute * 60 + newSteps[index].stepSecond;
+    if (Number(newSteps[index].stepSecond) > 59) {
+      newSteps[index].stepSecond = '59';
+    }
+    newSteps[index].stepTime = Number(newSteps[index].stepMinute) * 60
+      + Number(newSteps[index].stepSecond);
     setSteps(newSteps);
   }
 
@@ -955,9 +976,9 @@ function ModifyRecipe() {
         `recipeStep/${new Date().getTime()} - ${e.target.files[0].name}`,
       );
 
-      if (steps[index].stepImgPath) {
-        await deleteObject(ref(storage, steps[index].stepImgPath));
-      }
+      // if (steps[index].stepImgPath) {
+      //   await deleteObject(ref(storage, steps[index].stepImgPath));
+      // }
 
       const snap = await uploadBytes(imgRef, e.target.files[0]);
       const url = await getDownloadURL(ref(storage, snap.ref.fullPath));
@@ -990,6 +1011,15 @@ function ModifyRecipe() {
 
   function submitData() {
     decideToUpdateOrSetRecipe();
+  }
+
+  if (checkingUser) {
+    return (
+      <>
+        <AuthHeader />
+        <Loading />
+      </>
+    );
   }
 
   if (loading) {
@@ -1115,6 +1145,7 @@ function ModifyRecipe() {
                       placeholder="0"
                       type="number"
                       min="0"
+                      max="59"
                     />
                     <MediumLargeDiv>秒</MediumLargeDiv>
                   </StepTimeDiv>

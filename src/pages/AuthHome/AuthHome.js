@@ -5,7 +5,7 @@ import {
   collection, query, where, getDocs, onSnapshot, doc,
 } from 'firebase/firestore';
 import styled from 'styled-components/macro';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { db } from '../../firestore';
 import { devices } from '../../utils/StyleUtils';
 import Stars from '../../components/DisplayStars';
@@ -299,7 +299,7 @@ const SelectiveContext = styled.div`
 
 function AuthHome() {
   const userInfo = useContext(AuthContext);
-  const [userId, setUserId] = useState('');
+  const userId = userInfo?.uid || '';
   const [userRecipes, setUserRecipes] = useState([]);
   const [userRecipeIndex, setUserRecipeIndex] = useState(0);
   const [averageDifficulty, setAverageDifficulty] = useState(1);
@@ -317,14 +317,20 @@ function AuthHome() {
   const userRef = useRef(null);
   const favoriteRef = useRef(null);
 
-  // 當userInfo存在時，取得uid
+  const [checkingUser, setCheckingUser] = useState(true);
+  const navigate = useNavigate();
+
   useEffect(() => {
-    if (userInfo) {
-      setUserId(userInfo.uid);
-    } else {
-      setUserId('');
+    if (userInfo === '') {
+      setCheckingUser(true);
     }
-  }, [userInfo]);
+    if (userInfo === null) {
+      navigate({ pathname: '/' });
+    }
+    if (userId) {
+      setCheckingUser(false);
+    }
+  }, [navigate, userId, userInfo]);
 
   // 抓出所有食譜
   useEffect(() => {
@@ -456,6 +462,15 @@ function AuthHome() {
   };
 
   const scrollToRef = (ref) => { ref.current.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'end' }); };
+
+  if (checkingUser) {
+    return (
+      <>
+        <AuthHomeHeader />
+        <Loading />
+      </>
+    );
+  }
 
   if (loading) {
     return (

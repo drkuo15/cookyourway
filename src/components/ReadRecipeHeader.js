@@ -274,6 +274,10 @@ ReadRecipeHeader.propTypes = {
   addToFavorites: PropTypes.func.isRequired,
   removeFromFavorites: PropTypes.func.isRequired,
   myFavorites: PropTypes.arrayOf(PropTypes.string).isRequired,
-  currentRecipeId: PropTypes.string.isRequired,
+  currentRecipeId: PropTypes.string,
+};
+
+ReadRecipeHeader.defaultProps = {
+  currentRecipeId: '',
 };
 export default ReadRecipeHeader;

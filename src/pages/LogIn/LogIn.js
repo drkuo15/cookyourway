@@ -193,6 +193,16 @@ const ErrorMsg = styled.p`
   }
 `;
 
+const TestMsg = styled.p`
+  font-size: calc(24*100vw/1920);
+  width: 100%;
+  text-align: center;
+  ${'' /* color: red; */}
+  @media ${devices.Tablet} {
+    font-size: calc(60*100vw/1920);
+  }
+`;
+
 function Login() {
   const [data, setData] = useState({
     // email: '',
@@ -221,13 +231,15 @@ function Login() {
     setPersistence(auth, browserSessionPersistence)
       .then(() => signInWithEmailAndPassword(auth, email, password))
       .then(() => {
-        setData({
-          email: '',
-          password: '',
-          error: null,
-          loading: false,
-        });
-        navigate('/home', { replace: true });
+        setTimeout(() => {
+          setData({
+            email: '',
+            password: '',
+            error: null,
+            loading: false,
+          });
+          navigate('/home', { replace: true });
+        }, 500);
       })
       .catch((err) => { setData({ ...data, error: err.message, loading: false }); });
   };
@@ -265,7 +277,13 @@ function Login() {
             <LoginButton onClick={handleSubmit}>
               {loading ? '登入中...' : '登入'}
             </LoginButton>
-            {error && <ErrorMsg>{error}</ErrorMsg>}
+            {error ? <ErrorMsg>{error}</ErrorMsg> : (
+              <TestMsg>
+                測試帳號: 123@gmail.com
+                &nbsp;
+                測試密碼: 123456
+              </TestMsg>
+            )}
           </ManualSignIn>
         </LoginBox>
         <VerticalLine />

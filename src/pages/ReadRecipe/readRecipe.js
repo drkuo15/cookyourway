@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import styled from 'styled-components/macro';
 import { doc, onSnapshot, updateDoc } from 'firebase/firestore';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { motion, useAnimation } from 'framer-motion'; // npm i react-intersection-observer framer-motion
 import { useInView } from 'react-intersection-observer';
@@ -386,11 +386,20 @@ function ReadRecipe({ setUserInfo }) {
   const [authorId, setAuthorId] = useState('');
   const [fullTime, setFulltime] = useState(0);
   const location = useLocation();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
 
   const setMyFavorites = (newMyFavorites) => {
     setUserInfo({ ...userInfo, myFavorites: newMyFavorites });
   };
+
+  // 判斷是否存在食譜id，不存在則導入首頁。
+  // useEffect(() => {
+  // eslint-disable-next-line max-len
+  //   if (!location.search || location.search.split('=')[0] !== '?id' || location.search.split('=')[1] === '') {
+  //     navigate({ pathname: '/home' });
+  //   }
+  // }, [location.search, navigate]);
 
   // 當userInfo存在時，取得uid
   // useEffect(() => {
@@ -407,24 +416,32 @@ function ReadRecipe({ setUserInfo }) {
 
   const currentRecipeId = location.search.split('=')[1];
   useEffect(() => {
-    const unsubscribe = onSnapshot(
-      doc(db, 'recipes', currentRecipeId),
-      (document) => {
-        const recipeData = document.data();
-        setTitle(recipeData.title);
-        setDifficulty(recipeData.difficulty);
-        setImgUrl(recipeData.mainImage);
-        setIngredients(recipeData.ingredients);
-        setSteps(recipeData.steps);
-        setComment(recipeData.comment);
-        setAuthorName(recipeData.authorName);
-        setAuthorId(recipeData.authorId);
-        setFulltime(recipeData.fullTime);
-        setLoading(false);
-      },
-    );
-    return unsubscribe;
-  }, [currentRecipeId]);
+    if (currentRecipeId) {
+      const unsubscribe = onSnapshot(
+        doc(db, 'recipes', currentRecipeId),
+        (document) => {
+          const recipeData = document.data();
+          if (!recipeData) {
+            navigate({ pathname: '/home' });
+            return;
+          }
+          setTitle(recipeData.title);
+          setDifficulty(recipeData.difficulty);
+          setImgUrl(recipeData.mainImage);
+          setIngredients(recipeData.ingredients);
+          setSteps(recipeData.steps);
+          setComment(recipeData.comment);
+          setAuthorName(recipeData.authorName);
+          setAuthorId(recipeData.authorId);
+          setFulltime(recipeData.fullTime);
+          setLoading(false);
+        },
+      );
+      return unsubscribe;
+    }
+    navigate({ pathname: '/home' });
+    return undefined;
+  }, [currentRecipeId, navigate]);
 
   const copyText = ingredients.reduce((acc, i) => `${acc}${i.ingredientsTitle}:${i.ingredientsQuantity}公克,`, '');
 

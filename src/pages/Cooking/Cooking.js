@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
 import { ScreenRotation } from '@styled-icons/material-rounded';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { doc, getDoc } from 'firebase/firestore';
 import Counter from './Counter';
 import Player from './Music';
 import Recipe from './Recipe';
@@ -9,6 +11,8 @@ import music1 from '../../music/music1.mp3';
 import music2 from '../../music/music2.mp3';
 import music3 from '../../music/music3.mp3';
 import music4 from '../../music/music4.mp3';
+import Loading from '../../components/Loading';
+import { db } from '../../firestore';
 
 const ForceLandscapeAlert = styled.div`
   display:none;
@@ -91,6 +95,10 @@ function Cooking() {
   const [stepsLength, setStepsLength] = useState(0);
   const [playIndex, setPlayIndex] = useState(0);
   const url = playlist[playIndex];
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [steps, setSteps] = useState([]);
 
   // const DEFAULT_URL = 'https://firebasestorage.googleapis.com/v0/b/cook-your-way.appspot.com/o/tunetank.com_5423_lazy-bones_by_vital.mp3?alt=media&token=30cb614d-0230-482a-b83c-9c82bf77022e';
   // const [url, setUrl] = useState(DEFAULT_URL);
@@ -100,6 +108,38 @@ function Cooking() {
   useEffect(() => {
     setTime(initialTime);
   }, [initialTime]);
+
+  const currentRecipeId = location.search.split('=')[1];
+  useEffect(() => {
+    async function getData() {
+      const docRef = doc(db, 'recipes', currentRecipeId);
+      const docSnap = await getDoc(docRef);
+      const docData = docSnap.data();
+      if (!docData) {
+        navigate({ pathname: '/home' });
+        return;
+      }
+      setSteps(docData.steps);
+      setTitle(docData.title);
+      setInitialTime((docData.steps[stepIndex].stepTime));
+      setStepsLength(docData.steps.length);
+      setLoading(false);
+    }
+    if (currentRecipeId) {
+      getData();
+    } else {
+      navigate({ pathname: '/home' });
+    }
+  }, [currentRecipeId, navigate, stepIndex]);
+
+  if (loading) {
+    return (
+      <>
+        <AuthHeader setIsCounting={setIsCounting} />
+        <Loading />
+      </>
+    );
+  }
 
   return (
     <>
@@ -144,12 +184,10 @@ function Cooking() {
           </LeftTimer>
           <RightRecipe>
             <Recipe
-              setInitialTime={setInitialTime}
               stepIndex={stepIndex}
               setStepIndex={setStepIndex}
-              setStepsLength={setStepsLength}
               setIsCounting={setIsCounting}
-              setTitle={setTitle}
+              steps={steps}
             />
           </RightRecipe>
         </Wrapper>

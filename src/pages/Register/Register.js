@@ -235,8 +235,8 @@ function Register() {
         error: null,
         loading: false,
       });
-      showCustomAlert('您已註冊成功，即將轉跳登入頁面');
-      setTimeout(() => { navigate('/login', { replace: true }); }, 4000);
+      showCustomAlert('您已註冊成功，即將轉跳首頁');
+      setTimeout(() => { navigate('/home', { replace: true }); }, 4000);
     } catch (err) {
       setData({ ...data, error: err.message, loading: false });
     }

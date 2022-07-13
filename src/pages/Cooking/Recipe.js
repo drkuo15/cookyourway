@@ -1,4 +1,3 @@
-import { doc, getDoc } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
 import {
@@ -6,14 +5,12 @@ import {
 } from '@styled-icons/material-rounded';
 import PropTypes from 'prop-types';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { db } from '../../firestore';
 
 const RecipeArea = styled.div`
   width: calc(1250*100vw/1920);
   height: calc(730*100vw/1920);
   display: flex;
   flex-direction: column;
-  ${'' /* margin-top: calc(60*100vw/1920); */}
 `;
 
 const Wrapper = styled.div`
@@ -26,7 +23,6 @@ const WrapperStep = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  ${'' /* align-items: center; */}
   gap: calc(50*100vw/1920);
   width: calc(600*100vw/1920);
 `;
@@ -97,7 +93,7 @@ const StepDiv = styled.div`
   width: calc(1250*100vw/1920);
   height: calc(450*100vw/1920);
   display: flex;
-  justify-content: space-around;
+  gap: calc(50*100vw/1920);
 `;
 
 const ExpectTime = styled.div`
@@ -115,29 +111,15 @@ const StepContent = styled.div`
 `;
 
 const Img = styled.img`
-  max-width: calc(600*100vw/1920);
-  max-height: calc(450*100vw/1920);
+  width: calc(600*100vw/1920);
+  height: calc(450*100vw/1920);
+  object-fit: cover;
   border-radius: calc(15*100vw/1920);
 `;
 
-// const Button = styled.button`
-//   width: calc(250*100vw/1920);
-//   height: calc(65*100vw/1920);
-//   background-color: #584743;
-//   border: 0;
-//   border-radius: calc(15*100vw/1920);
-//   color: #FDFDFC;
-//   margin-top: calc(50*100vw/1920);
-//   font-size: calc(28*100vw/1920);
-//   cursor: pointer;
-// `;
-
 const Icon = styled.span`
-  ${'' /* width: calc(100*100vw/1920);
-  height: calc(100*100vw/1920); */}
   cursor: pointer;
   font-size: calc(40*100vw/1920);
-  ${'' /* font-size: 18px; */}
   display: flex;
   align-items: end;
   &:hover {
@@ -145,7 +127,6 @@ const Icon = styled.span`
   }
   & > svg{
     width: calc(60*100vw/1920);
-    ${'' /* width: 24px; */}
     height: calc(60*100vw/1920);
   }
   & > svg:hover {
@@ -153,39 +134,58 @@ const Icon = styled.span`
   }
 `;
 function Recipe({
-  setInitialTime, stepIndex, setStepIndex, setStepsLength, setIsCounting, setTitle,
+  stepIndex, setStepIndex, setIsCounting, steps,
 }) {
-  const [steps, setSteps] = useState([]);
   const [isNextStep, setIsNextStep] = useState(true);
   const [isPrevStep, setIsPrevStep] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    async function getData() {
-      const currentRecipeId = location.search.split('=')[1];
-      const docRef = doc(db, 'recipes', currentRecipeId);
-      const docSnap = await getDoc(docRef);
-      const docData = docSnap.data();
+  // const currentRecipeId = location.search.split('=')[1];
+  // useEffect(() => {
+  //   async function getData() {
+  //     const docRef = doc(db, 'recipes', currentRecipeId);
+  //     const docSnap = await getDoc(docRef);
+  //     const docData = docSnap.data();
+  //     if (!docData) {
+  //       navigate({ pathname: '/home' });
+  //       return;
+  //     }
+  //     setSteps(docData.steps);
+  //     setTitle(docData.title);
+  //     if (docData.steps.length === stepIndex + 1) {
+  //       setIsNextStep(false);
+  //     } else {
+  //       setIsNextStep(true);
+  //     }
+  //     if (stepIndex > 0) {
+  //       setIsPrevStep(true);
+  //     } else {
+  //       setIsPrevStep(false);
+  //     }
+  //     setInitialTime((docData.steps[stepIndex].stepTime));
+  //     // setInitialTime((docData.steps[stepIndex].time));
+  //     setStepsLength(docData.steps.length);
+  //   }
+  //   if (currentRecipeId) {
+  //     getData();
+  //   } else {
+  //     navigate({ pathname: '/home' });
+  //   }
+  // }, [currentRecipeId, navigate, setInitialTime, setStepsLength, setTitle, stepIndex]);
 
-      setSteps(docData.steps);
-      setTitle(docData.title);
-      if (docData.steps.length === stepIndex + 1) {
-        setIsNextStep(false);
-      } else {
-        setIsNextStep(true);
-      }
-      if (stepIndex > 0) {
-        setIsPrevStep(true);
-      } else {
-        setIsPrevStep(false);
-      }
-      setInitialTime((docData.steps[stepIndex].stepTime));
-      // setInitialTime((docData.steps[stepIndex].time));
-      setStepsLength(docData.steps.length);
+  useEffect(() => {
+    if (steps.length === stepIndex + 1) {
+      setIsNextStep(false);
+    } else {
+      setIsNextStep(true);
     }
-    getData();
-  }, [location.search, setInitialTime, setStepsLength, setTitle, stepIndex]);
+    if (stepIndex > 0) {
+      setIsPrevStep(true);
+    } else {
+      setIsPrevStep(false);
+    }
+  }, [stepIndex, steps.length]);
 
   function renderSwitch() {
     switch (stepIndex) {
@@ -283,12 +283,10 @@ function Recipe({
 }
 
 Recipe.propTypes = {
-  setInitialTime: PropTypes.func.isRequired,
   stepIndex: PropTypes.number.isRequired,
   setStepIndex: PropTypes.func.isRequired,
-  setStepsLength: PropTypes.func.isRequired,
   setIsCounting: PropTypes.func.isRequired,
-  setTitle: PropTypes.func.isRequired,
+  steps: PropTypes.PropTypes.arrayOf(PropTypes.objectOf).isRequired,
 };
 
 export default Recipe;
