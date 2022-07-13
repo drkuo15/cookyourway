@@ -20,6 +20,7 @@ const Player = ({ url, isCounting }) => {
   useEffect(() => {
     audio.addEventListener('ended', function repeat() {
       this.currentTime = 0;
+      this.load();
       this.play();
     }, false);
   }, [audio]);

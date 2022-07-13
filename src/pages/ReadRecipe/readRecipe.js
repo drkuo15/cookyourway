@@ -1,18 +1,20 @@
 import { useState, useEffect, useContext } from 'react';
-import styled from 'styled-components';
+import styled from 'styled-components/macro';
 import { doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { Link, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { motion, useAnimation } from 'framer-motion'; // npm i react-intersection-observer framer-motion
 import { useInView } from 'react-intersection-observer';
+import { IosShare } from '@styled-icons/material-rounded';
 import { db } from '../../firestore';
+import { devices } from '../../utils/StyleUtils';
 import Stars from '../../components/DisplayStars';
 import defaultImage from '../../images/upload.png';
 import { ToastContainer, showCustomAlert } from '../../components/CustomAlert';
 import AuthContext from '../../components/AuthContext';
-import Footer from '../../components/Footer';
 import ReadRecipeHeader from '../../components/ReadRecipeHeader';
 import tipImage from '../../images/tips.png';
+import Loading from '../../components/Loading';
 
 const Background = styled.div`
   padding: 0 calc(116*100vw/1920);
@@ -23,21 +25,33 @@ const Div = styled.div`
   justify-content: space-between;
 `;
 
-const LogoImg = styled.img`
-  width: calc(70*100vw/1920);
-  height: calc(70*100vw/1920);
+const TipImg = styled.img`
+  width: calc(60*100vw/1920);
+  height: calc(60*100vw/1920);
+  @media ${devices.Tablet} {
+    width: calc(90*100vw/1920);
+    height: calc(90*100vw/1920);
+  }
 `;
 
 const Img = styled.img`
   width: calc(800*100vw/1920);
   height: calc(600*100vw/1920);
-  border-radius: calc(15*100vw/1920)
+  border-radius: calc(15*100vw/1920);
+  @media ${devices.Tablet} {
+    width: calc(1600*100vw/1920);
+    height: calc(1200*100vw/1920);
+  }
 `;
 
 const StepImg = styled.img`
   width: calc(600*100vw/1920);
   height: calc(450*100vw/1920);
-  border-radius: calc(15*100vw/1920)
+  border-radius: calc(15*100vw/1920);
+  @media ${devices.Tablet} {
+    width: calc(900*100vw/1920);
+    height: calc(675*100vw/1920);
+  }
 `;
 
 const TitleWrapper = styled(Div)`
@@ -45,51 +59,85 @@ const TitleWrapper = styled(Div)`
   align-items: end;
   margin-top: calc(38*100vw/1920);
   gap: calc(36*100vw/1920);
+  margin-bottom: calc(50*100vw/1920);
+  @media ${devices.Tablet} {
+    flex-direction: column;
+    align-items: center;
+  }
 `;
 
 const ExtraLargeDiv = styled.div`
   font-size: calc(76*100vw/1920);
+  font-weight: 500;
+  @media ${devices.Tablet} {
+    font-size: calc(152*100vw/1920);
+  }
 `;
 
 const LargeDiv = styled.div`
   font-size: calc(48*100vw/1920);
+  @media ${devices.Tablet} {
+    font-size: calc(96*100vw/1920);
+  }
 `;
 
 const MediumLargeDiv = styled.div`
-  font-size: calc(36*100vw/1920);
+  font-size: calc(32*100vw/1920);
   margin: calc(20*100vw/1920);
+  @media ${devices.Tablet} {
+    font-size: calc(72*100vw/1920);
+  }
 `;
 
 const MediumDiv = styled.div`
   font-size: calc(28*100vw/1920);
+  @media ${devices.Tablet} {
+    font-size: calc(56*100vw/1920);
+  }
 `;
 
 const ContentWrapper = styled.div`
   display: flex;
   gap: calc(88*100vw/1920);
-  margin-top: calc(60*100vw/1920);
+  align-items: center;
+  margin-bottom: calc(50*100vw/1920);
+  @media ${devices.Tablet} {
+    flex-direction: column;
+    align-items: center;
+  }
 `;
 
 const ContentDiv = styled.div`
   width: calc(800*100vw/1920);
   display: flex;
   justify-content: space-between;
+  align-items: baseline;
+  @media ${devices.Tablet} {
+    width: calc(1600*100vw/1920);
+  }
 `;
 
-const IngredientContentDiv = styled(ContentDiv)`
+const IngredientContentDiv = styled.div`
+  width: calc(800*100vw/1920);
+  display: flex;
+  justify-content: space-between;
   flex-direction: column;
   background-color: #E5D2C0;
   border-radius: calc(15*100vw/1920);
   padding: calc(16*100vw/1920);
   justify-content: start;
-  width: calc(800*100vw/1920);
   height: calc(600*100vw/1920);
-  margin-bottom: calc(50*100vw/1920);
+  @media ${devices.Tablet} {
+    width: calc(1600*100vw/1920);
+    height: calc(1200*100vw/1920);
+  }
 `;
 
 const IngredientTitleDiv = styled(Div)`
   border-bottom: calc(2*100vw/1920)  #2B2A29 solid;
   padding-bottom: calc(15*100vw/1920);
+  padding-left: calc(15*100vw/1920);
+  padding-right: calc(15*100vw/1920);
 `;
 
 const AllIngredientsDiv = styled.div`
@@ -98,19 +146,9 @@ const AllIngredientsDiv = styled.div`
   justify-content: space-between;
   margin-top: calc(15*100vw/1920);
   overflow: scroll;
-`;
-
-const ExportButton = styled.div`
-  width: calc(150*100vw/1920);
-  height: calc(64*100vw/1920);
-  color: #FDFDFC;
-  background-color: #584743;
-  border-radius: calc(15*100vw/1920);
-  font-size: calc(28*100vw/1920);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
+  @media ${devices.Tablet} {
+    margin-top: calc(50*100vw/1920);
+  }
 `;
 
 const StepCircleDiv = styled.div`
@@ -120,6 +158,9 @@ const StepCircleDiv = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  @media ${devices.Tablet} {
+    width: calc(300*100vw/1920);
+  }
 `;
 
 const Circle = styled.div`
@@ -133,12 +174,20 @@ const Circle = styled.div`
   text-align: center;
   justify-content: center;
   align-items: center;
+  @media ${devices.Tablet} {
+    width: calc(200*100vw/1920);
+    height: calc(200*100vw/1920);
+    font-size: calc(96*100vw/1920);
+  }
 `;
 
 const Line = styled.div`
   width: calc(2.5*100vw/1920);
   height: calc(625*100vw/1920);
   background-color: #2B2A29;
+  @media ${devices.Tablet} {
+    height: calc(1000*100vw/1920);
+  }
 `;
 
 const BlankLine = styled(Line)`
@@ -148,11 +197,18 @@ const BlankLine = styled(Line)`
 const StepWrapper = styled.div`
   display: flex;
   justify-content: space-between;
+  @media ${devices.Tablet} {
+    justify-content: center;
+  }
 `;
 
 const StepTitleContentWrapper = styled.div`
   height: calc(650*100vw/1920);
   width: calc(1400*100vw/1920);
+  @media ${devices.Tablet} {
+    width: calc(1300*100vw/1920);
+    height: calc(1000*100vw/1920);
+  }
 `;
 
 const StepTitleAndTimeDiv = styled(Div)`
@@ -165,34 +221,57 @@ const StepContentDiv = styled(LargeDiv)`
   font-size: calc(36*100vw/1920);
   width: calc(700*100vw/1920);
   height: calc(450*100vw/1920);
+  line-height: calc(50*100vw/1920);
   overflow: scroll;
   display: flex;
   align-items: center;
+  @media ${devices.Tablet} {
+    width: calc(1300*100vw/1920);
+    height: calc(300*100vw/1920);
+    font-size: calc(72*100vw/1920);
+    line-height: calc(100*100vw/1920);
+    overflow-y: scroll;
+    white-space: nowrap;
+  }
 `;
 
 const StepContentAndImgDiv = styled(Div)`
   align-items: center;
   margin-top: calc(36*100vw/1920);
+  @media ${devices.Tablet} {
+    margin-top: calc(5*100vw/1920);
+    flex-direction: column;
+    justify-content: center;
+  }
 `;
 
 const DoItYourSelfButton = styled.button`
   position:fixed;
   right: 1.5%;
-  top: 50%;
+  top: 40%;
   white-space: normal;
   word-wrap: break-word;
   width: calc(50*100vw/1920);
-  height: calc(286*100vw/1920);
+  height: calc(200*100vw/1920);
   font-size: calc(28*100vw/1920);
-  background-color: #EB811F50;
+  background-color: #EB811F;
+  color: #FDFDFC;
   border: 0;
   border-radius: calc(15*100vw/1920);
   cursor: pointer;
+  &:hover{
+  background-color:#fa8921;
+  }
+  @media ${devices.Tablet} {
+    width: calc(100*100vw/1920);
+    height: calc(400*100vw/1920);
+    font-size: calc(60*100vw/1920);
+  }
 `;
 
 const TipsDiv = styled.div`
   display: flex;
-  align-items: center;
+  align-items: end;
 `;
 
 const CommentDiv = styled.div`
@@ -202,12 +281,40 @@ const CommentDiv = styled.div`
   background-color: #E5D2C050;
   border-radius: calc(15*100vw/1920);
   margin-bottom: calc(90*100vw/1920);
+  @media ${devices.Tablet} {
+    padding: calc(60*100vw/1920);
+    margin-top: calc(90*100vw/1920);
+    width: 100%;
+    height: calc(600*100vw/1920);
+  }
 `;
 
 const CommentContentDiv = styled.div`
   font-size: calc(36*100vw/1920);
   padding-left: calc(220*100vw/1920);
   margin-top: calc(25*100vw/1920);
+  line-height: calc(64*100vw/1920);
+  overflow: auto;
+  @media ${devices.Tablet} {
+    margin-top: calc(60*100vw/1920);
+    font-size: calc(72*100vw/1920);
+    line-height: calc(100*100vw/1920);
+  }
+`;
+
+const CommentTitleSpan = styled.span`
+  font-size: calc(36*100vw/1920);
+  font-weight: 500;
+  @media ${devices.Tablet} {
+    font-size: calc(72*100vw/1920);
+  }
+`;
+
+const Mark = styled.mark`
+  display: inline-block;
+  line-height: 0;
+  padding-bottom: 0.5em;
+  background-color: #fec740;
 `;
 
 // https://blog.logrocket.com/react-scroll-animations-framer-motion/
@@ -241,10 +348,34 @@ function MotionLine() {
   );
 }
 
-function ReadRecipe() {
+const Icon = styled.span`
+  cursor: pointer;
+  font-size: calc(40*100vw/1920);
+  display: flex;
+  align-items: end;
+  &:hover {
+    color: #808080;
+  }
+  & > svg{
+    width: calc(50*100vw/1920);
+    height: calc(50*100vw/1920);
+  }
+  & > svg:hover {
+    color: #808080;
+  }
+  @media ${devices.Tablet} {
+    & > svg{
+    width: calc(110*100vw/1920);
+    height: calc(110*100vw/1920);
+  }
+  }
+`;
+function ReadRecipe({ setUserInfo }) {
   const userInfo = useContext(AuthContext);
-  const [userId, setUserId] = useState('');
-  const [myFavorites, setMyFavorites] = useState([]);
+  const userId = userInfo?.uid || '';
+  const myFavorites = userInfo?.myFavorites || [];
+  // const [userId, setUserId] = useState('');
+  // const [myFavorites, setMyFavorites] = useState([]);
   const [title, setTitle] = useState('');
   const [difficulty, setDifficulty] = useState(1);
   const [ingredients, setIngredients] = useState([]);
@@ -257,16 +388,22 @@ function ReadRecipe() {
   const location = useLocation();
   const [loading, setLoading] = useState(true);
 
+  const setMyFavorites = (newMyFavorites) => {
+    setUserInfo({ ...userInfo, myFavorites: newMyFavorites });
+  };
+
   // 當userInfo存在時，取得uid
-  useEffect(() => {
-    if (userInfo) {
-      setUserId(userInfo.uid);
-      setMyFavorites(userInfo.myFavorites);
-    } else {
-      setUserId('');
-      setMyFavorites([]);
-    }
-  }, [userInfo]);
+  // useEffect(() => {
+  //   if (userInfo) {
+  //     setUserId(userInfo.uid);
+  //     if (myFavorites.length === 0) {
+  //       setMyFavorites(userInfo.myFavorites);
+  //     }
+  //     return;
+  //   }
+  //   setUserId('');
+  //   setMyFavorites([]);
+  // }, [userInfo, myFavorites.length]);
 
   const currentRecipeId = location.search.split('=')[1];
   useEffect(() => {
@@ -294,11 +431,11 @@ function ReadRecipe() {
   function exportIngredients() {
     if (navigator.share) {
       navigator.share({
-        title: `${title}食材內容`,
-        text: `${title}食材內容:${copyText}`,
+        title: `【 ${title} 】 食材內容`,
+        text: `【 ${title} 】 食材內容: \n ${copyText}`,
       });
     } else {
-      navigator.clipboard.writeText(`【 ${title} 】  食材內容: \n ${copyText}`);
+      navigator.clipboard.writeText(`【 ${title} 】食材內容: \n ${copyText}`);
       navigator.clipboard.readText().then((text) => showCustomAlert(`已成功複製\n${text}`));
     }
   }
@@ -325,7 +462,19 @@ function ReadRecipe() {
   }
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <>
+        <ReadRecipeHeader
+          authorId={authorId}
+          userId={userId}
+          addToFavorites={() => { addToFavorites(); }}
+          removeFromFavorites={() => { removeFromFavorites(); }}
+          myFavorites={myFavorites}
+          currentRecipeId={currentRecipeId}
+        />
+        <Loading />
+      </>
+    );
   }
 
   return (
@@ -343,13 +492,14 @@ function ReadRecipe() {
           <ExtraLargeDiv>{title}</ExtraLargeDiv>
           <MediumDiv>
             by
+            {' '}
             {authorName}
           </MediumDiv>
         </TitleWrapper>
         <ContentWrapper>
           <ContentDiv>
             <LargeDiv>難易度</LargeDiv>
-            <Stars stars={difficulty} size={48} spacing={2} fill="#EB811F" />
+            <Stars stars={difficulty} size={48} spacing={2} fill="#BE0028" />
           </ContentDiv>
           <ContentDiv>
             <LargeDiv>總時長</LargeDiv>
@@ -364,7 +514,7 @@ function ReadRecipe() {
           <IngredientContentDiv>
             <IngredientTitleDiv>
               <LargeDiv>食材</LargeDiv>
-              <ExportButton type="button" onClick={() => exportIngredients()}>匯出食材</ExportButton>
+              <Icon onClick={() => exportIngredients()}><IosShare /></Icon>
             </IngredientTitleDiv>
             <AllIngredientsDiv>
               {ingredients.map((ingredient) => (
@@ -372,6 +522,7 @@ function ReadRecipe() {
                   <MediumLargeDiv>{ingredient.ingredientsTitle}</MediumLargeDiv>
                   <MediumLargeDiv>
                     {ingredient.ingredientsQuantity}
+                    {' '}
                     公克
                   </MediumLargeDiv>
                 </Div>
@@ -406,8 +557,10 @@ function ReadRecipe() {
         ))}
         <CommentDiv>
           <TipsDiv>
-            <LogoImg src={tipImage} alt="tipImage" />
-            <LargeDiv>小秘訣</LargeDiv>
+            <TipImg src={tipImage} alt="tipImage" />
+            <CommentTitleSpan>
+              <Mark>小秘訣</Mark>
+            </CommentTitleSpan>
           </TipsDiv>
           <CommentContentDiv>
             {comment}
@@ -418,10 +571,13 @@ function ReadRecipe() {
         </Link>
         <ToastContainer />
       </Background>
-      <Footer />
     </>
   );
 }
+
+ReadRecipe.propTypes = {
+  setUserInfo: PropTypes.func.isRequired,
+};
 
 Stars.propTypes = {
   stars: PropTypes.number.isRequired,

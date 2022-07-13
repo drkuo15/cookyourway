@@ -1,19 +1,47 @@
 import { useEffect, useState } from 'react';
-import styled from 'styled-components';
+import styled from 'styled-components/macro';
+import { ScreenRotation } from '@styled-icons/material-rounded';
 import Counter from './Counter';
 import Player from './Music';
 import Recipe from './Recipe';
-import Footer from '../../components/Footer';
 import AuthHeader from '../../components/AuthHeader';
 import music1 from '../../music/music1.mp3';
 import music2 from '../../music/music2.mp3';
 import music3 from '../../music/music3.mp3';
 import music4 from '../../music/music4.mp3';
 
+const ForceLandscapeAlert = styled.div`
+  display:none;
+  @media only screen and (orientation:portrait){
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding-top: 40%;
+    font-size: calc(100*100vw/1920);
+    }
+`;
+
+const Icon = styled.div`
+  width: 50%;
+  margin-top: 20%;
+`;
+
+const CookingWrapper = styled.div`
+  height: 92.5vh;
+  @media only screen and (orientation:portrait){
+    display: none;
+    }
+`;
+
 const Wrapper = styled.div`
   display: flex;
   justify-content: space-around;
-  align-items: center;
+  align-items: flex-start;
+  ${'' /* margin-top: calc(60*100vw/1920);
+  margin-bottom: calc(60*100vw/1920); */}
+  height: calc(100% - 11vh);
+
 `;
 
 const LeftTimer = styled.div`
@@ -22,15 +50,23 @@ const LeftTimer = styled.div`
   justify-content: center;
   align-items: center;
   width: calc(500*100vw/1920);
-  height: calc(830*100vw/1920);
+  height: calc(730*100vw/1920);
   background-color: #E5D2C0;
   border-radius: calc(15*100vw/1920);
+  margin: auto;
+`;
+
+const RightRecipe = styled.div`
+  margin: auto;
 `;
 
 const Title = styled.div`
-  font-size: calc(60*100vw/1920);
+  font-size: calc(48*100vw/1920);
   margin-bottom: calc(50*100vw/1920);
 `;
+
+// const Background = styled.div`
+// `;
 
 const playlist = [music1, music2, music3, music4];
 
@@ -66,51 +102,59 @@ function Cooking() {
   }, [initialTime]);
 
   return (
-    <div>
-      <AuthHeader />
-      <Wrapper>
-        <LeftTimer>
-          <Title>{title}</Title>
-          <Counter
-            time={time}
-            setTime={setTime}
-            isCounting={isCounting}
-            setIsCounting={setIsCounting}
-            initialTime={initialTime}
-            onTimeUp={() => {
-              const generateRandomNumber = () => {
-                const randomNumber = Math.floor(Math.random() * playlist.length);
-                if (randomNumber !== playIndex) {
-                  return randomNumber;
+    <>
+      <ForceLandscapeAlert>
+        請將螢幕轉為橫向以繼續瀏覽此頁面
+        <br />
+        <Icon><ScreenRotation /></Icon>
+      </ForceLandscapeAlert>
+      <CookingWrapper>
+        <AuthHeader setIsCounting={setIsCounting} />
+        <Wrapper>
+          <LeftTimer>
+            <Title>{title}</Title>
+            <Counter
+              time={time}
+              setTime={setTime}
+              isCounting={isCounting}
+              setIsCounting={setIsCounting}
+              initialTime={initialTime}
+              onTimeUp={() => {
+                const generateRandomNumber = () => {
+                  const randomNumber = Math.floor(Math.random() * playlist.length);
+                  if (randomNumber !== playIndex) {
+                    return randomNumber;
+                  }
+                  return generateRandomNumber();
+                };
+                if (stepIndex + 1 < stepsLength) {
+                  setStepIndex((prev) => prev + 1);
+                  setTime(initialTime);
+                  setPlayIndex(generateRandomNumber());
+                } else {
+                  setIsCounting(false);
                 }
-                return generateRandomNumber();
-              };
-              if (stepIndex + 1 < stepsLength) {
-                setStepIndex((prev) => prev + 1);
-                setTime(initialTime);
-                setPlayIndex(generateRandomNumber());
-              } else {
-                setIsCounting(false);
-              }
-            }}
-          />
-          <Player
-            url={url}
-            isCounting={isCounting}
-            setIsCounting={setIsCounting}
-          />
-        </LeftTimer>
-        <Recipe
-          setInitialTime={setInitialTime}
-          stepIndex={stepIndex}
-          setStepIndex={setStepIndex}
-          setStepsLength={setStepsLength}
-          setIsCounting={setIsCounting}
-          setTitle={setTitle}
-        />
-      </Wrapper>
-      <Footer />
-    </div>
+              }}
+            />
+            <Player
+              url={url}
+              isCounting={isCounting}
+              setIsCounting={setIsCounting}
+            />
+          </LeftTimer>
+          <RightRecipe>
+            <Recipe
+              setInitialTime={setInitialTime}
+              stepIndex={stepIndex}
+              setStepIndex={setStepIndex}
+              setStepsLength={setStepsLength}
+              setIsCounting={setIsCounting}
+              setTitle={setTitle}
+            />
+          </RightRecipe>
+        </Wrapper>
+      </CookingWrapper>
+    </>
   );
 }
 

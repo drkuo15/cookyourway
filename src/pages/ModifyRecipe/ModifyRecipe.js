@@ -1,4 +1,3 @@
-// 待修： 判斷輸入欄是否都有輸入, 優化NAN提示(下方出現輸入請輸入數字);
 import {
   useEffect, useState, useContext, useRef,
 } from 'react';
@@ -6,24 +5,25 @@ import {
   collection, doc, setDoc, onSnapshot, updateDoc,
 } from 'firebase/firestore';
 import {
-  getDownloadURL, uploadBytes, ref, deleteObject,
+  getDownloadURL, uploadBytes, ref,
+  deleteObject,
 } from 'firebase/storage';
-import styled from 'styled-components';
+import styled from 'styled-components/macro';
 import { v4 } from 'uuid';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, useAnimation } from 'framer-motion'; // npm i react-intersection-observer framer-motion
 import { useInView } from 'react-intersection-observer';
 import PropTypes from 'prop-types';
 import { db, storage } from '../../firestore';
+import { devices } from '../../utils/StyleUtils';
 import defaultImage from '../../images/upload.png';
 import StarRating from '../../components/Stars';
 import { ToastContainer, showCustomAlert } from '../../components/CustomAlert';
 import AuthContext from '../../components/AuthContext';
-// import Header from '../../components/Header';
-import Footer from '../../components/Footer';
 import AuthHeader from '../../components/AuthHeader';
 import binImage from '../../images/bin.png';
 import tipImage from '../../images/tips.png';
+import Loading from '../../components/Loading';
 
 const Background = styled.div`
   padding: 0 calc(116*100vw/1920);
@@ -36,47 +36,77 @@ const Div = styled.div`
 
 // Title
 const TitleWrapper = styled(Div)`
-  display: flex;
-  align-items: baseline;
-  width: calc(1720*100vw/1920);
-  height: calc(110*100vw/1920);
+  margin: auto;
   margin-top: calc(46*100vw/1920);
+  margin-bottom: calc(50*100vw/1920);
+  width: calc(800*100vw/1920);
+  @media ${devices.Tablet} {
+    flex-direction: column;
+    align-items: center;
+      width: calc(1600*100vw/1920);
+  }
 `;
 
-const LargeDiv = styled.div`
-  font-size: calc(48*100vw/1920);
+const MediumLargeDiv = styled.div`
+  font-size: calc(36*100vw/1920);
+  @media ${devices.Tablet} {
+    font-size: calc(72*100vw/1920);
+  }
 `;
 
 const TittleInputWrapper = styled.div`
   display: flex;
   flex-direction: column;
+  width: 100%;
 `;
 
 const TitleInput = styled.input`
-  width: calc(1392*100vw/1920);
-  font-size: calc(36*100vw/1920);
-  border: calc(2.5*100vw/1920) solid #B3B3AC;
-  border-radius: calc(15*100vw/1920);
+  font-size: calc(48*100vw/1920);
+  border: 0;
+  outline :0;
+  border-bottom: calc(2.5*100vw/1920) solid #B3B3AC;
   padding: calc(2*100vw/1920) calc(8*100vw/1920);
+  text-align: center;
+  font-weight: 500;
+  &:focus {
+    border-color: #EB811F;
+  }
+  @media ${devices.Tablet} {
+      font-size: calc(96*100vw/1920);
+  }
 `;
 
 const ErrorMsg = styled.div`
   font-size: calc(24*100vw/1920);
   color: red;
   margin-top: calc(10*100vw/1920);
+  text-align: end;
+  @media ${devices.Tablet} {
+      font-size: calc(48*100vw/1920);
+  }
 `;
 
 // Content
 const ContentWrapper = styled.div`
   display: flex;
   gap: calc(88*100vw/1920);
-  margin-top: calc(60*100vw/1920);
+  align-items: center;
+  margin-bottom: calc(50*100vw/1920);
+  @media ${devices.Tablet} {
+    flex-direction: column;
+    align-items: center;
+  }
 `;
 
 const ContentDiv = styled.div`
   width: calc(800*100vw/1920);
   display: flex;
   justify-content: space-between;
+  align-items: baseline;
+  @media ${devices.Tablet} {
+    width: calc(1600*100vw/1920);
+  }
+
 `;
 
 const ImgWrapper = styled.div`
@@ -87,6 +117,10 @@ const FoodImg = styled.img`
   width: calc(800*100vw/1920);
   height: calc(600*100vw/1920);
   border-radius: calc(15*100vw/1920);
+  @media ${devices.Tablet} {
+    width: calc(1600*100vw/1920);
+    height: calc(1200*100vw/1920);
+  }
 `;
 
 const Label = styled.label`
@@ -100,6 +134,10 @@ const Label = styled.label`
   height: calc(600*100vw/1920);
   position: absolute;
   top: 0;
+  @media ${devices.Tablet} {
+    width: calc(1600*100vw/1920);
+    height: calc(1200*100vw/1920);
+  }
 `;
 
 const UploadImgP = styled.p`
@@ -113,10 +151,18 @@ const UploadImgP = styled.p`
   letter-spacing: calc(2*100vw/1920);
   font-size: calc(36*100vw/1920);
   border-radius: calc(15*100vw/1920);
+  @media ${devices.Tablet} {
+    width: calc(568*100vw/1920);
+    height: calc(128*100vw/1920); 
+    font-size: calc(72*100vw/1920);
+    top: calc(900*100vw/1920);
+    left: calc(550*100vw/1920);
+    line-height: calc(128*100vw/1920);
+  }
 `;
 
 // Ingredient
-const IngredientContentDiv = styled(ContentDiv)`
+const IngredientContentDiv = styled.div`
   display: flex;
   flex-direction: column;
   background-color: #E5D2C0;
@@ -125,12 +171,16 @@ const IngredientContentDiv = styled(ContentDiv)`
   justify-content: space-around;
   width: calc(800*100vw/1920);
   height: calc(600*100vw/1920);
-  margin-bottom: calc(50*100vw/1920);
+  @media ${devices.Tablet} {
+    width: calc(1600*100vw/1920);
+    height: calc(1200*100vw/1920);
+  }
 `;
 
 const IngredientTitleDiv = styled(Div)`
-  border-bottom: calc(2*100vw/1920)  #2B2A29 solid;
+  border-bottom: calc(2*100vw/1920) #2B2A29 solid;
   padding-bottom: calc(15*100vw/1920);
+  padding-left: calc(30*100vw/1920);
 `;
 
 const AllIngredientsDiv = styled.div`
@@ -142,6 +192,11 @@ const AllIngredientsDiv = styled.div`
   font-size: calc(36*100vw/1920);
   flex-grow: 1;
   overflow-y: auto;
+  @media ${devices.Tablet} {
+    font-size: calc(72*100vw/1920);
+    padding-top: calc(50*100vw/1920);
+    gap: calc(30*100vw/1920);
+  }
 `;
 
 const IngredientDiv = styled.div`
@@ -156,6 +211,16 @@ const Input = styled.input`
   border-radius: calc(15*100vw/1920);
   padding: calc(2*100vw/1920) calc(8*100vw/1920);
   font-size: calc(28*100vw/1920);
+  outline: 0;
+  &:focus {
+    border-color: #EB811F;
+  }
+  @media ${devices.Tablet} {
+    width: calc(650*100vw/1920);
+    height: calc(112*100vw/1920);
+    padding: calc(4*100vw/1920) calc(16*100vw/1920);
+    font-size: calc(56*100vw/1920);
+  }
 `;
 
 const Quantity = styled.div`
@@ -168,40 +233,88 @@ const Quantity = styled.div`
 const QuantityInput = styled(Input)`
   width: calc(135*100vw/1920);
   text-align: right;
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+  }
+  @media ${devices.Tablet} {
+    width: calc(270*100vw/1920);
+  }
 `;
 
 const DeleteButton = styled.button`
-  height: calc(56 * 100vw / 1920);
+  height: calc(45 * 100vw / 1920);
   background-color: transparent;
   cursor: pointer;
   border: 0;
+  @media ${devices.Tablet} {
+    height: calc(90 * 100vw / 1920);
+  }
 `;
 
 const IconImg = styled.img`
+  width: calc(45*100vw/1920);
+  height: calc(45*100vw/1920);
+  @media ${devices.Tablet} {
+    height: calc(90 * 100vw / 1920);
+    width: calc(90*100vw/1920);
+  }
+`;
+
+const StepDeleteButton = styled(DeleteButton)`
+  height: calc(56 * 100vw / 1920);
+  margin-top: calc(20*100vw/1920);
+  @media ${devices.Tablet} {
+    height: calc(112 * 100vw / 1920);
+    margin-top: calc(40*100vw/1920);
+  }
+`;
+
+const StepIconImg = styled(IconImg)`
   width: calc(56*100vw/1920);
   height: calc(56*100vw/1920);
+  @media ${devices.Tablet} {
+    height: calc(112 * 100vw / 1920);
+    width: calc(112*100vw/1920);
+  }
 `;
 
 const AddIngredientDiv = styled.div`
   width: 100%;
   text-align: center;
-  margin-top: calc(10*100vw/1920);
+  margin-top: calc(16*100vw/1920);
+  @media ${devices.Tablet} {
+      margin-top: calc(32*100vw/1920);
+      margin-bottom: calc(32*100vw/1920);
+  }
 `;
 
 const AddIngredientButton = styled.button`
-  width: calc(250*100vw/1920);
-  height: calc(65*100vw/1920);
+  width: calc(200*100vw/1920);
+  height: calc(50*100vw/1920);
   background-color: #584743;
   border: 0;
   border-radius: calc(15*100vw/1920);
   color: #FDFDFC;
   font-size: calc(28*100vw/1920);
+  cursor: pointer;
+  &:hover {
+    background-color: #4c3732;
+  }
+  @media ${devices.Tablet} {
+      width: calc(400*100vw/1920);
+    height: calc(100*100vw/1920);
+    font-size: calc(56*100vw/1920);
+  }
 `;
 
 // Step
 const StepWrapper = styled.div`
   display: flex;
   justify-content: space-between;
+  @media ${devices.Tablet} {
+    justify-content: center;
+    gap: calc(20*100vw/1920);
+  }
 `;
 
 const StepCircleDiv = styled.div`
@@ -211,6 +324,9 @@ const StepCircleDiv = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  @media ${devices.Tablet} {
+    width: calc(300*100vw/1920);
+  }
 `;
 
 const Circle = styled.div`
@@ -224,18 +340,31 @@ const Circle = styled.div`
   text-align: center;
   justify-content: center;
   align-items: center;
+  @media ${devices.Tablet} {
+    width: calc(200*100vw/1920);
+    height: calc(200*100vw/1920);
+    font-size: calc(96*100vw/1920);
+  }
 `;
 
 const Line = styled.div`
   width: calc(2.5*100vw/1920);
   height: calc(625*100vw/1920);
   background-color: #2B2A29;
+  @media ${devices.Tablet} {
+    width: calc(5*100vw/1920);
+    height: calc(1400*100vw/1920);
+  }
 `;
 
 const AddStepDiv = styled.div`
-  height: calc(625*100vw/1920);
+  height: calc(525*100vw/1920);
   display: flex;
-  align-items: center;
+  margin-top: calc(100*100vw/1920);
+  @media ${devices.Tablet} {
+    height: calc(1050*100vw/1920);
+    margin-top: calc(200*100vw/1920);
+  }
 `;
 
 const AddStepButton = styled.div`
@@ -243,8 +372,8 @@ const AddStepButton = styled.div`
   white-space: normal;
   word-wrap: break-word;
   width: calc(50*100vw/1920);
-  height: calc(300*100vw/1920);
-  font-size: calc(36*100vw/1920);
+  height: calc(200*100vw/1920);
+  font-size: calc(28*100vw/1920);
   background-color: #584743;
   color: #FDFDFC;
   border: 0;
@@ -252,56 +381,108 @@ const AddStepButton = styled.div`
   cursor: pointer;
   display: flex;
   align-items: center;
+    &:hover {
+    background-color: #4c3732;
+  }
+  @media ${devices.Tablet} {
+    width: calc(100*100vw/1920);
+    height: calc(400*100vw/1920);
+    font-size: calc(56*100vw/1920);
+  }
 `;
 
 const StepTitleContentWrapper = styled.div`
   height: calc(650*100vw/1920);
   padding-top: calc(18 * 100vw / 1920);
+    @media ${devices.Tablet} {
+    width: calc(1100*100vw/1920);
+    height: calc(1000*100vw/1920);
+  }
 `;
 
 const StepTitleAndTimeDiv = styled(Div)`
   font-size: calc(48*100vw/1920);
   border-bottom: calc(5*100vw/1920)  #2B2A29 solid;
   padding-bottom: calc(50*100vw/1920);
+  @media ${devices.Tablet} {
+    font-size: calc(96*100vw/1920);
+    flex-direction: column;
+    gap: calc(50*100vw/1920);
+  }
 `;
 
 const StepInput = styled.input`
   width: calc(650*100vw/1920);
   height: calc(60*100vw/1920);
-  font-size: calc(28*100vw/1920);
-  border-radius: calc(15*100vw/1920);
-  border: calc(2.5*100vw/1920) solid #B3B3AC;
+  font-size: calc(36*100vw/1920);
+  border: 0;
+  outline :0;
+  border-bottom: calc(2.5*100vw/1920) solid #B3B3AC;
+  padding: calc(2*100vw/1920) calc(8*100vw/1920);
+  &:focus {
+    border-color: #EB811F;
+  }
   padding-left: calc(15*100vw/1920);
+  @media ${devices.Tablet} {
+    width: calc(1100*100vw/1920);
+    height: calc(120*100vw/1920);
+    font-size: calc(72*100vw/1920);
+  }
 `;
 
 const StepTimeDiv = styled.div`
   display: flex;
-  justify-content: end;
+  align-items: center;
   gap: calc(15*100vw/1920);
 `;
 
 const TimeInput = styled.input`
   width: calc(150*100vw/1920);
   height: calc(60*100vw/1920);
-  font-size: calc(28*100vw/1920);
-  border-radius: calc(15*100vw/1920);
-  border: calc(2.5*100vw/1920) solid #B3B3AC;
-  padding: calc(2*100vw/1920) calc(8*100vw/1920);
+  font-size: calc(36*100vw/1920);
   text-align: right;
+  border: 0;
+  outline :0;
+  border-bottom: calc(2.5*100vw/1920) solid #B3B3AC;
+  padding: calc(2*100vw/1920) calc(8*100vw/1920);
+  &:focus {
+    border-color: #EB811F;
+  }
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+  }
+  @media ${devices.Tablet} {
+    width: calc(300*100vw/1920);
+    height: calc(120*100vw/1920);
+    font-size: calc(76*100vw/1920);
+  }
 `;
 
 const StepContentAndImgDiv = styled(Div)`
   align-items: center;
   margin-top: calc(36*100vw/1920);
+  @media ${devices.Tablet} {
+    margin-top: calc(0*100vw/1920);
+    flex-direction: column;
+    justify-content: center;
+  }
 `;
 
-const StepContentDiv = styled(LargeDiv)`
+const StepContentDiv = styled.div`
   font-size: calc(36*100vw/1920);
   width: calc(800*100vw/1920);
   height: calc(500*100vw/1920);
   overflow: scroll;
   display: flex;
   align-items: center;
+  @media ${devices.Tablet} {
+    width: calc(1100*100vw/1920);
+    height: calc(300*100vw/1920);
+    font-size: calc(72*100vw/1920);
+    line-height: calc(100*100vw/1920);
+    overflow-y: scroll;
+    white-space: nowrap;
+  }
 `;
 
 const TextArea = styled.textarea`
@@ -310,18 +491,39 @@ const TextArea = styled.textarea`
   width: calc(650*100vw/1920);
   height: calc(450*100vw/1920);
   padding: calc(15*100vw/1920) 0 0 calc(15*100vw/1920);
-  font-size: calc(28*100vw/1920); 
+  font-size: calc(36*100vw/1920); 
+  line-height: calc(50*100vw/1920);
+  outline: none;
+  &:focus{
+    border-color:  #EB811F;
+  }
+  @media ${devices.Tablet} {
+    width: calc(1100*100vw/1920);
+    height: calc(200*100vw/1920);
+    font-size: calc(72*100vw/1920);
+    overflow-x: auto;
+    white-space: nowrap;
+    line-height: calc(150*100vw/1920);
+  }
 `;
 
 const StepImg = styled.img`
   width: calc(600*100vw/1920);
   height: calc(450*100vw/1920);
-  border-radius: calc(15*100vw/1920)
+  border-radius: calc(15*100vw/1920);
+  @media ${devices.Tablet} {
+    width: calc(900*100vw/1920);
+    height: calc(675*100vw/1920);
+  }
 `;
 
 const StepLabel = styled(Label)`
   width: calc(600*100vw/1920);
   height: calc(450*100vw/1920);
+  @media ${devices.Tablet} {
+    width: calc(900*100vw/1920);
+    height: calc(675*100vw/1920);
+  }
 `;
 
 const StepUploadImgP = styled(UploadImgP)`
@@ -331,6 +533,14 @@ const StepUploadImgP = styled(UploadImgP)`
   top: calc(325*100vw/1920);
   left: calc(175*100vw/1920);
   font-size: calc(28*100vw/1920);
+  @media ${devices.Tablet} {
+    width: calc(568*100vw/1920);
+    height: calc(128*100vw/1920); 
+    font-size: calc(56*100vw/1920);
+    top: calc(450*100vw/1920);
+    left: calc(180*100vw/1920);
+    line-height: calc(128*100vw/1920);
+  }
 `;
 
 // Comment
@@ -341,43 +551,60 @@ const CommentDiv = styled.div`
   background-color: #E5D2C050;
   border-radius: calc(15*100vw/1920);
   margin-bottom: calc(50*100vw/1920);
+  @media ${devices.Tablet} {
+    padding: calc(60*100vw/1920);
+    margin-top: calc(90*100vw/1920);
+    width: 100%;
+    height: calc(600*100vw/1920);
+  }
 `;
 
 const CommentContentDiv = styled.div`
   font-size: calc(36*100vw/1920);
-  padding-left: calc(220*100vw/1920);
   margin-top: calc(25*100vw/1920);
+  @media ${devices.Tablet} {
+    margin-top: calc(60*100vw/1920);
+    font-size: calc(72*100vw/1920);
+  }
+`;
+
+const CommentTitleSpan = styled.span`
+  font-size: calc(36*100vw/1920);
+  font-weight: 500;
+  @media ${devices.Tablet} {
+    font-size: calc(72*100vw/1920);
+  }
+`;
+
+const Mark = styled.mark`
+    display: inline-block;
+    line-height: 0;
+    padding-bottom: 0.5em;
+    background-color: #fec740;
 `;
 
 const TipsDiv = styled.div`
   display: flex;
-  align-items: center;
+  align-items: end;
 `;
 
-const LogoImg = styled.img`
-  width: calc(70*100vw/1920);
-  height: calc(70*100vw/1920);
+const TipImg = styled.img`
+  width: calc(60*100vw/1920);
+  height: calc(60*100vw/1920);
+  @media ${devices.Tablet} {
+    width: calc(90*100vw/1920);
+    height: calc(90*100vw/1920);
+  }
 `;
 
 const CommentTextArea = styled(TextArea)`
-  width: calc(1350*100vw/1920);
+  width: 100%;
   height: calc(150*100vw/1920);
-`;
-
-const ButtonSaveDiv = styled.div`
-  display: flex;
-  justify-content: center;
-  margin-bottom: calc(50*100vw/1920);
-`;
-
-const ButtonSaveButton = styled.button`
-  width: calc(300*100vw/1920);
-  height: calc(68*100vw/1920);
-  font-size: calc(36*100vw/1920);
-  background-color: #EB811F;
-  border: 0;
-  border-radius: calc(15*100vw/1920);
-  cursor: pointer;
+  line-height: calc(64*100vw/1920);
+  @media ${devices.Tablet} {
+    height: calc(300*100vw/1920);
+    line-height: calc(100*100vw/1920);
+  }
 `;
 
 const RightSaveButton = styled.button`
@@ -387,12 +614,21 @@ const RightSaveButton = styled.button`
   white-space: normal;
   word-wrap: break-word;
   width: calc(50*100vw/1920);
-  height: calc(286*100vw/1920);
+  height: calc(200*100vw/1920);
   font-size: calc(28*100vw/1920);
-  background-color: #EB811F50;
+  background-color: #EB811F;
+  color: #FDFDFC;
   border: 0;
   border-radius: calc(15*100vw/1920);
   cursor: pointer;
+  &:hover{
+    background-color:#fa8921;
+  }
+  @media ${devices.Tablet} {
+    width: calc(100*100vw/1920);
+    height: calc(400*100vw/1920);
+    font-size: calc(60*100vw/1920);
+  }
 `;
 
 // https://blog.logrocket.com/react-scroll-animations-framer-motion/
@@ -463,11 +699,10 @@ function ModifyRecipe() {
   const userInfo = useContext(AuthContext);
   const userId = userInfo.uid;
   const userName = userInfo.name;
-  // const [userName, setUserName] = useState('');
-  // const [userId, setUserId] = useState('');
   const fullTime = steps.reduce((accValue, step) => accValue + Number(step.stepTime), 0);
   const navigate = useNavigate();
   const location = useLocation();
+  const [loading, setLoading] = useState(true);
 
   // 取得當前食譜id的資料，放入編輯列
   useEffect(() => {
@@ -488,10 +723,13 @@ function ModifyRecipe() {
           setSteps(recipeData.steps);
           setComment(recipeData.comment);
           setAuthorId(recipeData.authorId);
+          setLoading(false);
         },
       );
       return unsubscribe;
     }
+    setLoading(false);
+
     return undefined;
   }, [location]);
 
@@ -515,21 +753,6 @@ function ModifyRecipe() {
       uploadImg();
     }
   }, [img, imgPath]);
-
-  // 依照當前使用者id抓出使用者名稱和id
-  // const currentId = 'XmtaQyFOf0wPGlQUKYJG'; // Zoe
-  // const currentId = 'FzrMOc7gXewUwNg5cyMn'; // David
-  // useEffect(() => {
-  //   const unsubscribe = onSnapshot(
-  //     doc(db, 'users', currentId),
-  //     (document) => {
-  //       const userdata = document.data();
-  //       setUserName(userdata.name);
-  //       setUserId(userdata.id);
-  //     },
-  //   );
-  //   return () => { unsubscribe(); };
-  // }, []);
 
   async function setNewRecipeAndNavigate() {
     // 只知道collection，要產生id
@@ -769,12 +992,20 @@ function ModifyRecipe() {
     decideToUpdateOrSetRecipe();
   }
 
+  if (loading) {
+    return (
+      <>
+        <AuthHeader />
+        <Loading />
+      </>
+    );
+  }
+
   return (
     <>
       <AuthHeader />
       <Background>
         <TitleWrapper>
-          <LargeDiv>食譜名稱</LargeDiv>
           <TittleInputWrapper>
             <TitleInput
               value={title}
@@ -784,21 +1015,19 @@ function ModifyRecipe() {
             {authorId && userId !== authorId && title === oldTitle ? <ErrorMsg>請為您的食譜取個新名稱</ErrorMsg> : ''}
           </TittleInputWrapper>
         </TitleWrapper>
-
         <ContentWrapper>
           <ContentDiv>
-            <LargeDiv>難易度</LargeDiv>
+            <MediumLargeDiv>難易度</MediumLargeDiv>
             <StarRating onChange={(i) => setDifficulty(i)} rating={difficulty} />
           </ContentDiv>
           <ContentDiv>
-            <LargeDiv>總時長</LargeDiv>
-            <LargeDiv>
+            <MediumLargeDiv>總時長</MediumLargeDiv>
+            <MediumLargeDiv>
               {Math.floor(fullTime / 60) === 0 ? '' : `${Math.floor(fullTime / 60)}分鐘`}
               {fullTime % 60 === 0 ? '' : `${fullTime % 60}秒鐘`}
-            </LargeDiv>
+            </MediumLargeDiv>
           </ContentDiv>
         </ContentWrapper>
-
         <ContentWrapper>
           <ImgWrapper>
             <FoodImg src={imgUrl || defaultImage} alt="stepImages" />
@@ -813,10 +1042,9 @@ function ModifyRecipe() {
               onChange={(e) => setImg(e.target.files[0])}
             />
           </ImgWrapper>
-
           <IngredientContentDiv>
             <IngredientTitleDiv>
-              <LargeDiv>食材</LargeDiv>
+              <MediumLargeDiv>食材</MediumLargeDiv>
             </IngredientTitleDiv>
             <AllIngredientsDiv>
               {ingredients.map((ingredient, index) => (
@@ -852,9 +1080,9 @@ function ModifyRecipe() {
         {steps.map((step, index) => (
           <div key={step.id}>
             <StepWrapper>
-              <DeleteButton type="button" onClick={() => { DeleteSteps(index); }}>
-                <IconImg src={binImage} alt="deleteImage" />
-              </DeleteButton>
+              <StepDeleteButton type="button" onClick={() => { DeleteSteps(index); }}>
+                <StepIconImg src={binImage} alt="deleteImage" />
+              </StepDeleteButton>
               <StepCircleDiv>
                 <Circle>{index + 1}</Circle>
                 {index + 1 === steps.length
@@ -880,7 +1108,7 @@ function ModifyRecipe() {
                       type="number"
                       min="0"
                     />
-                    <LargeDiv>分</LargeDiv>
+                    <MediumLargeDiv>分</MediumLargeDiv>
                     <TimeInput
                       value={steps[index].stepSecond}
                       onChange={(e) => { updateStepSecondValue(e, index); }}
@@ -888,7 +1116,7 @@ function ModifyRecipe() {
                       type="number"
                       min="0"
                     />
-                    <LargeDiv>秒</LargeDiv>
+                    <MediumLargeDiv>秒</MediumLargeDiv>
                   </StepTimeDiv>
                 </StepTitleAndTimeDiv>
                 <StepContentAndImgDiv>
@@ -919,8 +1147,10 @@ function ModifyRecipe() {
         ))}
         <CommentDiv>
           <TipsDiv>
-            <LogoImg src={tipImage} alt="tipImage" />
-            <LargeDiv>小秘訣</LargeDiv>
+            <TipImg src={tipImage} alt="tipImage" />
+            <CommentTitleSpan>
+              <Mark>小秘訣</Mark>
+            </CommentTitleSpan>
           </TipsDiv>
           <CommentContentDiv>
             <CommentTextArea
@@ -930,13 +1160,9 @@ function ModifyRecipe() {
             />
           </CommentContentDiv>
         </CommentDiv>
-        <ButtonSaveDiv>
-          <ButtonSaveButton type="button" onClick={() => { submitData(); }}>儲存食譜</ButtonSaveButton>
-        </ButtonSaveDiv>
         <RightSaveButton onClick={() => { submitData(); }}>儲存食譜</RightSaveButton>
         <ToastContainer />
       </Background>
-      <Footer />
     </>
   );
 }

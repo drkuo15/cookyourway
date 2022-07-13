@@ -6,6 +6,7 @@ import localBarImage from '../images/foodSVG/local_bar_FILL0_wght400_GRAD0_opsz4
 import localPizzaImage from '../images/foodSVG/local_pizza_FILL0_wght400_GRAD0_opsz48.svg';
 import lunchDining from '../images/foodSVG/lunch_dining_FILL0_wght400_GRAD0_opsz48.svg';
 import ramenDining from '../images/foodSVG/ramen_dining_FILL0_wght400_GRAD0_opsz48.svg';
+import { devices } from '../utils/StyleUtils';
 
 const Background = styled.div`
   width: 100vw;
@@ -14,26 +15,35 @@ const Background = styled.div`
   justify-content: space-around;
   align-items: center;
   position: relative;
+  @media ${devices.Tablet} {
+    height: calc(500*100vw/1920);
+  }
 `;
 
 const UpWrapper = styled.div`
   width: 100vw;
-  ${'' /* height: calc(300*100vw/1920); */}
   display: flex;
   justify-content: space-between;
   align-items: center;
   position: absolute;
   top: calc(-100*100vw/1920);
+  @media ${devices.Tablet} {
+    justify-content: space-around;
+    top: calc(50*100vw/1920);
+  }
 `;
 
 const DownWrapper = styled.div`
   width: 90vw;
-  ${'' /* height: calc(300*100vw/1920); */}
   display: flex;
   justify-content: space-around;
   align-items: center;
   position: absolute;
   bottom: calc(-35*100vw/1920);
+  @media ${devices.Tablet} {
+    bottom: calc(-250*100vw/1920);
+  }
+  
 `;
 
 const ImageUp = styled.img`
@@ -41,6 +51,10 @@ const ImageUp = styled.img`
   height: calc(230*100vw/1920);
   opacity: 0.3;
   transform: rotate(20deg);
+  @media ${devices.Tablet} {
+    width: calc(345*100vw/1920);
+    height: calc(345*100vw/1920);
+  }
 `;
 
 const ImageDown = styled.img`
@@ -48,6 +62,10 @@ const ImageDown = styled.img`
   height: calc(230*100vw/1920);
   opacity: 0.3;
   transform: rotate(-15deg);
+  @media ${devices.Tablet} {
+    width: calc(345*100vw/1920);
+    height: calc(345*100vw/1920);
+  }
 `;
 
 function FoodBackground() {
