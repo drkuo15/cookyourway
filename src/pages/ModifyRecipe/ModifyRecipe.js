@@ -817,7 +817,7 @@ function ModifyRecipe() {
       } else if (!imgUrl) {
         showCustomAlert('請上傳食譜封面照');
       } else if (!comment) {
-        showCustomAlert('請填寫叮嚀事項');
+        showCustomAlert('請填寫小秘訣');
       }
       return;
     } if (hasEmptyIngredientInput) {
@@ -910,8 +910,10 @@ function ModifyRecipe() {
 
   function updateQuantityValue(e, targetIndex) {
     const newIngredients = [...ingredients];
-    const input = e.target.value;
-    newIngredients[targetIndex].ingredientsQuantity = input;
+    if (Number(e.target.value) < 0) {
+      e.target.value = 0;
+    }
+    newIngredients[targetIndex].ingredientsQuantity = e.target.value;
     setIngredients(newIngredients);
   }
   function updateTitleValue(e, index) {
@@ -942,6 +944,9 @@ function ModifyRecipe() {
   function updateStepMinuteValue(e, index) {
     const newSteps = [...steps];
     newSteps[index].stepMinute = e.target.value;
+    if (Number(newSteps[index].stepMinute) < 0) {
+      newSteps[index].stepMinute = '0';
+    }
     newSteps[index].stepTime = Number(newSteps[index].stepMinute) * 60
       + Number(newSteps[index].stepSecond);
     setSteps(newSteps);
@@ -952,6 +957,9 @@ function ModifyRecipe() {
     newSteps[index].stepSecond = e.target.value;
     if (Number(newSteps[index].stepSecond) > 59) {
       newSteps[index].stepSecond = '59';
+    }
+    if (Number(newSteps[index].stepSecond) < 0) {
+      newSteps[index].stepSecond = '0';
     }
     newSteps[index].stepTime = Number(newSteps[index].stepMinute) * 60
       + Number(newSteps[index].stepSecond);

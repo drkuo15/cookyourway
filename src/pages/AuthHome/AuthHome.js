@@ -278,7 +278,6 @@ const SelectiveContext = styled.div`
   font-size: 2em;
   font-weight: 500;
   letter-spacing: 2px;
-  z-index: 100;
   &::after{
     content: "";
     width: 100%;

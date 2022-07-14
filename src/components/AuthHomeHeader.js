@@ -12,7 +12,7 @@ import chefImage from '../images/chef.png';
 const Background = styled.div`
   width: 100vw;
   height: calc(116*100vw/1920);
-  background-color: #E5D2C080;
+  background-color: #E5D2C0;
   display: flex;
   align-item: center;
   justify-content: space-between;
