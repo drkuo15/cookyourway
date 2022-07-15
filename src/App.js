@@ -17,6 +17,7 @@ import { auth, db } from './firestore/index';
 import AuthContext from './components/AuthContext';
 import NoMatch from './pages/NoMatch/NoMatch';
 import Footer from './components/Footer';
+import ScrollToTop from './components/ScrollToTop';
 
 const GlobalStyle = createGlobalStyle`
   * {
@@ -88,6 +89,7 @@ function App() {
       <BodyDiv>
         <AuthContext.Provider value={userInfo}>
           <Router>
+            <ScrollToTop />
             <Routes>
               <Route path="/cooking" element={<Cooking />} />
               <Route path="/modify_recipe" element={<ModifyRecipe />} />
