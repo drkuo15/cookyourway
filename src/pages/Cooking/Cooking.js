@@ -107,7 +107,7 @@ function Cooking() {
 
   useEffect(() => {
     setTime(initialTime);
-  }, [initialTime]);
+  }, [initialTime, stepIndex]);
 
   const currentRecipeId = location.search.split('=')[1];
   useEffect(() => {

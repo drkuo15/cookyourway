@@ -36,8 +36,7 @@ const WrapperStepButton = styled(Wrapper)`
 const StepsNav = styled(Wrapper)`
   width: calc(1250*100vw/1920);
   height: calc(110*100vw/1920);
-  padding: calc(50*100vw/1920) calc(20*100vw/1920)
-  margin: 0 auto;
+  justify-content: flex-start;
   text-align: center;
   overflow: hidden;
   font-size: calc(48*100vw/1920);
@@ -141,39 +140,6 @@ function Recipe({
   const location = useLocation();
   const navigate = useNavigate();
 
-  // const currentRecipeId = location.search.split('=')[1];
-  // useEffect(() => {
-  //   async function getData() {
-  //     const docRef = doc(db, 'recipes', currentRecipeId);
-  //     const docSnap = await getDoc(docRef);
-  //     const docData = docSnap.data();
-  //     if (!docData) {
-  //       navigate({ pathname: '/home' });
-  //       return;
-  //     }
-  //     setSteps(docData.steps);
-  //     setTitle(docData.title);
-  //     if (docData.steps.length === stepIndex + 1) {
-  //       setIsNextStep(false);
-  //     } else {
-  //       setIsNextStep(true);
-  //     }
-  //     if (stepIndex > 0) {
-  //       setIsPrevStep(true);
-  //     } else {
-  //       setIsPrevStep(false);
-  //     }
-  //     setInitialTime((docData.steps[stepIndex].stepTime));
-  //     // setInitialTime((docData.steps[stepIndex].time));
-  //     setStepsLength(docData.steps.length);
-  //   }
-  //   if (currentRecipeId) {
-  //     getData();
-  //   } else {
-  //     navigate({ pathname: '/home' });
-  //   }
-  // }, [currentRecipeId, navigate, setInitialTime, setStepsLength, setTitle, stepIndex]);
-
   useEffect(() => {
     if (steps.length === stepIndex + 1) {
       setIsNextStep(false);
@@ -188,8 +154,8 @@ function Recipe({
   }, [stepIndex, steps.length]);
 
   function renderSwitch() {
-    switch (stepIndex) {
-      case (0):
+    switch (true) {
+      case (stepIndex === 0):
         // console.log('first');
         return steps
           .filter((_, index) => index <= stepIndex + 2)
@@ -200,7 +166,8 @@ function Recipe({
               <TitleText>{step.stepTitle}</TitleText>
             </StepArea>
           ));
-      case (steps.length - 1):
+      // 當是最後一步，而且總步驟長度不是2。
+      case (stepIndex === steps.length - 1 && steps.length !== 2):
         // console.log('last');
         return steps.filter((_, index) => index >= stepIndex - 2)
           .map((step, index) => (
@@ -251,17 +218,19 @@ function Recipe({
             <StepContent>
               {step.stepContent}
             </StepContent>
-            <ExpectTime>
-              預計時間：
-              {step.stepMinute ? `${step.stepMinute}分` : ''}
-              {step.stepSecond ? `${step.stepSecond}秒` : ''}
-            </ExpectTime>
+            {step.stepMinute || step.stepSecond ? (
+              <ExpectTime>
+                預計時間：
+                {step.stepMinute ? `${step.stepMinute}分` : ''}
+                {step.stepSecond ? `${step.stepSecond}秒` : ''}
+              </ExpectTime>
+            ) : ''}
           </WrapperStep>
           <Img src={step.stepImgUrl} alt="stepImage" />
         </StepDiv>
       )).filter((_, index) => index === stepIndex)}
       <WrapperStepButton>
-        {stepIndex + 1 !== steps.length && !isPrevStep
+        {stepIndex === 0 && !isPrevStep
           ? (
             <Icon onClick={() => { setIsCounting(true); }}>
               <OutdoorGrill />

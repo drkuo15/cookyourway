@@ -12,13 +12,14 @@ const CounterWrapper = styled.div`
 
 const Time = styled.div`
   font-size: calc(48*100vw/1920);
+  width: 100%;
+  text-align: center;
 `;
 
 const ButtonDiv = styled.div`
   width: calc(400*100vw/1920);
   display: flex;
   justify-content: center;
-  gap: calc(50*100vw/1920);
   margin-top: calc(50*100vw/1920);
 `;
 
