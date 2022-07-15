@@ -674,7 +674,7 @@ function ModifyRecipe() {
   const [titleKeywords, setTitleKeyWords] = useState([]);
   const [difficulty, setDifficulty] = useState(1);
   const [ingredients, setIngredients] = useState([{
-    ingredientsQuantity: '',
+    ingredientsQuantity: 0,
     ingredientsTitle: '',
     id: v4(),
   },
@@ -683,9 +683,9 @@ function ModifyRecipe() {
     [{
       stepTitle: '',
       stepContent: '',
-      stepMinute: '',
-      stepSecond: '',
-      stepTime: '',
+      stepMinute: 0,
+      stepSecond: 0,
+      stepTime: 0,
       stepImgUrl: '',
       id: v4(),
     },
@@ -896,7 +896,7 @@ function ModifyRecipe() {
 
   function addIngredients() {
     const newIngredients = [...ingredients, {
-      ingredientsQuantity: '',
+      ingredientsQuantity: 0,
       ingredientsTitle: '',
       id: v4(),
     }];
@@ -926,9 +926,9 @@ function ModifyRecipe() {
     setSteps((prevSteps) => [...prevSteps, {
       stepTitle: '',
       stepContent: '',
-      stepMinute: '',
-      stepSecond: '',
-      stepTime: '',
+      stepMinute: 0,
+      stepSecond: 0,
+      stepTime: 0,
       stepImgUrl: '',
       stepImgPath: '',
       id: v4(),
@@ -945,7 +945,10 @@ function ModifyRecipe() {
     const newSteps = [...steps];
     newSteps[index].stepMinute = e.target.value;
     if (Number(newSteps[index].stepMinute) < 0) {
-      newSteps[index].stepMinute = '0';
+      newSteps[index].stepMinute = 0;
+    }
+    if (Number(newSteps[index].stepMinute) % 1 !== 0) {
+      newSteps[index].stepMinute = Math.floor(e.target.value);
     }
     newSteps[index].stepTime = Number(newSteps[index].stepMinute) * 60
       + Number(newSteps[index].stepSecond);
@@ -956,10 +959,13 @@ function ModifyRecipe() {
     const newSteps = [...steps];
     newSteps[index].stepSecond = e.target.value;
     if (Number(newSteps[index].stepSecond) > 59) {
-      newSteps[index].stepSecond = '59';
+      newSteps[index].stepSecond = 59;
     }
     if (Number(newSteps[index].stepSecond) < 0) {
-      newSteps[index].stepSecond = '0';
+      newSteps[index].stepSecond = 0;
+    }
+    if (Number(newSteps[index].stepMinute) % 1 !== 0) {
+      newSteps[index].stepMinute = Math.floor(e.target.value);
     }
     newSteps[index].stepTime = Number(newSteps[index].stepMinute) * 60
       + Number(newSteps[index].stepSecond);
