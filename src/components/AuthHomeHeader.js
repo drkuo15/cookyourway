@@ -19,7 +19,8 @@ const Background = styled.div`
   padding: calc(26*100vw/1920);
   position: fixed;
   top: 0;
-  z-index: 100;
+  z-index: 200;
+  box-shadow: 0px 0px calc(30*100vw/1920) #fdfdfc;
   @media ${devices.Tablet} {
     height: calc(320*100vw/1920);
   }
@@ -49,6 +50,11 @@ const ImgLink = styled(Link)`
     width: calc(180*100vw/1920);
     height: calc(180*100vw/1920);
   }
+`;
+
+const TitleLink = styled(Link)`
+  text-decoration: none;
+  color: inherit;
 `;
 
 const Img = styled.img`
@@ -130,8 +136,8 @@ const MemberPhoto = styled.img`
   box-shadow: 0px 0px 3px #e0e0e0;
   object-fit: cover;
   @media ${devices.Tablet} {
-    width: calc(180*100vw/1920);
-    height: calc(180*100vw/1920);
+    width: calc(160*100vw/1920);
+    height: calc(160*100vw/1920);
   }
 `;
 
@@ -149,8 +155,8 @@ const MemberWord = styled.div`
   align-items: center;
   box-shadow: 0px 0px 3px #e0e0e0;
   @media ${devices.Tablet} {
-    width: calc(180*100vw/1920);
-    height: calc(180*100vw/1920);
+    width: calc(160*100vw/1920);
+    height: calc(160*100vw/1920);
     font-size: calc(70*100vw/1920);
   }
 `;
@@ -316,7 +322,9 @@ function HomeHeader() {
           <ImgLink to="/home">
             <Img src={logoImage} alt="logoImage" />
           </ImgLink>
-          <Title>Cook Your Way</Title>
+          <TitleLink to="/home">
+            <Title>Cook Your Way</Title>
+          </TitleLink>
         </LeftDiv>
         <RightDiv>
           <SearchWrap>

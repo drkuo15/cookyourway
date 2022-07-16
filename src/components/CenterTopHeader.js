@@ -25,6 +25,11 @@ const ImgLink = styled(Link)`
   }
 `;
 
+const TitleLink = styled(Link)`
+  text-decoration: none;
+  color: inherit;
+`;
+
 const Img = styled.img`
   width: calc(124*100vw/1920);
   height: calc(124*100vw/1920);
@@ -50,7 +55,7 @@ function CenterTopHeader() {
       <ImgLink to="/">
         <Img src={logoImage} alt="logoImage" />
       </ImgLink>
-      <Title>Cook Your Way</Title>
+      <TitleLink to="/"><Title>Cook Your Way</Title></TitleLink>
     </CenterHeader>
   );
 }

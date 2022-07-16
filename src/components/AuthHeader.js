@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { signOut } from 'firebase/auth';
 import { useContext, useEffect, useState } from 'react';
@@ -12,14 +12,15 @@ import chefImage from '../images/chef.png';
 const Background = styled.div`
   width: 100vw;
   height: calc(116*100vw/1920);
-  background-color: #E5D2C080;
+  background-color: #E5D2C0;
   display: flex;
   align-item: center;
   justify-content: space-between;
   padding: calc(26*100vw/1920);
   position: fixed;
   top: 0;
-  z-index: 100;
+  z-index: 200;
+  box-shadow: 0px 0px calc(30*100vw/1920) #fdfdfc;
   @media ${devices.Tablet} {
     height: calc(320*100vw/1920);
   }
@@ -39,6 +40,11 @@ const RightDiv = styled(LeftDiv)`
   @media ${devices.Tablet} {
     gap: calc(50*100vw/1920);
   }
+`;
+
+const TitleLink = styled(Link)`
+  text-decoration: none;
+  color: inherit;
 `;
 
 const Img = styled.img`
@@ -91,8 +97,8 @@ const MemberPhoto = styled.img`
   box-shadow: 0px 0px 3px #e0e0e0;
   object-fit: cover;
   @media ${devices.Tablet} {
-    width: calc(180*100vw/1920);
-    height: calc(180*100vw/1920);
+    width: calc(160*100vw/1920);
+    height: calc(160*100vw/1920);
   }
 `;
 
@@ -110,8 +116,8 @@ const MemberWord = styled.div`
   align-items: center;
   box-shadow: 0px 0px 3px #e0e0e0;
   @media ${devices.Tablet} {
-    width: calc(180*100vw/1920);
-    height: calc(180*100vw/1920);
+    width: calc(160*100vw/1920);
+    height: calc(160*100vw/1920);
     font-size: calc(70*100vw/1920);
   }
 `;
@@ -187,7 +193,7 @@ function AuthHeader({ setIsCounting }) {
       <Background>
         <LeftDiv>
           <Img src={logoImage} alt="logoImage" onClick={() => NavigateToHomeAndStopPlaying()} />
-          <Title>Cook Your Way</Title>
+          <TitleLink to="/home"><Title>Cook Your Way</Title></TitleLink>
         </LeftDiv>
         <RightDiv>
           <DropdownDiv>
