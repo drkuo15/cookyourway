@@ -22,7 +22,7 @@ import blueberry from '../../images/fruits/blueberry.jpg';
 const Background = styled.div`
   padding-bottom: calc(80*100vw/1920);
   color: #2B2A29;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     padding-bottom: calc(160*100vw/1920);
   }
 `;
@@ -71,7 +71,7 @@ const SectionTitle = styled.div`
   padding: calc(80*100vw/1920) 0 calc(40*100vw/1920) calc(129*100vw/1920);
   position: relative;
   font-weight: 400;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     font-size: calc(100*100vw/1920);
   }
 `;
@@ -81,13 +81,13 @@ const Mark = styled.mark`
   line-height: 0;
   padding-bottom: calc(40*100vw/1920);
   background-color: #fec74099;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     padding-bottom: calc(80*100vw/1920);
   }
 `;
 
 const FullContentWrapper = styled.div`
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     display: -webkit-box;
     overflow: auto;
     position: relative;
@@ -98,7 +98,7 @@ const ContentWrapper = styled.div`
   display: flex;
   gap: calc(81*100vw/1920);
   padding: 0 calc(129*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(3450*100vw/1920);
   }
 `;
@@ -110,7 +110,7 @@ const ContentDiv = styled.div`
   height: calc(600*100vw/1920);
   background-color: #E5D2C0;
   border-radius: calc(15*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(1000*100vw/1920);
     height: calc(1200*100vw/1920);
   }
@@ -130,7 +130,7 @@ const Img = styled.img`
   &:hover {
     transform: scale(1.1,1.1);
   }
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(1000*100vw/1920);
     height: calc(700*100vw/1920);
   }
@@ -140,7 +140,7 @@ const ImgDiv = styled.div`
   width: calc(500*100vw/1920);
   height: calc(350*100vw/1920);
   overflow: hidden;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(1000*100vw/1920);
     height: calc(700*100vw/1920);
   }
@@ -153,7 +153,7 @@ const ContentFirstRow = styled.div`
   justify-content: space-around;
   align-items: baseline;
   padding: calc(15*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     padding: calc(30*100vw/1920);
   }
 `;
@@ -161,7 +161,7 @@ const ContentFirstRow = styled.div`
 const ContentTitle = styled.div`
   font-size: calc(36*100vw/1920);
   font-weight: 600;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     font-size: calc(90*100vw/1920);
   }
 `;
@@ -171,7 +171,7 @@ const ContentAuthor = styled.div`
   margin-top: calc(20*100vw/1920);
   margin-left: calc(4*100vw/1920);
   margin-bottom: calc(20*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     font-size: calc(70*100vw/1920);
     margin-top: calc(40*100vw/1920);
     margin-left: calc(8*100vw/1920);
@@ -180,14 +180,14 @@ const ContentAuthor = styled.div`
 `;
 
 const DefaultText = styled.div`
-  height: calc(600*100vw/1920);
+  height: calc(300*100vw/1920);
   width: calc(1662*100vw/1920);
   font-size: calc(48*100vw/1920);
   display: flex;
   justify-content: center;
   align-items: center;
-  @media ${devices.Tablet} {
-    height: calc(1200*100vw/1920);
+  @media ${devices.Tablet} and (orientation:portrait) {
+    height: calc(600*100vw/1920);
     font-size: calc(120*100vw/1920);
   }
 `;
@@ -213,7 +213,7 @@ const LeftArrow = styled.button`
   &:hover{
     background-color: #EB811F;
   }
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     ${'' /* position: static; */}
     width: calc(150*100vw/1920);
     height: calc(150*100vw/1920);
@@ -225,7 +225,7 @@ const LeftArrow = styled.button`
 const RightArrow = styled(LeftArrow)`
   right: calc(80*100vw/1920);
   left: auto;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     right: calc(-1450*100vw/1920);
   }
 `;
@@ -233,7 +233,7 @@ const RightArrow = styled(LeftArrow)`
 const ArrowIcon = styled.img`
   width: calc(40*100vw/1920);
   height: calc(40*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(80*100vw/1920);
     height: calc(80*100vw/1920);
   }
@@ -242,7 +242,7 @@ const ArrowIcon = styled.img`
 const StarRow = styled.div`
   font-size: calc(20*100vw/1920);
   color: #808080;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     font-size: calc(50*100vw/1920);
   }
 `;

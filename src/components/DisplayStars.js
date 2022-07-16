@@ -17,7 +17,7 @@ const StarDiv = styled.div`
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   }
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     &:before{font-size: calc(var(--size)*1.8*100vw/1920)};
   }
 `;

@@ -33,7 +33,8 @@ const Icon = styled.div`
 `;
 
 const CookingWrapper = styled.div`
-  height: 92.5vh;
+  ${'' /* height: 92.5vh; */}
+
   @media only screen and (orientation:portrait){
     display: none;
     }
@@ -41,12 +42,13 @@ const CookingWrapper = styled.div`
 
 const Wrapper = styled.div`
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
+  gap: 7.5vh;
   align-items: flex-start;
-  ${'' /* margin-top: calc(60*100vw/1920);
-  margin-bottom: calc(60*100vw/1920); */}
-  height: calc(100% - 11vh);
-
+  ${'' /* margin-top: calc(60*100/9*16vh/1920);
+  margin-bottom: calc(60*100/9*16vh/1920); */}
+  min-height: 80vh;
+  margin: 0 2.5vh;
 `;
 
 const LeftTimer = styled.div`
@@ -54,20 +56,20 @@ const LeftTimer = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: calc(500*100vw/1920);
-  height: calc(730*100vw/1920);
+  width: calc(500*100/9*16vh/1920);
+  height: calc(730*100/9*16vh/1920);
   background-color: #E5D2C0;
-  border-radius: calc(15*100vw/1920);
-  margin: auto;
+  border-radius: calc(15*100/9*16vh/1920);
+  margin: auto 0;
 `;
 
 const RightRecipe = styled.div`
-  margin: auto;
+  margin: auto 0;
 `;
 
 const Title = styled.div`
-  font-size: calc(48*100vw/1920);
-  margin-bottom: calc(50*100vw/1920);
+  font-size: calc(48*100/9*16vh/1920);
+  margin-bottom: calc(50*100/9*16vh/1920);
 `;
 
 const playlist = [music1, music2, music3, music4];

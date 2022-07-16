@@ -11,38 +11,38 @@ const CounterWrapper = styled.div`
 `;
 
 const Time = styled.div`
-  font-size: calc(48*100vw/1920);
+  font-size: calc(48*100/9*16vh/1920);
   width: 100%;
   text-align: center;
 `;
 
 const ButtonDiv = styled.div`
-  width: calc(400*100vw/1920);
+  width: calc(400*100/9*16vh/1920);
   display: flex;
   justify-content: center;
-  margin-top: calc(50*100vw/1920);
+  margin-top: calc(50*100/9*16vh/1920);
 `;
 
 const Button = styled.button`
-  width: calc(65*100vw/1920);
-  height: calc(65*100vw/1920);
+  width: calc(65*100/9*16vh/1920);
+  height: calc(65*100/9*16vh/1920);
   background-color: transparent;
   border: 0;
   cursor: pointer;
 `;
 
 // const Img = styled.img`
-//   width: calc(65*100vw/1920);
-//   height: calc(65*100vw/1920);
+//   width: calc(65*100/9*16vh/1920);
+//   height: calc(65*100/9*16vh/1920);
 // `;
 
 const Icon = styled.span`
-  width: calc(65*100vw/1920);
-  height: calc(65*100vw/1920);
+  width: calc(65*100/9*16vh/1920);
+  height: calc(65*100/9*16vh/1920);
   cursor: pointer;
   & > svg{
-    width: calc(65*100vw/1920);
-    height: calc(65*100vw/1920);
+    width: calc(65*100/9*16vh/1920);
+    height: calc(65*100/9*16vh/1920);
     color: #2B2A29;
   }
   & > svg:hover {

@@ -40,7 +40,7 @@ const TitleWrapper = styled(Div)`
   margin-top: calc(46*100vw/1920);
   margin-bottom: calc(50*100vw/1920);
   width: calc(800*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     flex-direction: column;
     align-items: center;
       width: calc(1600*100vw/1920);
@@ -49,7 +49,7 @@ const TitleWrapper = styled(Div)`
 
 const MediumLargeDiv = styled.div`
   font-size: calc(36*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     font-size: calc(72*100vw/1920);
   }
 `;
@@ -71,7 +71,7 @@ const TitleInput = styled.input`
   &:focus {
     border-color: #EB811F;
   }
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
       font-size: calc(96*100vw/1920);
   }
 `;
@@ -81,7 +81,7 @@ const ErrorMsg = styled.div`
   color: red;
   margin-top: calc(10*100vw/1920);
   text-align: end;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
       font-size: calc(48*100vw/1920);
   }
 `;
@@ -92,7 +92,7 @@ const ContentWrapper = styled.div`
   gap: calc(88*100vw/1920);
   align-items: center;
   margin-bottom: calc(50*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     flex-direction: column;
     align-items: center;
   }
@@ -103,7 +103,7 @@ const ContentDiv = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(1600*100vw/1920);
   }
 
@@ -117,7 +117,7 @@ const FoodImg = styled.img`
   width: calc(800*100vw/1920);
   height: calc(600*100vw/1920);
   border-radius: calc(15*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(1600*100vw/1920);
     height: calc(1200*100vw/1920);
   }
@@ -134,7 +134,7 @@ const Label = styled.label`
   height: calc(600*100vw/1920);
   position: absolute;
   top: 0;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(1600*100vw/1920);
     height: calc(1200*100vw/1920);
   }
@@ -151,7 +151,7 @@ const UploadImgP = styled.p`
   letter-spacing: calc(2*100vw/1920);
   font-size: calc(36*100vw/1920);
   border-radius: calc(15*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(568*100vw/1920);
     height: calc(128*100vw/1920); 
     font-size: calc(72*100vw/1920);
@@ -171,7 +171,7 @@ const IngredientContentDiv = styled.div`
   justify-content: space-around;
   width: calc(800*100vw/1920);
   height: calc(600*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(1600*100vw/1920);
     height: calc(1200*100vw/1920);
   }
@@ -192,7 +192,7 @@ const AllIngredientsDiv = styled.div`
   font-size: calc(36*100vw/1920);
   flex-grow: 1;
   overflow-y: auto;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     font-size: calc(72*100vw/1920);
     padding-top: calc(50*100vw/1920);
     gap: calc(30*100vw/1920);
@@ -215,7 +215,7 @@ const Input = styled.input`
   &:focus {
     border-color: #EB811F;
   }
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(650*100vw/1920);
     height: calc(112*100vw/1920);
     padding: calc(4*100vw/1920) calc(16*100vw/1920);
@@ -236,7 +236,7 @@ const QuantityInput = styled(Input)`
   &::-webkit-inner-spin-button {
     -webkit-appearance: none;
   }
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(270*100vw/1920);
   }
 `;
@@ -246,7 +246,7 @@ const DeleteButton = styled.button`
   background-color: transparent;
   cursor: pointer;
   border: 0;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     height: calc(90 * 100vw / 1920);
   }
 `;
@@ -254,7 +254,7 @@ const DeleteButton = styled.button`
 const IconImg = styled.img`
   width: calc(45*100vw/1920);
   height: calc(45*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     height: calc(90 * 100vw / 1920);
     width: calc(90*100vw/1920);
   }
@@ -263,7 +263,7 @@ const IconImg = styled.img`
 const StepDeleteButton = styled(DeleteButton)`
   height: calc(56 * 100vw / 1920);
   margin-top: calc(20*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     height: calc(112 * 100vw / 1920);
     margin-top: calc(40*100vw/1920);
   }
@@ -272,7 +272,7 @@ const StepDeleteButton = styled(DeleteButton)`
 const StepIconImg = styled(IconImg)`
   width: calc(56*100vw/1920);
   height: calc(56*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     height: calc(112 * 100vw / 1920);
     width: calc(112*100vw/1920);
   }
@@ -282,7 +282,7 @@ const AddIngredientDiv = styled.div`
   width: 100%;
   text-align: center;
   margin-top: calc(16*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
       margin-top: calc(32*100vw/1920);
       margin-bottom: calc(32*100vw/1920);
   }
@@ -300,7 +300,7 @@ const AddIngredientButton = styled.button`
   &:hover {
     background-color: #4c3732;
   }
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
       width: calc(400*100vw/1920);
     height: calc(100*100vw/1920);
     font-size: calc(56*100vw/1920);
@@ -311,7 +311,7 @@ const AddIngredientButton = styled.button`
 const StepWrapper = styled.div`
   display: flex;
   justify-content: space-between;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     justify-content: center;
     gap: calc(20*100vw/1920);
   }
@@ -324,7 +324,7 @@ const StepCircleDiv = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(300*100vw/1920);
   }
 `;
@@ -340,7 +340,7 @@ const Circle = styled.div`
   text-align: center;
   justify-content: center;
   align-items: center;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(200*100vw/1920);
     height: calc(200*100vw/1920);
     font-size: calc(96*100vw/1920);
@@ -351,7 +351,7 @@ const Line = styled.div`
   width: calc(2.5*100vw/1920);
   height: calc(625*100vw/1920);
   background-color: #2B2A29;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(5*100vw/1920);
     height: calc(1400*100vw/1920);
   }
@@ -361,7 +361,7 @@ const AddStepDiv = styled.div`
   height: calc(525*100vw/1920);
   display: flex;
   margin-top: calc(100*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     height: calc(1050*100vw/1920);
     margin-top: calc(200*100vw/1920);
   }
@@ -384,7 +384,7 @@ const AddStepButton = styled.div`
     &:hover {
     background-color: #4c3732;
   }
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(100*100vw/1920);
     height: calc(400*100vw/1920);
     font-size: calc(56*100vw/1920);
@@ -394,7 +394,7 @@ const AddStepButton = styled.div`
 const StepTitleContentWrapper = styled.div`
   height: calc(650*100vw/1920);
   padding-top: calc(18 * 100vw / 1920);
-    @media ${devices.Tablet} {
+    @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(1100*100vw/1920);
     height: calc(1000*100vw/1920);
   }
@@ -404,7 +404,7 @@ const StepTitleAndTimeDiv = styled(Div)`
   font-size: calc(48*100vw/1920);
   border-bottom: calc(5*100vw/1920)  #2B2A29 solid;
   padding-bottom: calc(50*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     font-size: calc(96*100vw/1920);
     flex-direction: column;
     gap: calc(50*100vw/1920);
@@ -423,7 +423,7 @@ const StepInput = styled.input`
     border-color: #EB811F;
   }
   padding-left: calc(15*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(1100*100vw/1920);
     height: calc(120*100vw/1920);
     font-size: calc(72*100vw/1920);
@@ -451,7 +451,7 @@ const TimeInput = styled.input`
   &::-webkit-inner-spin-button {
     -webkit-appearance: none;
   }
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(300*100vw/1920);
     height: calc(120*100vw/1920);
     font-size: calc(76*100vw/1920);
@@ -461,7 +461,7 @@ const TimeInput = styled.input`
 const StepContentAndImgDiv = styled(Div)`
   align-items: center;
   margin-top: calc(36*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     margin-top: calc(0*100vw/1920);
     flex-direction: column;
     justify-content: center;
@@ -472,15 +472,15 @@ const StepContentDiv = styled.div`
   font-size: calc(36*100vw/1920);
   width: calc(800*100vw/1920);
   height: calc(500*100vw/1920);
-  overflow: scroll;
+  overflow: auto;
   display: flex;
   align-items: center;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(1100*100vw/1920);
     height: calc(300*100vw/1920);
     font-size: calc(72*100vw/1920);
     line-height: calc(100*100vw/1920);
-    overflow-y: scroll;
+    overflow-y: auto;
     white-space: nowrap;
   }
 `;
@@ -497,7 +497,7 @@ const TextArea = styled.textarea`
   &:focus{
     border-color:  #EB811F;
   }
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(1100*100vw/1920);
     height: calc(200*100vw/1920);
     font-size: calc(72*100vw/1920);
@@ -511,7 +511,7 @@ const StepImg = styled.img`
   width: calc(600*100vw/1920);
   height: calc(450*100vw/1920);
   border-radius: calc(15*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(900*100vw/1920);
     height: calc(675*100vw/1920);
   }
@@ -520,7 +520,7 @@ const StepImg = styled.img`
 const StepLabel = styled(Label)`
   width: calc(600*100vw/1920);
   height: calc(450*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(900*100vw/1920);
     height: calc(675*100vw/1920);
   }
@@ -533,7 +533,7 @@ const StepUploadImgP = styled(UploadImgP)`
   top: calc(325*100vw/1920);
   left: calc(175*100vw/1920);
   font-size: calc(28*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(568*100vw/1920);
     height: calc(128*100vw/1920); 
     font-size: calc(56*100vw/1920);
@@ -551,7 +551,7 @@ const CommentDiv = styled.div`
   background-color: #E5D2C050;
   border-radius: calc(15*100vw/1920);
   margin-bottom: calc(50*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     padding: calc(60*100vw/1920);
     margin-top: calc(90*100vw/1920);
     width: 100%;
@@ -562,7 +562,7 @@ const CommentDiv = styled.div`
 const CommentContentDiv = styled.div`
   font-size: calc(36*100vw/1920);
   margin-top: calc(25*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     margin-top: calc(60*100vw/1920);
     font-size: calc(72*100vw/1920);
   }
@@ -571,7 +571,7 @@ const CommentContentDiv = styled.div`
 const CommentTitleSpan = styled.span`
   font-size: calc(36*100vw/1920);
   font-weight: 500;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     font-size: calc(72*100vw/1920);
   }
 `;
@@ -591,7 +591,7 @@ const TipsDiv = styled.div`
 const TipImg = styled.img`
   width: calc(60*100vw/1920);
   height: calc(60*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(90*100vw/1920);
     height: calc(90*100vw/1920);
   }
@@ -601,7 +601,7 @@ const CommentTextArea = styled(TextArea)`
   width: 100%;
   height: calc(150*100vw/1920);
   line-height: calc(64*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     height: calc(300*100vw/1920);
     line-height: calc(100*100vw/1920);
   }
@@ -624,7 +624,7 @@ const RightSaveButton = styled.button`
   &:hover{
     background-color:#fa8921;
   }
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(100*100vw/1920);
     height: calc(400*100vw/1920);
     font-size: calc(60*100vw/1920);

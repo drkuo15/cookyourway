@@ -50,7 +50,6 @@ const Player = styled.div`
   height: calc(1.5*195*100vw/1920);
   width: calc(1.5*220*100vw/1920);
   position: relative;
-  margin: calc(48*100vw/1920) auto calc(64*100vw/1920) auto;
   background: #EB811F;
   border: calc(1.5*3*100vw/1920) solid #E5D2C0;
   border-radius: calc(1.5*8*100vw/1920);

@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { devices } from '../utils/StyleUtils';
 
 const Background = styled.div`
-  width: 100vw;
+  width: 100%;
   height: 7.5vh;
   background-color: #343638;
   color: #FDFDFC;
@@ -11,7 +11,7 @@ const Background = styled.div`
   justify-content: center;
   align-items: center;
   padding: calc(26*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     font-size: calc(50*100vw/1920);
   }
 `;

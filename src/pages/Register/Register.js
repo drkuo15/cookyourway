@@ -17,7 +17,7 @@ const Wrapper = styled.div`
   justify-content: center;
   align-items: center;
   gap: calc(95*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     flex-direction: column;
   }
 `;
@@ -31,7 +31,7 @@ const RegisterBox = styled.div`
   width: calc(804*100vw/1920);
   height: calc(572*100vw/1920);
   border-radius: calc(15*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(1650*100vw/1920);
     height: calc(1144*100vw/1920);
   }
@@ -76,7 +76,7 @@ const ManualRegister = styled.div`
   align-items: center;
   justify-content: space-around;
   height: calc(400*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     height: calc(800*100vw/1920);
   }
 `;
@@ -95,7 +95,7 @@ const ManualInput = styled.input`
   &:focus {
     border-color: #EB811F;
   }
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(1120*100vw/1920);
     height: calc(144*100vw/1920);
     font-size: calc(70*100vw/1920);
@@ -117,7 +117,7 @@ const RegisterButton = styled.div`
   &:hover{
   background-color:#fa8921;
   }
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(664*100vw/1920);
     height: calc(144*100vw/1920);
     line-height: calc(144*100vw/1920);
@@ -130,7 +130,7 @@ const VerticalLine = styled.div`
   height: calc(644*100vw/1920);
   background-color: #2B2A29;
   opacity: 0.5;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
   height: calc(10*100vw/1920);
   width: calc(1650*100vw/1920);
   margin-top: calc(80*100vw/1920);
@@ -149,7 +149,7 @@ const Question = styled(Link)`
   text-decoration: none;
   color: inherit;
   &:hover {opacity: 1;};
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
   font-size: calc(120*100vw/1920);
   opacity: 1;
   }
@@ -158,7 +158,7 @@ const Question = styled(Link)`
 const HelpImg = styled.img`
   width: calc(384*100vw/1920);
   height: calc(384*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
   width: calc(900*100vw/1920);
   height: calc(900*100vw/1920);
   }
@@ -177,7 +177,7 @@ const LoginButton = styled.div`
   cursor: pointer;
   z-index: 10;
   &:hover {background-color: #4c3732;}
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(664*100vw/1920);
     height: calc(144*100vw/1920);
     line-height: calc(144*100vw/1920);
@@ -188,7 +188,7 @@ const LoginButton = styled.div`
 const ErrorMsg = styled.p`
   font-size: calc(24*100vw/1920);
   color: red;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     font-size: calc(60*100vw/1920);
   }
 `;
