@@ -4,7 +4,7 @@ import { devices } from '../utils/StyleUtils';
 import logoImage from '../images/CookYourWay_logo_v1.png';
 
 const Background = styled.div`
-  width: 100vw;
+  width: 100%;
   height: calc(116*100vw/1920);
   background-color: #E5D2C0;
   display: flex;

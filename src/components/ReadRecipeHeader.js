@@ -13,7 +13,7 @@ import AuthContext from './AuthContext';
 import chefImage from '../images/chef.png';
 
 const Background = styled.div`
-  width: 100vw;
+  width: 100%;
   height: calc(116*100vw/1920);
   background-color: #E5D2C0;
   display: flex;

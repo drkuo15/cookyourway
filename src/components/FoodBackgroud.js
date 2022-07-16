@@ -9,7 +9,7 @@ import ramenDining from '../images/foodSVG/ramen_dining_FILL0_wght400_GRAD0_opsz
 import { devices } from '../utils/StyleUtils';
 
 const Background = styled.div`
-  width: 100vw;
+  width: 100%;
   height: calc(250*100vw/1920);
   display: flex;
   justify-content: space-around;
@@ -21,7 +21,7 @@ const Background = styled.div`
 `;
 
 const UpWrapper = styled.div`
-  width: 100vw;
+  width: 96%;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -34,7 +34,7 @@ const UpWrapper = styled.div`
 `;
 
 const DownWrapper = styled.div`
-  width: 90vw;
+  width: 90%;
   display: flex;
   justify-content: space-around;
   align-items: center;

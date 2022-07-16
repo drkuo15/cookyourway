@@ -57,12 +57,12 @@ const Background = styled.div`
 // `;
 
 const SectionWithBackground = styled.div`
-  width: 100vw;
+  width: 100%;
   position: relative;
 `;
 
 const Section = styled.div`
-  width: 100vw;
+  width: 100%;
   position: relative;
 `;
 
