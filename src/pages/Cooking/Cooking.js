@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import styled from 'styled-components/macro';
 import { ScreenRotation } from '@styled-icons/material-rounded';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -13,6 +13,7 @@ import music3 from '../../music/music3.mp3';
 import music4 from '../../music/music4.mp3';
 import Loading from '../../components/Loading';
 import { db } from '../../firestore';
+import AuthContext from '../../components/AuthContext';
 
 const ForceLandscapeAlert = styled.div`
   display:none;
@@ -69,9 +70,6 @@ const Title = styled.div`
   margin-bottom: calc(50*100vw/1920);
 `;
 
-// const Background = styled.div`
-// `;
-
 const playlist = [music1, music2, music3, music4];
 
 // const playlist = [
@@ -99,11 +97,26 @@ function Cooking() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [steps, setSteps] = useState([]);
+  const userInfo = useContext(AuthContext);
+  const userId = userInfo?.uid || '';
+  const [checkingUser, setCheckingUser] = useState(true);
 
   // const DEFAULT_URL = 'https://firebasestorage.googleapis.com/v0/b/cook-your-way.appspot.com/o/tunetank.com_5423_lazy-bones_by_vital.mp3?alt=media&token=30cb614d-0230-482a-b83c-9c82bf77022e';
   // const [url, setUrl] = useState(DEFAULT_URL);
   // const [random, setRandom] = useState(Math.floor(Math.random() * playlist.length));
   // const randomUrl = playlist[random];
+
+  useEffect(() => {
+    if (userInfo === '') {
+      setCheckingUser(true);
+    }
+    if (userInfo === null) {
+      navigate({ pathname: '/' });
+    }
+    if (userId) {
+      setCheckingUser(false);
+    }
+  }, [navigate, userId, userInfo]);
 
   useEffect(() => {
     setTime(initialTime);
@@ -131,6 +144,15 @@ function Cooking() {
       navigate({ pathname: '/home' });
     }
   }, [currentRecipeId, navigate, stepIndex]);
+
+  if (checkingUser) {
+    return (
+      <>
+        <AuthHeader setIsCounting={setIsCounting} />
+        <Loading />
+      </>
+    );
+  }
 
   if (loading) {
     return (

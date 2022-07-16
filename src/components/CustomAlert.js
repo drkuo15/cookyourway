@@ -4,10 +4,10 @@ import 'react-toastify/dist/ReactToastify.css';
 function showCustomAlert(message) {
   const notify = () => toast.error(message, {
     style: {
-      '--toastify-color-progress-error': '#EB811F', '--toastify-icon-color-error': '#EB811F', color: '#2B2A29', whiteSpace: 'pre-line', textAlign: 'left',
+      '--toastify-color-progress-error': '#EB811F', '--toastify-icon-color-error': '#EB811F', color: '#2B2A29', whiteSpace: 'pre-line', textAlign: 'center',
     },
     position: 'top-center',
-    autoClose: 3000,
+    autoClose: 4000,
     hideProgressBar: false,
     closeOnClick: true,
     pauseOnHover: true,
