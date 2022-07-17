@@ -263,7 +263,7 @@ const SearchInput = styled.input`
   top: calc(24*100vw/1920);
   right: 0;
   background: none;
-  z-index: 3;
+  z-index: ${(props) => (props.show ? 3 : 1)};
   transition: width 0.4s cubic-bezier(0, 0.795, 0, 1);
   cursor: pointer;
   &:hover ~ ${SearchInputImg}{
@@ -304,6 +304,7 @@ function HomeHeader() {
   const [userInitial, setUserInitial] = useState('');
   const [showMemberWord, setShowMemberWord] = useState(true);
   const [showMemberPhoto, setShowMemberPhoto] = useState(false);
+  const [inputShown, setInputShown] = useState(true);
   const [searchName, setSearchName] = useState('');
   const navigate = useNavigate();
 
@@ -330,6 +331,7 @@ function HomeHeader() {
           <SearchWrap>
             <SearchForm action="" autocomplete="on">
               <SearchInput
+                show={inputShown}
                 name="search"
                 type="search"
                 placeholder="來找些料理吧！"
@@ -339,10 +341,17 @@ function HomeHeader() {
                   }
                 }}
                 onChange={(e) => { setSearchName(e.target.value); }}
+                onBlur={() => {
+                  setInputShown(false);
+                }}
               />
               <SearchInputImg>
                 <Search onClick={() => {
-                  navigate({ pathname: '/search_recipe', search: `?q=${searchName}` });
+                  if (searchName) {
+                    navigate({ pathname: '/search_recipe', search: `?q=${searchName}` });
+                  } else {
+                    setInputShown(true);
+                  }
                 }}
                 />
               </SearchInputImg>
