@@ -93,7 +93,7 @@ function Cooking() {
   const [isCounting, setIsCounting] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
   const [stepsLength, setStepsLength] = useState(0);
-  const [playIndex, setPlayIndex] = useState(0);
+  const [playIndex, setPlayIndex] = useState(Math.floor(Math.random() * 4));
   const url = playlist[playIndex];
   const location = useLocation();
   const navigate = useNavigate();
