@@ -1,5 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
+import { devices } from '../utils/StyleUtils';
+
+const StarSpan = styled.span`
+  cursor: pointer;
+  font-size: calc(48*100vw/1920);
+  color: #BE0028;
+  @media ${devices.Tablet} and (orientation: portrait){
+    font-size: calc(48*1.8*100vw/1920);
+  }
+`;
 
 class StarRating extends React.Component {
   constructor(props) {
@@ -38,9 +49,8 @@ class StarRating extends React.Component {
       <div>
         <div className="rating">
           {stars.map((star) => (
-            <span
+            <StarSpan
               key={star}
-              style={{ cursor: 'pointer', fontSize: 'calc(48*100vw/1920)', color: '#BE0028' }}
               onClick={() => { this.changeRating(star); }}
               role="presentation"
               onKeyPress={this.handleKeyPress}
@@ -49,7 +59,7 @@ class StarRating extends React.Component {
             >
               {rating < star
                 && hovered < star ? deselectedIcon : selectedIcon}
-            </span>
+            </StarSpan>
           ))}
         </div>
       </div>

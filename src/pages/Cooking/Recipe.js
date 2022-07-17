@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import styled from 'styled-components/macro';
+import styled, { keyframes } from 'styled-components/macro';
 import {
   West, East, OutdoorGrill, LocalDining,
 } from '@styled-icons/material-rounded';
@@ -116,6 +116,23 @@ const Img = styled.img`
   border-radius: calc(15*100/9*16vh/1920);
 `;
 
+const Shine = keyframes`
+  to {
+    background-position-x: -200%;
+  }
+`;
+
+const ImgDefaultDiv = styled.div`
+  width: calc(600*100/9*16vh/1920);
+  height: calc(450*100/9*16vh/1920);
+  object-fit: cover;
+  border-radius: calc(15*100/9*16vh/1920);
+  background: #eee;
+  background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
+  background-size: 200% 100%;
+  animation: 1.5s ${Shine} linear infinite;
+`;
+
 const Icon = styled.span`
   cursor: pointer;
   font-size: calc(40*100/9*16vh/1920);
@@ -139,6 +156,7 @@ function Recipe({
   const [isPrevStep, setIsPrevStep] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const [imgLoaded, setImgLoaded] = useState(false);
 
   useEffect(() => {
     if (steps.length === stepIndex + 1) {
@@ -226,7 +244,23 @@ function Recipe({
               </ExpectTime>
             ) : ''}
           </WrapperStep>
-          <Img src={step.stepImgUrl} alt="stepImage" />
+          {/* <Img src={step.stepImgUrl} alt="stepImage" /> */}
+          {imgLoaded ? (
+            <Img
+              src={step.stepImgUrl}
+              alt="stepImage"
+            />
+          ) : (
+            <>
+              <Img
+                style={imgLoaded ? {} : { display: 'none' }}
+                src={step.stepImgUrl}
+                alt="stepImage"
+                onLoad={() => { setImgLoaded(true); }}
+              />
+              <ImgDefaultDiv />
+            </>
+          )}
         </StepDiv>
       )).filter((_, index) => index === stepIndex)}
       <WrapperStepButton>

@@ -167,7 +167,26 @@ const Padding = styled.div`
   }
 `;
 
+const ToolTipText = styled.span`
+  visibility: hidden;
+  width: calc(440*100vw/1920);
+  background-color: #26262590;
+  font-size: calc(26*100vw/1920);
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: calc(20*100vw/1920); 0;
+  position: absolute;
+  z-index: 1;
+  bottom: -230%;
+  left: -100%;
+  margin-left: calc(-250*100vw/1920);;
+  opacity: 0;
+  transition: opacity 1s;
+`;
+
 const Icon = styled.span`
+  position: relative;
   cursor: pointer;
   font-size: calc(40*100vw/1920);
   display: flex;
@@ -182,6 +201,10 @@ const Icon = styled.span`
   }
   & > svg:hover {
     color: ${(props) => ((props.selected))};
+  }
+  &:hover > ${ToolTipText} {
+    visibility: visible;
+    opacity: 1;
   }
   @media ${devices.Tablet} and (orientation:portrait) {
     & > svg{
@@ -234,18 +257,38 @@ function ReadRecipeHeader({
         </LeftDiv>
         <RightDiv>
           {myFavorites.includes(currentRecipeId)
-            ? <Icon colorCode="#BE0028" selected="#dd1b44" onClick={removeFromFavorites}><Favorite /></Icon>
-            : <Icon colorCode="#808080" selected="#b2b0b0" onClick={addToFavorites}><FavoriteBorder /></Icon>}
+            ? (
+              <Icon colorCode="#BE0028" selected="#dd1b44" onClick={removeFromFavorites}>
+                <Favorite />
+                <ToolTipText>
+                  點擊取消收藏
+                  <br />
+                  嗚嗚～我的心碎了一地
+                </ToolTipText>
+              </Icon>
+            )
+            : (
+              <Icon colorCode="#808080" selected="#b2b0b0" onClick={addToFavorites}>
+                <FavoriteBorder />
+                <ToolTipText>喜歡我嗎？趕緊加入收藏吧！</ToolTipText>
+              </Icon>
+            )}
           <ButtonLink to={`/modify_recipe?id=${location.search.split('=')[1]}`}>
             {userId === authorId
               ? (
                 <Icon colorCode="#808080" selected="#b2b0b0">
                   <Edit />
+                  <ToolTipText>有些新想法嗎？ 來編輯食譜吧！</ToolTipText>
                 </Icon>
               )
               : (
                 <Icon colorCode="#808080" selected="#b2b0b0">
                   <ContentCopy />
+                  <ToolTipText>
+                    複製食譜！
+                    <br />
+                    將天馬行空的點子寫進食譜吧！
+                  </ToolTipText>
                 </Icon>
               )}
           </ButtonLink>
