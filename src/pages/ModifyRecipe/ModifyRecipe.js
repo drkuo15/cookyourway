@@ -674,7 +674,7 @@ function ModifyRecipe() {
   const [titleKeywords, setTitleKeyWords] = useState([]);
   const [difficulty, setDifficulty] = useState(1);
   const [ingredients, setIngredients] = useState([{
-    ingredientsQuantity: 0,
+    ingredientsQuantity: '',
     ingredientsTitle: '',
     id: v4(),
   },
@@ -683,9 +683,9 @@ function ModifyRecipe() {
     [{
       stepTitle: '',
       stepContent: '',
-      stepMinute: 0,
-      stepSecond: 0,
-      stepTime: 0,
+      stepMinute: '',
+      stepSecond: '',
+      stepTime: '',
       stepImgUrl: '',
       id: v4(),
     },
@@ -806,11 +806,12 @@ function ModifyRecipe() {
       authorId: userId,
 
     };
-    const hasEmptyIngValue = (obj) => Object.values(obj).some((value) => value === '');
+    const hasEmptyIngValue = (obj) => Object.values(obj).some((value) => value === '' || value === 0);
     const hasEmptyIngredientInput = ingredients.some((ingredient) => hasEmptyIngValue(ingredient));
     const hasEmptyStepValue = (obj) => Object.values(obj).some((value) => value === '');
-    const hasEmptyStepInput = steps.some((step) => hasEmptyStepValue(step));
+    const hasEmptyStepInput = steps.some((step) => hasEmptyStepValue(step) || step.stepTime === 0);
     const hasEmptyOtherInput = Object.values(newRecipeData).some((value) => !value);
+
     if (hasEmptyOtherInput) {
       if (!title) {
         showCustomAlert('請填寫食譜名稱');
@@ -818,13 +819,11 @@ function ModifyRecipe() {
         showCustomAlert('請上傳食譜封面照');
       } else if (!comment) {
         showCustomAlert('請填寫小秘訣');
+      } else if (hasEmptyIngredientInput) {
+        showCustomAlert('請填寫完整食材內容');
+      } else if (hasEmptyStepInput) {
+        showCustomAlert('請填寫完整步驟內容 \n 步驟時間不可以都是0喔');
       }
-      return;
-    } if (hasEmptyIngredientInput) {
-      showCustomAlert('請填寫完整食材內容');
-      return;
-    } if (hasEmptyStepInput) {
-      showCustomAlert('請填寫完整步驟內容');
       return;
     }
     // 知道collection name, document name，新建資料
@@ -868,10 +867,10 @@ function ModifyRecipe() {
       authorName: userName,
       authorId: userId,
     };
-    const hasEmptyIngValue = (obj) => Object.values(obj).some((value) => value === '');
+    const hasEmptyIngValue = (obj) => Object.values(obj).some((value) => value === '' || value === 0);
     const hasEmptyIngredientInput = ingredients.some((ingredient) => hasEmptyIngValue(ingredient));
     const hasEmptyStepValue = (obj) => Object.values(obj).some((value) => value === '');
-    const hasEmptyStepInput = steps.some((step) => hasEmptyStepValue(step));
+    const hasEmptyStepInput = steps.some((step) => hasEmptyStepValue(step) || step.stepTime === 0);
     const hasEmptyOtherInput = Object.values(newRecipeData).some((value) => !value);
 
     if (hasEmptyOtherInput) {
@@ -880,14 +879,12 @@ function ModifyRecipe() {
       } else if (!imgUrl) {
         showCustomAlert('請上傳食譜封面照');
       } else if (!comment) {
-        showCustomAlert('請填寫叮嚀事項');
+        showCustomAlert('請填寫小秘訣');
+      } else if (hasEmptyIngredientInput) {
+        showCustomAlert('請填寫完整食材內容');
+      } else if (hasEmptyStepInput) {
+        showCustomAlert('請填寫完整步驟內容 \n 步驟時間不可以都是0喔');
       }
-      return;
-    } if (hasEmptyIngredientInput) {
-      showCustomAlert('請填寫完整食材內容');
-      return;
-    } if (hasEmptyStepInput) {
-      showCustomAlert('請填寫完整步驟內容');
       return;
     }
     updateDoc(RecipeRef, newRecipeData);
@@ -896,7 +893,7 @@ function ModifyRecipe() {
 
   function addIngredients() {
     const newIngredients = [...ingredients, {
-      ingredientsQuantity: 0,
+      ingredientsQuantity: '',
       ingredientsTitle: '',
       id: v4(),
     }];
@@ -926,9 +923,9 @@ function ModifyRecipe() {
     setSteps((prevSteps) => [...prevSteps, {
       stepTitle: '',
       stepContent: '',
-      stepMinute: 0,
-      stepSecond: 0,
-      stepTime: 0,
+      stepMinute: '',
+      stepSecond: '',
+      stepTime: '',
       stepImgUrl: '',
       stepImgPath: '',
       id: v4(),
