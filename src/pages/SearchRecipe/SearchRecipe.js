@@ -3,12 +3,13 @@ import {
   collection, query, where, getDocs,
 } from 'firebase/firestore';
 import { useState, useEffect } from 'react';
-import styled from 'styled-components/macro';
+import styled, { keyframes } from 'styled-components/macro';
 import { Search } from '@styled-icons/material-rounded';
 import { db } from '../../firestore';
 import { devices } from '../../utils/StyleUtils';
 import Stars from '../../components/DisplayStars';
 import SearchRecipeHeader from '../../components/SearchRecipeHeader';
+import Loading from '../../components/Loading';
 
 const SearchInput = styled.input`
   width: calc(1282*100vw/1920);
@@ -129,6 +130,26 @@ const Img = styled.img`
   }
 `;
 
+const Shine = keyframes`
+  to {
+    background-position-x: -200%;
+  }
+`;
+
+const ImgDefaultDiv = styled.div`
+  width: calc(500*100vw/1920);
+  height: calc(350*100vw/1920);
+  border-radius: calc(15*100vw/1920);
+  background: #eee;
+  background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
+  background-size: 200% 100%;
+  animation: 1.5s ${Shine} linear infinite;
+  @media ${devices.Tablet} and (orientation:portrait) {
+    width: calc(750*100vw/1920);
+    height: calc(525*100vw/1920);
+  }
+`;
+
 const ResultContent = styled.div`
   display: flex;
   flex-direction: column;
@@ -238,6 +259,8 @@ function SearchRecipe() {
   const location = useLocation();
   const [searchName, setSearchName] = useState(decodeURI(location.search.split('=')[1]));
   const [searchResult, setSearchResult] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [imgLoaded, setImgLoaded] = useState(false);
 
   useEffect(() => {
     if (searchName) {
@@ -256,11 +279,23 @@ function SearchRecipe() {
           );
         }
         setSearchResult(queryDataArray);
+        setLoading(false);
       });
     } else {
       setSearchResult([]);
+      setLoading(false);
     }
   }, [searchName]);
+
+  if (loading) {
+    return (
+      <>
+        <SearchRecipeHeader />
+        <Loading />
+      </>
+    );
+  }
+
   return (
     <>
       <SearchRecipeHeader />
@@ -290,8 +325,25 @@ function SearchRecipe() {
           <ResultDiv key={recipe.recipeId}>
             <StyledLink to={`/read_recipe?id=${recipe.recipeId}`}>
               <ImgDiv>
-                <Img src={recipe.mainImage} alt="食譜封面照" />
+                {/* <Img src={recipe.mainImage} alt="食譜封面照" /> */}
+                {imgLoaded ? (
+                  <Img
+                    src={recipe.mainImage}
+                    alt="食譜封面照"
+                  />
+                ) : (
+                  <>
+                    <Img
+                      style={imgLoaded ? {} : { display: 'none' }}
+                      src={recipe.mainImage}
+                      alt="食譜封面照"
+                      onLoad={() => { setImgLoaded(true); }}
+                    />
+                    <ImgDefaultDiv />
+                  </>
+                )}
               </ImgDiv>
+
               <ResultContent>
                 <ResultContentTop>
                   <TitleAuthorDiv>
