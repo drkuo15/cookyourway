@@ -239,7 +239,7 @@ function Login() {
             loading: false,
           });
           navigate('/home', { replace: true });
-        }, 500);
+        }, 800);
       })
       .catch((err) => { setData({ ...data, error: err.message, loading: false }); });
   };

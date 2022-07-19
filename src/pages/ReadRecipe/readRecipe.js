@@ -541,7 +541,7 @@ function ReadRecipe({ setUserInfo }) {
     const updatedMyFavorite = [...myFavorites, currentRecipeId];
     setMyFavorites(updatedMyFavorite);
     updateDoc(UserRef, { myFavorites: updatedMyFavorite });
-    showCustomAlert('已成功加入收藏清單，請前往首頁查看');
+    showCustomAlert('已成功加入收藏清單\n\n請前往首頁查看');
   }
 
   function removeFromFavorites() {

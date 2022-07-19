@@ -19,6 +19,7 @@ const Background = styled.div`
     flex-direction: column;
     margin-top: calc(75*100vw/1920);
     margin-bottom: calc(75*100vw/1920);
+    gap: calc(100*100vw/1920);
   }
 `;
 
@@ -58,15 +59,17 @@ const HomeDefaultDiv = styled.div`
 
 const Title = styled.div`
   font-size: calc(76*100vw/1920);
-  font-weight: 500;
+  font-weight: 450;
+  text-align: center;
   @media ${devices.Tablet} and (orientation: portrait){
-    font-size: calc(190*100vw/1920);
+    font-size: calc(170*100vw/1920);
   }
 `;
 
 const SubTitle = styled.div`
   font-size: calc(40*100vw/1920);
   letter-spacing: calc(3*100vw/1920);
+  text-align: center;
   @media ${devices.Tablet} and (orientation: portrait){
     font-size: calc(100*100vw/1920);
   }
@@ -82,6 +85,7 @@ const Wrapper = styled.div`
     width: calc(1650*100vw/1920);
     height: calc(1912*100vw/1920);
     margin-top: calc(100*100vw/1920);
+    gap: calc(100*100vw/1920);
   }
 `;
 
@@ -267,11 +271,15 @@ function UnAuthHome() {
           </>
         )}
         <Wrapper>
-          <Title>自己的美食自己做</Title>
+          <Title>編製食譜｜隨音料理</Title>
           <SubTitle>
-            立即註冊看此網站如何讓您
+            隨意編製完整食譜
+
+            +
+
+            音樂自動化步驟指引
             <br />
-            成為一個名符其實的米其林3星主廚
+            帶您體驗料理新樂趣
           </SubTitle>
           <RegisterBox>
             {/* <SSOs>
