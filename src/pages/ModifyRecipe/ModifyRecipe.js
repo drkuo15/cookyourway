@@ -6,12 +6,11 @@ import {
 } from 'firebase/firestore';
 import {
   getDownloadURL, uploadBytes, ref,
-  // deleteObject,
 } from 'firebase/storage';
 import styled from 'styled-components/macro';
 import { v4 } from 'uuid';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { motion, useAnimation } from 'framer-motion'; // npm i react-intersection-observer framer-motion
+import { motion, useAnimation } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import PropTypes from 'prop-types';
 import { db, storage } from '../../firestore';
@@ -34,7 +33,6 @@ const Div = styled.div`
   justify-content: space-between;
 `;
 
-// Title
 const TitleWrapper = styled(Div)`
   margin: auto;
   margin-top: calc(46*100vw/1920);
@@ -86,7 +84,6 @@ const ErrorMsg = styled.div`
   }
 `;
 
-// Content
 const ContentWrapper = styled.div`
   display: flex;
   gap: calc(88*100vw/1920);
@@ -161,7 +158,6 @@ const UploadImgP = styled.p`
   }
 `;
 
-// Ingredient
 const IngredientContentDiv = styled.div`
   display: flex;
   flex-direction: column;
@@ -307,7 +303,6 @@ const AddIngredientButton = styled.button`
   }
 `;
 
-// Step
 const StepWrapper = styled.div`
   display: flex;
   justify-content: space-between;
@@ -543,7 +538,6 @@ const StepUploadImgP = styled(UploadImgP)`
   }
 `;
 
-// Comment
 const CommentDiv = styled.div`
   width: calc(1688*100vw/1920);
   height: calc(312*100vw/1920);
@@ -631,7 +625,6 @@ const RightSaveButton = styled.button`
   }
 `;
 
-// https://blog.logrocket.com/react-scroll-animations-framer-motion/
 const LineVariant = {
   visible: { opacity: 1, scale: 1, transition: { duration: 1.5 } },
   hidden: { opacity: 0, scale: 0 },
@@ -672,7 +665,7 @@ function ModifyRecipe() {
   const [title, setTitle] = useState('');
   const [oldTitle, setOldTitle] = useState('');
   const [titleKeywords, setTitleKeyWords] = useState([]);
-  const [difficulty, setDifficulty] = useState(1);
+  const [difficulty, setDifficulty] = useState(0);
   const [ingredients, setIngredients] = useState([{
     ingredientsQuantity: '',
     ingredientsTitle: '',
@@ -757,9 +750,6 @@ function ModifyRecipe() {
           storage,
           `recipe/${new Date().getTime()} - ${img.name}`,
         );
-        // if (imgPath) {
-        //   await deleteObject(ref(storage, imgPath));
-        // }
         const snap = await uploadBytes(imgRef, img);
         const url = await getDownloadURL(ref(storage, snap.ref.fullPath));
         setImgUrl(url);
@@ -815,16 +805,44 @@ function ModifyRecipe() {
     if (hasEmptyOtherInput) {
       if (!title) {
         showCustomAlert('請填寫食譜名稱');
+      } else if (!difficulty) {
+        showCustomAlert('請選擇難易度');
       } else if (!imgUrl) {
         showCustomAlert('請上傳食譜封面照');
       } else if (!comment) {
         showCustomAlert('請填寫小秘訣');
-      } else if (hasEmptyIngredientInput) {
-        showCustomAlert('請填寫完整食材內容');
       } else if (hasEmptyStepInput) {
-        showCustomAlert('請填寫完整步驟內容 \n 步驟時間不可以都是0喔');
+        showCustomAlert('步驟時間不可以都是0喔');
       }
       return;
+    }
+    if (hasEmptyIngredientInput) {
+      if (ingredients.some((ingredient) => ingredient.ingredientsTitle === '')) {
+        showCustomAlert('請填寫食材名稱');
+        return;
+      }
+      if (ingredients.some((ingredient) => ingredient.ingredientsQuantity === 0)) {
+        showCustomAlert('請填寫食材數量');
+        return;
+      }
+    }
+    if (hasEmptyStepInput) {
+      if (steps.some((step) => step.stepTitle === '')) {
+        showCustomAlert('請填寫步驟簡稱');
+        return;
+      }
+      if (steps.some((step) => step.stepContent === '')) {
+        showCustomAlert('請填寫步驟內容');
+        return;
+      }
+      if (steps.some((step) => step.stepTime === 0)) {
+        showCustomAlert('步驟時間不可以都是0喔');
+        return;
+      }
+      if (steps.some((step) => step.stepImgUrl === '')) {
+        showCustomAlert('請上傳步驟照片');
+        return;
+      }
     }
     // 知道collection name, document name，新建資料
     setDoc(doc(db, 'recipes', docId), newRecipeData);
@@ -876,16 +894,44 @@ function ModifyRecipe() {
     if (hasEmptyOtherInput) {
       if (!title) {
         showCustomAlert('請填寫食譜名稱');
+      } else if (!difficulty) {
+        showCustomAlert('請選擇難易度');
       } else if (!imgUrl) {
         showCustomAlert('請上傳食譜封面照');
       } else if (!comment) {
         showCustomAlert('請填寫小秘訣');
-      } else if (hasEmptyIngredientInput) {
-        showCustomAlert('請填寫完整食材內容');
       } else if (hasEmptyStepInput) {
-        showCustomAlert('請填寫完整步驟內容 \n 步驟時間不可以都是0喔');
+        showCustomAlert('步驟時間不可以都是0喔');
       }
       return;
+    }
+    if (hasEmptyIngredientInput) {
+      if (ingredients.some((ingredient) => ingredient.ingredientsTitle === '')) {
+        showCustomAlert('請填寫食材名稱');
+        return;
+      }
+      if (ingredients.some((ingredient) => ingredient.ingredientsQuantity === 0)) {
+        showCustomAlert('請填寫食材數量');
+        return;
+      }
+    }
+    if (hasEmptyStepInput) {
+      if (steps.some((step) => step.stepTitle === '')) {
+        showCustomAlert('請填寫步驟簡稱');
+        return;
+      }
+      if (steps.some((step) => step.stepContent === '')) {
+        showCustomAlert('請填寫步驟內容');
+        return;
+      }
+      if (steps.some((step) => step.stepTime === 0)) {
+        showCustomAlert('步驟時間不可以都是0喔');
+        return;
+      }
+      if (steps.some((step) => step.stepImgUrl === '')) {
+        showCustomAlert('請上傳步驟照片');
+        return;
+      }
     }
     updateDoc(RecipeRef, newRecipeData);
     navigate({ pathname: '/read_recipe', search: `?id=${currentRecipeId}` });
@@ -986,14 +1032,8 @@ function ModifyRecipe() {
         storage,
         `recipeStep/${new Date().getTime()} - ${e.target.files[0].name}`,
       );
-
-      // if (steps[index].stepImgPath) {
-      //   await deleteObject(ref(storage, steps[index].stepImgPath));
-      // }
-
       const snap = await uploadBytes(imgRef, e.target.files[0]);
       const url = await getDownloadURL(ref(storage, snap.ref.fullPath));
-
       const newSteps = [...steps];
       newSteps[index].stepImgUrl = url;
       newSteps[index].stepImgPath = snap.ref.fullPath;
