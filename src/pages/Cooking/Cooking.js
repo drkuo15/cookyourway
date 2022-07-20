@@ -6,7 +6,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import Counter from './Counter';
 import Player from './Music';
 import Recipe from './Recipe';
-import AuthHeader from '../../components/AuthHeader';
+import Header from '../../components/Header';
 import music1 from '../../music/music1.m4a';
 import music2 from '../../music/music2.m4a';
 import music3 from '../../music/music3.m4a';
@@ -150,7 +150,7 @@ function Cooking() {
   if (checkingUser) {
     return (
       <>
-        <AuthHeader setIsCounting={setIsCounting} />
+        <Header setIsCounting={setIsCounting} />
         <Loading />
       </>
     );
@@ -159,7 +159,7 @@ function Cooking() {
   if (loading) {
     return (
       <>
-        <AuthHeader setIsCounting={setIsCounting} />
+        <Header setIsCounting={setIsCounting} />
         <Loading />
       </>
     );
@@ -173,7 +173,7 @@ function Cooking() {
         <Icon><ScreenRotation /></Icon>
       </ForceLandscapeAlert>
       <CookingWrapper>
-        <AuthHeader setIsCounting={setIsCounting} />
+        <Header setIsCounting={setIsCounting} />
         <Wrapper>
           <LeftTimer>
             <Title>{title}</Title>

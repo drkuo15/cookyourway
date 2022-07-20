@@ -10,7 +10,7 @@ import { db } from '../../firestore';
 import { devices } from '../../utils/StyleUtils';
 import Stars from '../../components/DisplayStars';
 import AuthContext from '../../components/AuthContext';
-import AuthHomeHeader from '../../components/AuthHomeHeader';
+import Header from '../../components/Header';
 import Loading from '../../components/Loading';
 import nextIcon from '../../images/next.png';
 import beforeIcon from '../../images/before.png';
@@ -496,7 +496,7 @@ function AuthHome() {
   if (checkingUser) {
     return (
       <>
-        <AuthHomeHeader />
+        <Header />
         <Loading />
       </>
     );
@@ -505,7 +505,7 @@ function AuthHome() {
   if (loading) {
     return (
       <>
-        <AuthHomeHeader />
+        <Header />
         <Loading />
       </>
     );
@@ -513,7 +513,7 @@ function AuthHome() {
 
   return (
     <>
-      <AuthHomeHeader />
+      <Header />
       <Background>
         <Selections>
           {/* <Selective onClick={() => { scrollToRef(allRef); }} mainImage={strawberry}>

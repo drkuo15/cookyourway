@@ -19,7 +19,7 @@ import defaultImage from '../../images/upload.png';
 import StarRating from '../../components/Stars';
 import { ToastContainer, showCustomAlert } from '../../components/CustomAlert';
 import AuthContext from '../../components/AuthContext';
-import AuthHeader from '../../components/AuthHeader';
+import Header from '../../components/Header';
 import binImage from '../../images/bin.png';
 import tipImage from '../../images/tips.png';
 import Loading from '../../components/Loading';
@@ -1026,7 +1026,7 @@ function ModifyRecipe() {
   if (checkingUser) {
     return (
       <>
-        <AuthHeader />
+        <Header />
         <Loading />
       </>
     );
@@ -1035,7 +1035,7 @@ function ModifyRecipe() {
   if (loading) {
     return (
       <>
-        <AuthHeader />
+        <Header />
         <Loading />
       </>
     );
@@ -1043,7 +1043,7 @@ function ModifyRecipe() {
 
   return (
     <>
-      <AuthHeader />
+      <Header />
       <Background>
         <TitleWrapper>
           <TittleInputWrapper>

@@ -12,7 +12,7 @@ import Stars from '../../components/DisplayStars';
 import defaultImage from '../../images/upload.png';
 import { ToastContainer, showCustomAlert } from '../../components/CustomAlert';
 import AuthContext from '../../components/AuthContext';
-import ReadRecipeHeader from '../../components/ReadRecipeHeader';
+import Header from '../../components/Header';
 import tipImage from '../../images/tips.png';
 import Loading from '../../components/Loading';
 
@@ -558,7 +558,7 @@ function ReadRecipe({ setUserInfo }) {
   if (checkingUser) {
     return (
       <>
-        <ReadRecipeHeader
+        <Header
           authorId={authorId}
           userId={userId}
           addToFavorites={() => { addToFavorites(); }}
@@ -574,7 +574,7 @@ function ReadRecipe({ setUserInfo }) {
   if (loading) {
     return (
       <>
-        <ReadRecipeHeader
+        <Header
           authorId={authorId}
           userId={userId}
           addToFavorites={() => { addToFavorites(); }}
@@ -589,7 +589,7 @@ function ReadRecipe({ setUserInfo }) {
 
   return (
     <>
-      <ReadRecipeHeader
+      <Header
         authorId={authorId}
         userId={userId}
         addToFavorites={() => { addToFavorites(); }}

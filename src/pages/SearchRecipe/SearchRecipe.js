@@ -8,7 +8,7 @@ import { Search } from '@styled-icons/material-rounded';
 import { db } from '../../firestore';
 import { devices } from '../../utils/StyleUtils';
 import Stars from '../../components/DisplayStars';
-import SearchRecipeHeader from '../../components/SearchRecipeHeader';
+import Header from '../../components/Header';
 import Loading from '../../components/Loading';
 
 const SearchInput = styled.input`
@@ -290,7 +290,7 @@ function SearchRecipe() {
   if (loading) {
     return (
       <>
-        <SearchRecipeHeader />
+        <Header />
         <Loading />
       </>
     );
@@ -298,7 +298,7 @@ function SearchRecipe() {
 
   return (
     <>
-      <SearchRecipeHeader />
+      <Header />
       <SearchDiv>
         <SearchInput
           type="search"
