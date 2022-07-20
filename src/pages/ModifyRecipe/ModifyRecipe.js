@@ -760,183 +760,6 @@ function ModifyRecipe() {
     }
   }, [img, imgPath]);
 
-  async function setNewRecipeAndNavigate() {
-    // 只知道collection，要產生id
-    const docId = doc(collection(db, 'recipes')).id;
-
-    // 將文字轉換成數字
-    const parsedIngredients = [...ingredients];
-    parsedIngredients.forEach((ingredientObj) => {
-      const ingredientObjTemp = ingredientObj;
-      ingredientObjTemp.ingredientsQuantity = Number(ingredientObj.ingredientsQuantity);
-      return ingredientObjTemp;
-    });
-
-    const parsedSteps = [...steps];
-    parsedSteps.forEach((stepObject) => {
-      const stepObjTemp = stepObject;
-      stepObjTemp.stepMinute = Number(stepObjTemp.stepMinute);
-      stepObjTemp.stepSecond = Number(stepObjTemp.stepSecond);
-      stepObjTemp.stepTime = Number(stepObjTemp.stepTime);
-    });
-
-    const newRecipeData = {
-      recipeId: docId,
-      createTime: new Date(),
-      title,
-      titleKeywords,
-      difficulty,
-      fullTime,
-      mainImage: imgUrl,
-      mainImagePath: imgPath,
-      ingredients: parsedIngredients,
-      steps: parsedSteps,
-      comment,
-      authorName: userName,
-      authorId: userId,
-
-    };
-    const hasEmptyIngValue = (obj) => Object.values(obj).some((value) => value === '' || value === 0);
-    const hasEmptyIngredientInput = ingredients.some((ingredient) => hasEmptyIngValue(ingredient));
-    const hasEmptyStepValue = (obj) => Object.values(obj).some((value) => value === '');
-    const hasEmptyStepInput = steps.some((step) => hasEmptyStepValue(step) || step.stepTime === 0);
-    const hasEmptyOtherInput = Object.values(newRecipeData).some((value) => !value);
-
-    if (hasEmptyOtherInput) {
-      if (!title) {
-        showCustomAlert('請填寫食譜名稱');
-      } else if (!difficulty) {
-        showCustomAlert('請選擇難易度');
-      } else if (!imgUrl) {
-        showCustomAlert('請上傳食譜封面照');
-      } else if (!comment) {
-        showCustomAlert('請填寫小秘訣');
-      } else if (hasEmptyStepInput) {
-        showCustomAlert('步驟時間不可以都是0喔');
-      }
-      return;
-    }
-    if (hasEmptyIngredientInput) {
-      if (ingredients.some((ingredient) => ingredient.ingredientsTitle === '')) {
-        showCustomAlert('請填寫食材名稱');
-        return;
-      }
-      if (ingredients.some((ingredient) => ingredient.ingredientsQuantity === 0)) {
-        showCustomAlert('請填寫食材數量');
-        return;
-      }
-    }
-    if (hasEmptyStepInput) {
-      if (steps.some((step) => step.stepTitle === '')) {
-        showCustomAlert('請填寫步驟簡稱');
-        return;
-      }
-      if (steps.some((step) => step.stepContent === '')) {
-        showCustomAlert('請填寫步驟內容');
-        return;
-      }
-      if (steps.some((step) => step.stepTime === 0)) {
-        showCustomAlert('步驟時間不可以都是0喔');
-        return;
-      }
-      if (steps.some((step) => step.stepImgUrl === '')) {
-        showCustomAlert('請上傳步驟照片');
-        return;
-      }
-    }
-    // 知道collection name, document name，新建資料
-    setDoc(doc(db, 'recipes', docId), newRecipeData);
-    // 依照新建的食譜id導到對應頁面
-    navigate({ pathname: '/read_recipe', search: `?id=${docId}` });
-  }
-
-  async function updateRecipeAndNavigate() {
-    const currentRecipeId = location.search.split('=')[1];
-    const RecipeRef = doc(db, 'recipes', currentRecipeId);
-
-    // 將文字轉換成數字
-    const parsedIngredients = [...ingredients];
-    parsedIngredients.forEach((ingredientObj) => {
-      const ingredientObjTemp = ingredientObj;
-      ingredientObjTemp.ingredientsQuantity = Number(ingredientObj.ingredientsQuantity);
-      return ingredientObjTemp;
-    });
-
-    const parsedSteps = [...steps];
-    parsedSteps.forEach((stepObject) => {
-      const stepObjTemp = stepObject;
-      stepObjTemp.stepMinute = Number(stepObjTemp.stepMinute);
-      stepObjTemp.stepSecond = Number(stepObjTemp.stepSecond);
-      stepObjTemp.stepTime = Number(stepObjTemp.stepTime);
-    });
-
-    const newRecipeData = {
-      recipeId: currentRecipeId,
-      createTime: new Date(),
-      title,
-      titleKeywords,
-      difficulty,
-      fullTime,
-      mainImage: imgUrl,
-      mainImagePath: imgPath,
-      ingredients: parsedIngredients,
-      steps: parsedSteps,
-      comment,
-      authorName: userName,
-      authorId: userId,
-    };
-    const hasEmptyIngValue = (obj) => Object.values(obj).some((value) => value === '' || value === 0);
-    const hasEmptyIngredientInput = ingredients.some((ingredient) => hasEmptyIngValue(ingredient));
-    const hasEmptyStepValue = (obj) => Object.values(obj).some((value) => value === '');
-    const hasEmptyStepInput = steps.some((step) => hasEmptyStepValue(step) || step.stepTime === 0);
-    const hasEmptyOtherInput = Object.values(newRecipeData).some((value) => !value);
-
-    if (hasEmptyOtherInput) {
-      if (!title) {
-        showCustomAlert('請填寫食譜名稱');
-      } else if (!difficulty) {
-        showCustomAlert('請選擇難易度');
-      } else if (!imgUrl) {
-        showCustomAlert('請上傳食譜封面照');
-      } else if (!comment) {
-        showCustomAlert('請填寫小秘訣');
-      } else if (hasEmptyStepInput) {
-        showCustomAlert('步驟時間不可以都是0喔');
-      }
-      return;
-    }
-    if (hasEmptyIngredientInput) {
-      if (ingredients.some((ingredient) => ingredient.ingredientsTitle === '')) {
-        showCustomAlert('請填寫食材名稱');
-        return;
-      }
-      if (ingredients.some((ingredient) => ingredient.ingredientsQuantity === 0)) {
-        showCustomAlert('請填寫食材數量');
-        return;
-      }
-    }
-    if (hasEmptyStepInput) {
-      if (steps.some((step) => step.stepTitle === '')) {
-        showCustomAlert('請填寫步驟簡稱');
-        return;
-      }
-      if (steps.some((step) => step.stepContent === '')) {
-        showCustomAlert('請填寫步驟內容');
-        return;
-      }
-      if (steps.some((step) => step.stepTime === 0)) {
-        showCustomAlert('步驟時間不可以都是0喔');
-        return;
-      }
-      if (steps.some((step) => step.stepImgUrl === '')) {
-        showCustomAlert('請上傳步驟照片');
-        return;
-      }
-    }
-    updateDoc(RecipeRef, newRecipeData);
-    navigate({ pathname: '/read_recipe', search: `?id=${currentRecipeId}` });
-  }
-
   function addIngredients() {
     const newIngredients = [...ingredients, {
       ingredientsQuantity: '',
@@ -950,7 +773,6 @@ function ModifyRecipe() {
     const newIngredients = ingredients.filter((_, index) => i !== index);
     setIngredients(newIngredients);
   }
-
   function updateQuantityValue(e, targetIndex) {
     const newIngredients = [...ingredients];
     if (Number(e.target.value) < 0) {
@@ -1040,6 +862,143 @@ function ModifyRecipe() {
       setSteps(newSteps);
     };
     uploadImg();
+  }
+
+  function parseIngredientsQuantity() {
+    const parsedIngredients = [...ingredients];
+    parsedIngredients.forEach((ingredientObj) => {
+      const ingredientObjTemp = ingredientObj;
+      ingredientObjTemp.ingredientsQuantity = Number(ingredientObj.ingredientsQuantity);
+      return ingredientObjTemp;
+    });
+    return parsedIngredients;
+  }
+
+  function parseStepsTime() {
+    const parsedSteps = [...steps];
+    parsedSteps.forEach((stepObject) => {
+      const stepObjTemp = stepObject;
+      stepObjTemp.stepMinute = Number(stepObjTemp.stepMinute);
+      stepObjTemp.stepSecond = Number(stepObjTemp.stepSecond);
+      stepObjTemp.stepTime = Number(stepObjTemp.stepTime);
+    });
+    return parsedSteps;
+  }
+
+  function checkInputValue(newRecipeData) {
+    const hasEmptyIngValue = (obj) => Object.values(obj).some((value) => value === '' || value === 0);
+    const hasEmptyIngredientInput = ingredients.some((ingredient) => hasEmptyIngValue(ingredient));
+    const hasEmptyStepValue = (obj) => Object.values(obj).some((value) => value === '');
+    const hasEmptyStepInput = steps.some((step) => hasEmptyStepValue(step) || step.stepTime === 0);
+    const hasEmptyOtherInput = Object.values(newRecipeData).some((value) => !value);
+
+    if (hasEmptyOtherInput || hasEmptyIngredientInput || hasEmptyStepInput) {
+      return false;
+    }
+    return true;
+  }
+
+  function alertUnfinishedInput() {
+    if (!title) {
+      showCustomAlert('請填寫食譜名稱');
+      return;
+    }
+    if (!difficulty) {
+      showCustomAlert('請選擇難易度');
+      return;
+    }
+    if (!imgUrl) {
+      showCustomAlert('請上傳食譜封面照');
+      return;
+    }
+    if (!comment) {
+      showCustomAlert('請填寫小秘訣');
+      return;
+    }
+    if (!fullTime) {
+      showCustomAlert('步驟時間不可以都是0喔');
+      return;
+    }
+    if (ingredients.some((ingredient) => ingredient.ingredientsTitle === '')) {
+      showCustomAlert('請填寫食材名稱');
+      return;
+    }
+    if (ingredients.some((ingredient) => ingredient.ingredientsQuantity === 0)) {
+      showCustomAlert('請填寫食材數量');
+      return;
+    }
+    if (steps.some((step) => step.stepTitle === '')) {
+      showCustomAlert('請填寫步驟簡稱');
+      return;
+    }
+    if (steps.some((step) => step.stepContent === '')) {
+      showCustomAlert('請填寫步驟內容');
+      return;
+    }
+    if (steps.some((step) => step.stepTime === 0)) {
+      showCustomAlert('步驟時間不可以都是0喔');
+      return;
+    }
+    if (steps.some((step) => step.stepImgUrl === '')) {
+      showCustomAlert('請上傳步驟照片');
+    }
+  }
+
+  async function setNewRecipeAndNavigate() {
+    const docId = doc(collection(db, 'recipes')).id;
+    const parsedIngredients = parseIngredientsQuantity();
+    const parsedSteps = parseStepsTime();
+    const newRecipeData = {
+      recipeId: docId,
+      createTime: new Date(),
+      title,
+      titleKeywords,
+      difficulty,
+      fullTime,
+      mainImage: imgUrl,
+      mainImagePath: imgPath,
+      ingredients: parsedIngredients,
+      steps: parsedSteps,
+      comment,
+      authorName: userName,
+      authorId: userId,
+    };
+    const isInputCompleted = checkInputValue(newRecipeData);
+    if (isInputCompleted) {
+      setDoc(doc(db, 'recipes', docId), newRecipeData);
+      navigate({ pathname: '/read_recipe', search: `?id=${docId}` });
+    } else {
+      alertUnfinishedInput();
+    }
+  }
+
+  async function updateRecipeAndNavigate() {
+    const currentRecipeId = location.search.split('=')[1];
+    const RecipeRef = doc(db, 'recipes', currentRecipeId);
+    const parsedIngredients = parseIngredientsQuantity();
+    const parsedSteps = parseStepsTime();
+    const newRecipeData = {
+      recipeId: currentRecipeId,
+      createTime: new Date(),
+      title,
+      titleKeywords,
+      difficulty,
+      fullTime,
+      mainImage: imgUrl,
+      mainImagePath: imgPath,
+      ingredients: parsedIngredients,
+      steps: parsedSteps,
+      comment,
+      authorName: userName,
+      authorId: userId,
+    };
+    const isInputCompleted = checkInputValue(newRecipeData);
+    if (isInputCompleted) {
+      updateDoc(RecipeRef, newRecipeData);
+      navigate({ pathname: '/read_recipe', search: `?id=${currentRecipeId}` });
+    } else {
+      alertUnfinishedInput();
+    }
   }
 
   // 送出資料，檢查資料是否都有填寫，跳出完成提示，清除欄位，進入食譜閱覽頁面
