@@ -1,19 +1,16 @@
-import { doc, getDoc } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
-import styled from 'styled-components/macro';
+import styled, { keyframes } from 'styled-components/macro';
 import {
   West, East, OutdoorGrill, LocalDining,
 } from '@styled-icons/material-rounded';
 import PropTypes from 'prop-types';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { db } from '../../firestore';
 
 const RecipeArea = styled.div`
-  width: calc(1250*100vw/1920);
-  height: calc(730*100vw/1920);
+  width: calc(1250*100/9*16vh/1920);
+  height: calc(730*100/9*16vh/1920);
   display: flex;
   flex-direction: column;
-  ${'' /* margin-top: calc(60*100vw/1920); */}
 `;
 
 const Wrapper = styled.div`
@@ -26,25 +23,23 @@ const WrapperStep = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  ${'' /* align-items: center; */}
-  gap: calc(50*100vw/1920);
-  width: calc(600*100vw/1920);
+  gap: calc(50*100/9*16vh/1920);
+  width: calc(600*100/9*16vh/1920);
 `;
 
 const WrapperStepButton = styled(Wrapper)`
   justify-content: space-between;
-  width: calc(1250*100vw/1920);
-  height: calc(70*100vw/1920);
+  width: calc(1250*100/9*16vh/1920);
+  height: calc(70*100/9*16vh/1920);
 `;
 
 const StepsNav = styled(Wrapper)`
-  width: calc(1250*100vw/1920);
-  height: calc(110*100vw/1920);
-  padding: calc(50*100vw/1920) calc(20*100vw/1920)
-  margin: 0 auto;
+  width: calc(1250*100/9*16vh/1920);
+  height: calc(110*100/9*16vh/1920);
+  justify-content: flex-start;
   text-align: center;
   overflow: hidden;
-  font-size: calc(48*100vw/1920);
+  font-size: calc(48*100/9*16vh/1920);
   color: white;
 `;
 
@@ -52,25 +47,25 @@ const StepArea = styled.div`
   display: inline-flex;
   position: relative;
   float: left;
-  width: calc(382*100vw/1920);
-  height: calc(110*100vw/1920);
-  line-height: calc(110*100vw/1920);
-  margin-right: calc(62.5*100vw/1920);
-  padding-left: calc(100*100vw/1920);
+  width: calc(382*100/9*16vh/1920);
+  height: calc(110*100/9*16vh/1920);
+  line-height: calc(110*100/9*16vh/1920);
+  margin-right: calc(62.5*100/9*16vh/1920);
+  padding-left: calc(100*100/9*16vh/1920);
   background-color: ${(props) => (props.selected ? '#EB811F' : '#584743')};
-  border-radius: calc(4*100vw/1920);
-  font-size: calc(36*100vw/1920);
+  border-radius: calc(4*100/9*16vh/1920);
+  font-size: calc(36*100/9*16vh/1920);
   color: #FDFDFC;
   &:before {
   content: "";
   position: absolute;
-  right: calc(-61.5*100vw/1920);
+  right: calc(-61.5*100/9*16vh/1920);
   height: 0;
   width: 0;
-  border-top: calc(54*100vw/1920) solid transparent;
-  border-bottom: calc(56*100vw/1920) solid transparent;
-  border-left: calc(64*100vw/1920) solid ${(props) => (props.selected ? '#EB811F' : '#584743')};
-  border-radius: calc(4*100vw/1920);
+  border-top: calc(54*100/9*16vh/1920) solid transparent;
+  border-bottom: calc(56*100/9*16vh/1920) solid transparent;
+  border-left: calc(64*100/9*16vh/1920) solid ${(props) => (props.selected ? '#EB811F' : '#584743')};
+  border-radius: calc(4*100/9*16vh/1920);
   };
   &:after {
   content: "";
@@ -78,118 +73,107 @@ const StepArea = styled.div`
   left: 0;
   height: 0;
   width: 0;
-  border-top: calc(55.5*100vw/1920) solid transparent;
-  border-bottom: calc(55.5*100vw/1920) solid transparent;
-  border-left: calc(64*100vw/1920) solid #FDFDFC;
-  border-radius: calc(4*100vw/1920);
+  border-top: calc(55.5*100/9*16vh/1920) solid transparent;
+  border-bottom: calc(55.5*100/9*16vh/1920) solid transparent;
+  border-left: calc(64*100/9*16vh/1920) solid #FDFDFC;
+  border-radius: calc(4*100/9*16vh/1920);
   };
 `;
 
 const TitleText = styled.p`
-  margin-left: calc(5*100vw/1920);
+  margin-left: calc(5*100/9*16vh/1920);
   overflow-x: auto;
   white-space: nowrap;
 `;
 
 const StepDiv = styled.div`
-  margin-top: calc(50*100vw/1920);
-  margin-bottom: calc(50*100vw/1920);
-  width: calc(1250*100vw/1920);
-  height: calc(450*100vw/1920);
+  margin-top: calc(50*100/9*16vh/1920);
+  margin-bottom: calc(50*100/9*16vh/1920);
+  width: calc(1250*100/9*16vh/1920);
+  height: calc(450*100/9*16vh/1920);
   display: flex;
-  justify-content: space-around;
+  gap: calc(50*100/9*16vh/1920);
 `;
 
 const ExpectTime = styled.div`
-  font-size: calc(28*100vw/1920);
+  font-size: calc(28*100/9*16vh/1920);
   width: 100%;
   text-align: end;
 `;
 
 const StepContent = styled.div`
   text-align: start;
-  margin-top: calc(20*100vw/1920);
-  font-size: calc(36*100vw/1920);
-  font-size: calc(40*100vw/1920);
-  overflow: scroll;
+  margin-top: calc(20*100/9*16vh/1920);
+  font-size: calc(36*100/9*16vh/1920);
+  font-size: calc(40*100/9*16vh/1920);
+  overflow: auto;
 `;
 
 const Img = styled.img`
-  max-width: calc(600*100vw/1920);
-  max-height: calc(450*100vw/1920);
-  border-radius: calc(15*100vw/1920);
+  width: calc(600*100/9*16vh/1920);
+  height: calc(450*100/9*16vh/1920);
+  object-fit: cover;
+  border-radius: calc(15*100/9*16vh/1920);
 `;
 
-// const Button = styled.button`
-//   width: calc(250*100vw/1920);
-//   height: calc(65*100vw/1920);
-//   background-color: #584743;
-//   border: 0;
-//   border-radius: calc(15*100vw/1920);
-//   color: #FDFDFC;
-//   margin-top: calc(50*100vw/1920);
-//   font-size: calc(28*100vw/1920);
-//   cursor: pointer;
-// `;
+const Shine = keyframes`
+  to {
+    background-position-x: -200%;
+  }
+`;
+
+const ImgDefaultDiv = styled.div`
+  width: calc(600*100/9*16vh/1920);
+  height: calc(450*100/9*16vh/1920);
+  object-fit: cover;
+  border-radius: calc(15*100/9*16vh/1920);
+  background: #eee;
+  background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
+  background-size: 200% 100%;
+  animation: 1.5s ${Shine} linear infinite;
+`;
 
 const Icon = styled.span`
-  ${'' /* width: calc(100*100vw/1920);
-  height: calc(100*100vw/1920); */}
   cursor: pointer;
-  font-size: calc(40*100vw/1920);
-  ${'' /* font-size: 18px; */}
+  font-size: calc(40*100/9*16vh/1920);
   display: flex;
   align-items: end;
   &:hover {
     color:#EB811F
   }
   & > svg{
-    width: calc(60*100vw/1920);
-    ${'' /* width: 24px; */}
-    height: calc(60*100vw/1920);
+    width: calc(60*100/9*16vh/1920);
+    height: calc(60*100/9*16vh/1920);
   }
   & > svg:hover {
     color:#EB811F;
   }
 `;
 function Recipe({
-  setInitialTime, stepIndex, setStepIndex, setStepsLength, setIsCounting, setTitle,
+  stepIndex, setStepIndex, setIsCounting, steps,
 }) {
-  const [steps, setSteps] = useState([]);
   const [isNextStep, setIsNextStep] = useState(true);
   const [isPrevStep, setIsPrevStep] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const [imgLoaded, setImgLoaded] = useState(false);
 
   useEffect(() => {
-    async function getData() {
-      const currentRecipeId = location.search.split('=')[1];
-      const docRef = doc(db, 'recipes', currentRecipeId);
-      const docSnap = await getDoc(docRef);
-      const docData = docSnap.data();
-
-      setSteps(docData.steps);
-      setTitle(docData.title);
-      if (docData.steps.length === stepIndex + 1) {
-        setIsNextStep(false);
-      } else {
-        setIsNextStep(true);
-      }
-      if (stepIndex > 0) {
-        setIsPrevStep(true);
-      } else {
-        setIsPrevStep(false);
-      }
-      setInitialTime((docData.steps[stepIndex].stepTime));
-      // setInitialTime((docData.steps[stepIndex].time));
-      setStepsLength(docData.steps.length);
+    if (steps.length === stepIndex + 1) {
+      setIsNextStep(false);
+    } else {
+      setIsNextStep(true);
     }
-    getData();
-  }, [location.search, setInitialTime, setStepsLength, setTitle, stepIndex]);
+    if (stepIndex > 0) {
+      setIsPrevStep(true);
+    } else {
+      setIsPrevStep(false);
+    }
+  }, [stepIndex, steps.length]);
 
   function renderSwitch() {
-    switch (stepIndex) {
-      case (0):
+    switch (true) {
+      case (stepIndex === 0):
         // console.log('first');
         return steps
           .filter((_, index) => index <= stepIndex + 2)
@@ -200,7 +184,8 @@ function Recipe({
               <TitleText>{step.stepTitle}</TitleText>
             </StepArea>
           ));
-      case (steps.length - 1):
+      // 當是最後一步，而且總步驟長度不是2。
+      case (stepIndex === steps.length - 1 && steps.length !== 2):
         // console.log('last');
         return steps.filter((_, index) => index >= stepIndex - 2)
           .map((step, index) => (
@@ -251,17 +236,35 @@ function Recipe({
             <StepContent>
               {step.stepContent}
             </StepContent>
-            <ExpectTime>
-              預計時間：
-              {step.stepMinute ? `${step.stepMinute}分` : ''}
-              {step.stepSecond ? `${step.stepSecond}秒` : ''}
-            </ExpectTime>
+            {step.stepMinute || step.stepSecond ? (
+              <ExpectTime>
+                預計時間：
+                {step.stepMinute ? `${step.stepMinute}分` : ''}
+                {step.stepSecond ? `${step.stepSecond}秒` : ''}
+              </ExpectTime>
+            ) : ''}
           </WrapperStep>
-          <Img src={step.stepImgUrl} alt="stepImage" />
+          {/* <Img src={step.stepImgUrl} alt="stepImage" /> */}
+          {imgLoaded ? (
+            <Img
+              src={step.stepImgUrl}
+              alt="stepImage"
+            />
+          ) : (
+            <>
+              <Img
+                style={imgLoaded ? {} : { display: 'none' }}
+                src={step.stepImgUrl}
+                alt="stepImage"
+                onLoad={() => { setImgLoaded(true); }}
+              />
+              <ImgDefaultDiv />
+            </>
+          )}
         </StepDiv>
       )).filter((_, index) => index === stepIndex)}
       <WrapperStepButton>
-        {stepIndex + 1 !== steps.length && !isPrevStep
+        {stepIndex === 0 && !isPrevStep
           ? (
             <Icon onClick={() => { setIsCounting(true); }}>
               <OutdoorGrill />
@@ -283,12 +286,10 @@ function Recipe({
 }
 
 Recipe.propTypes = {
-  setInitialTime: PropTypes.func.isRequired,
   stepIndex: PropTypes.number.isRequired,
   setStepIndex: PropTypes.func.isRequired,
-  setStepsLength: PropTypes.func.isRequired,
   setIsCounting: PropTypes.func.isRequired,
-  setTitle: PropTypes.func.isRequired,
+  steps: PropTypes.PropTypes.arrayOf(PropTypes.objectOf).isRequired,
 };
 
 export default Recipe;

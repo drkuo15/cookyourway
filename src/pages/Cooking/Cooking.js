@@ -1,14 +1,19 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import styled from 'styled-components/macro';
 import { ScreenRotation } from '@styled-icons/material-rounded';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { doc, getDoc } from 'firebase/firestore';
 import Counter from './Counter';
 import Player from './Music';
 import Recipe from './Recipe';
 import AuthHeader from '../../components/AuthHeader';
-import music1 from '../../music/music1.mp3';
-import music2 from '../../music/music2.mp3';
-import music3 from '../../music/music3.mp3';
-import music4 from '../../music/music4.mp3';
+import music1 from '../../music/music1.m4a';
+import music2 from '../../music/music2.m4a';
+import music3 from '../../music/music3.m4a';
+import music4 from '../../music/music4.m4a';
+import Loading from '../../components/Loading';
+import { db } from '../../firestore';
+import AuthContext from '../../components/AuthContext';
 
 const ForceLandscapeAlert = styled.div`
   display:none;
@@ -28,7 +33,8 @@ const Icon = styled.div`
 `;
 
 const CookingWrapper = styled.div`
-  height: 92.5vh;
+  ${'' /* height: 92.5vh; */}
+
   @media only screen and (orientation:portrait){
     display: none;
     }
@@ -36,12 +42,13 @@ const CookingWrapper = styled.div`
 
 const Wrapper = styled.div`
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
+  gap: 7.5vh;
   align-items: flex-start;
-  ${'' /* margin-top: calc(60*100vw/1920);
-  margin-bottom: calc(60*100vw/1920); */}
-  height: calc(100% - 11vh);
-
+  ${'' /* margin-top: calc(60*100/9*16vh/1920);
+  margin-bottom: calc(60*100/9*16vh/1920); */}
+  min-height: 80vh;
+  margin: 0 2.5vh;
 `;
 
 const LeftTimer = styled.div`
@@ -49,24 +56,21 @@ const LeftTimer = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: calc(500*100vw/1920);
-  height: calc(730*100vw/1920);
+  width: calc(500*100/9*16vh/1920);
+  height: calc(730*100/9*16vh/1920);
   background-color: #E5D2C0;
-  border-radius: calc(15*100vw/1920);
-  margin: auto;
+  border-radius: calc(15*100/9*16vh/1920);
+  margin: auto 0;
 `;
 
 const RightRecipe = styled.div`
-  margin: auto;
+  margin: auto 0;
 `;
 
 const Title = styled.div`
-  font-size: calc(48*100vw/1920);
-  margin-bottom: calc(50*100vw/1920);
+  font-size: calc(48*100/9*16vh/1920);
+  margin-bottom: calc(50*100/9*16vh/1920);
 `;
-
-// const Background = styled.div`
-// `;
 
 const playlist = [music1, music2, music3, music4];
 
@@ -89,8 +93,15 @@ function Cooking() {
   const [isCounting, setIsCounting] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
   const [stepsLength, setStepsLength] = useState(0);
-  const [playIndex, setPlayIndex] = useState(0);
+  const [playIndex, setPlayIndex] = useState(Math.floor(Math.random() * 4));
   const url = playlist[playIndex];
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [steps, setSteps] = useState([]);
+  const userInfo = useContext(AuthContext);
+  const userId = userInfo?.uid || '';
+  const [checkingUser, setCheckingUser] = useState(true);
 
   // const DEFAULT_URL = 'https://firebasestorage.googleapis.com/v0/b/cook-your-way.appspot.com/o/tunetank.com_5423_lazy-bones_by_vital.mp3?alt=media&token=30cb614d-0230-482a-b83c-9c82bf77022e';
   // const [url, setUrl] = useState(DEFAULT_URL);
@@ -98,8 +109,61 @@ function Cooking() {
   // const randomUrl = playlist[random];
 
   useEffect(() => {
+    if (userInfo === '') {
+      setCheckingUser(true);
+    }
+    if (userInfo === null) {
+      navigate({ pathname: '/' });
+    }
+    if (userId) {
+      setCheckingUser(false);
+    }
+  }, [navigate, userId, userInfo]);
+
+  useEffect(() => {
     setTime(initialTime);
-  }, [initialTime]);
+  }, [initialTime, stepIndex]);
+
+  const currentRecipeId = location.search.split('=')[1];
+  useEffect(() => {
+    async function getData() {
+      const docRef = doc(db, 'recipes', currentRecipeId);
+      const docSnap = await getDoc(docRef);
+      const docData = docSnap.data();
+      if (!docData) {
+        navigate({ pathname: '/home' });
+        return;
+      }
+      setSteps(docData.steps);
+      setTitle(docData.title);
+      setInitialTime((docData.steps[stepIndex].stepTime));
+      setStepsLength(docData.steps.length);
+      setLoading(false);
+    }
+    if (currentRecipeId) {
+      getData();
+    } else {
+      navigate({ pathname: '/home' });
+    }
+  }, [currentRecipeId, navigate, stepIndex]);
+
+  if (checkingUser) {
+    return (
+      <>
+        <AuthHeader setIsCounting={setIsCounting} />
+        <Loading />
+      </>
+    );
+  }
+
+  if (loading) {
+    return (
+      <>
+        <AuthHeader setIsCounting={setIsCounting} />
+        <Loading />
+      </>
+    );
+  }
 
   return (
     <>
@@ -144,12 +208,10 @@ function Cooking() {
           </LeftTimer>
           <RightRecipe>
             <Recipe
-              setInitialTime={setInitialTime}
               stepIndex={stepIndex}
               setStepIndex={setStepIndex}
-              setStepsLength={setStepsLength}
               setIsCounting={setIsCounting}
-              setTitle={setTitle}
+              steps={steps}
             />
           </RightRecipe>
         </Wrapper>

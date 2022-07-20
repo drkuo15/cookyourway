@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
-import styled from 'styled-components/macro';
+import styled, { keyframes } from 'styled-components/macro';
 import { doc, onSnapshot, updateDoc } from 'firebase/firestore';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { motion, useAnimation } from 'framer-motion'; // npm i react-intersection-observer framer-motion
 import { useInView } from 'react-intersection-observer';
@@ -28,7 +28,7 @@ const Div = styled.div`
 const TipImg = styled.img`
   width: calc(60*100vw/1920);
   height: calc(60*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation: portrait){
     width: calc(90*100vw/1920);
     height: calc(90*100vw/1920);
   }
@@ -38,7 +38,27 @@ const Img = styled.img`
   width: calc(800*100vw/1920);
   height: calc(600*100vw/1920);
   border-radius: calc(15*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation: portrait){
+    width: calc(1600*100vw/1920);
+    height: calc(1200*100vw/1920);
+  }
+`;
+
+const Shine = keyframes`
+  to {
+    background-position-x: -200%;
+  }
+`;
+
+const ImgDefaultDiv = styled.div`
+  width: calc(800*100vw/1920);
+  height: calc(600*100vw/1920);
+  border-radius: calc(15*100vw/1920);
+  background: #eee;
+  background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
+  background-size: 200% 100%;
+  animation: 1.5s ${Shine} linear infinite;
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(1600*100vw/1920);
     height: calc(1200*100vw/1920);
   }
@@ -48,7 +68,21 @@ const StepImg = styled.img`
   width: calc(600*100vw/1920);
   height: calc(450*100vw/1920);
   border-radius: calc(15*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation: portrait){
+    width: calc(900*100vw/1920);
+    height: calc(675*100vw/1920);
+  }
+`;
+
+const StepImgDefaultDiv = styled.div`
+  width: calc(600*100vw/1920);
+  height: calc(450*100vw/1920);
+  border-radius: calc(15*100vw/1920);
+  background: #eee;
+  background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
+  background-size: 200% 100%;
+  animation: 1.5s ${Shine} linear infinite;
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(900*100vw/1920);
     height: calc(675*100vw/1920);
   }
@@ -60,7 +94,7 @@ const TitleWrapper = styled(Div)`
   margin-top: calc(38*100vw/1920);
   gap: calc(36*100vw/1920);
   margin-bottom: calc(50*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation: portrait){
     flex-direction: column;
     align-items: center;
   }
@@ -69,14 +103,14 @@ const TitleWrapper = styled(Div)`
 const ExtraLargeDiv = styled.div`
   font-size: calc(76*100vw/1920);
   font-weight: 500;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation: portrait){
     font-size: calc(152*100vw/1920);
   }
 `;
 
 const LargeDiv = styled.div`
   font-size: calc(48*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation: portrait){
     font-size: calc(96*100vw/1920);
   }
 `;
@@ -84,14 +118,14 @@ const LargeDiv = styled.div`
 const MediumLargeDiv = styled.div`
   font-size: calc(32*100vw/1920);
   margin: calc(20*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation: portrait){
     font-size: calc(72*100vw/1920);
   }
 `;
 
 const MediumDiv = styled.div`
   font-size: calc(28*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation: portrait){
     font-size: calc(56*100vw/1920);
   }
 `;
@@ -101,7 +135,7 @@ const ContentWrapper = styled.div`
   gap: calc(88*100vw/1920);
   align-items: center;
   margin-bottom: calc(50*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation: portrait){
     flex-direction: column;
     align-items: center;
   }
@@ -112,7 +146,7 @@ const ContentDiv = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation: portrait){
     width: calc(1600*100vw/1920);
   }
 `;
@@ -127,7 +161,7 @@ const IngredientContentDiv = styled.div`
   padding: calc(16*100vw/1920);
   justify-content: start;
   height: calc(600*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation: portrait){
     width: calc(1600*100vw/1920);
     height: calc(1200*100vw/1920);
   }
@@ -145,8 +179,8 @@ const AllIngredientsDiv = styled.div`
   flex-direction: column;
   justify-content: space-between;
   margin-top: calc(15*100vw/1920);
-  overflow: scroll;
-  @media ${devices.Tablet} {
+  overflow: auto;
+  @media ${devices.Tablet} and (orientation: portrait){
     margin-top: calc(50*100vw/1920);
   }
 `;
@@ -158,7 +192,7 @@ const StepCircleDiv = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation: portrait){
     width: calc(300*100vw/1920);
   }
 `;
@@ -174,7 +208,7 @@ const Circle = styled.div`
   text-align: center;
   justify-content: center;
   align-items: center;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation: portrait){
     width: calc(200*100vw/1920);
     height: calc(200*100vw/1920);
     font-size: calc(96*100vw/1920);
@@ -185,7 +219,7 @@ const Line = styled.div`
   width: calc(2.5*100vw/1920);
   height: calc(625*100vw/1920);
   background-color: #2B2A29;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation: portrait){
     height: calc(1000*100vw/1920);
   }
 `;
@@ -197,7 +231,7 @@ const BlankLine = styled(Line)`
 const StepWrapper = styled.div`
   display: flex;
   justify-content: space-between;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation: portrait){
     justify-content: center;
   }
 `;
@@ -205,7 +239,7 @@ const StepWrapper = styled.div`
 const StepTitleContentWrapper = styled.div`
   height: calc(650*100vw/1920);
   width: calc(1400*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation: portrait){
     width: calc(1300*100vw/1920);
     height: calc(1000*100vw/1920);
   }
@@ -222,15 +256,15 @@ const StepContentDiv = styled(LargeDiv)`
   width: calc(700*100vw/1920);
   height: calc(450*100vw/1920);
   line-height: calc(50*100vw/1920);
-  overflow: scroll;
+  overflow: auto;
   display: flex;
   align-items: center;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation: portrait){
     width: calc(1300*100vw/1920);
     height: calc(300*100vw/1920);
     font-size: calc(72*100vw/1920);
     line-height: calc(100*100vw/1920);
-    overflow-y: scroll;
+    overflow-y: auto;
     white-space: nowrap;
   }
 `;
@@ -238,7 +272,7 @@ const StepContentDiv = styled(LargeDiv)`
 const StepContentAndImgDiv = styled(Div)`
   align-items: center;
   margin-top: calc(36*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation: portrait){
     margin-top: calc(5*100vw/1920);
     flex-direction: column;
     justify-content: center;
@@ -262,7 +296,7 @@ const DoItYourSelfButton = styled.button`
   &:hover{
   background-color:#fa8921;
   }
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation: portrait){
     width: calc(100*100vw/1920);
     height: calc(400*100vw/1920);
     font-size: calc(60*100vw/1920);
@@ -281,7 +315,7 @@ const CommentDiv = styled.div`
   background-color: #E5D2C050;
   border-radius: calc(15*100vw/1920);
   margin-bottom: calc(90*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation: portrait){
     padding: calc(60*100vw/1920);
     margin-top: calc(90*100vw/1920);
     width: 100%;
@@ -295,7 +329,7 @@ const CommentContentDiv = styled.div`
   margin-top: calc(25*100vw/1920);
   line-height: calc(64*100vw/1920);
   overflow: auto;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation: portrait){
     margin-top: calc(60*100vw/1920);
     font-size: calc(72*100vw/1920);
     line-height: calc(100*100vw/1920);
@@ -305,7 +339,7 @@ const CommentContentDiv = styled.div`
 const CommentTitleSpan = styled.span`
   font-size: calc(36*100vw/1920);
   font-weight: 500;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation: portrait){
     font-size: calc(72*100vw/1920);
   }
 `;
@@ -348,7 +382,26 @@ function MotionLine() {
   );
 }
 
+// https://www.w3schools.com/css/css_tooltip.asp
+const ToolTipText = styled.span`
+  visibility: hidden;
+  width: calc(440*100vw/1920);
+  background-color: #26262590;
+  font-size: calc(26*100vw/1920);
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: calc(20*100vw/1920); 0;
+  position: absolute;
+  z-index: 1;
+  bottom: 100%;
+  margin-left: calc(-250*100vw/1920);;
+  opacity: 0;
+  transition: opacity 1s;
+`;
+
 const Icon = styled.span`
+  position: relative;
   cursor: pointer;
   font-size: calc(40*100vw/1920);
   display: flex;
@@ -363,13 +416,18 @@ const Icon = styled.span`
   & > svg:hover {
     color: #808080;
   }
-  @media ${devices.Tablet} {
+  &:hover > ${ToolTipText} {
+    visibility: visible;
+    opacity: 1;
+  }
+  @media ${devices.Tablet} and (orientation: portrait){
     & > svg{
     width: calc(110*100vw/1920);
     height: calc(110*100vw/1920);
   }
   }
 `;
+
 function ReadRecipe({ setUserInfo }) {
   const userInfo = useContext(AuthContext);
   const userId = userInfo?.uid || '';
@@ -386,11 +444,23 @@ function ReadRecipe({ setUserInfo }) {
   const [authorId, setAuthorId] = useState('');
   const [fullTime, setFulltime] = useState(0);
   const location = useLocation();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const [checkingUser, setCheckingUser] = useState(true);
+  const [imgLoaded, setImgLoaded] = useState(false);
+  const [stepImgLoaded, setStepImgLoaded] = useState(false);
 
   const setMyFavorites = (newMyFavorites) => {
     setUserInfo({ ...userInfo, myFavorites: newMyFavorites });
   };
+
+  // 判斷是否存在食譜id，不存在則導入首頁。
+  // useEffect(() => {
+  // eslint-disable-next-line max-len
+  //   if (!location.search || location.search.split('=')[0] !== '?id' || location.search.split('=')[1] === '') {
+  //     navigate({ pathname: '/home' });
+  //   }
+  // }, [location.search, navigate]);
 
   // 當userInfo存在時，取得uid
   // useEffect(() => {
@@ -405,38 +475,60 @@ function ReadRecipe({ setUserInfo }) {
   //   setMyFavorites([]);
   // }, [userInfo, myFavorites.length]);
 
+  useEffect(() => {
+    if (userInfo === '') {
+      setCheckingUser(true);
+    }
+    if (userInfo === null) {
+      navigate({ pathname: '/' });
+    }
+    if (userId) {
+      setCheckingUser(false);
+    }
+  }, [navigate, userId, userInfo]);
+
   const currentRecipeId = location.search.split('=')[1];
   useEffect(() => {
-    const unsubscribe = onSnapshot(
-      doc(db, 'recipes', currentRecipeId),
-      (document) => {
-        const recipeData = document.data();
-        setTitle(recipeData.title);
-        setDifficulty(recipeData.difficulty);
-        setImgUrl(recipeData.mainImage);
-        setIngredients(recipeData.ingredients);
-        setSteps(recipeData.steps);
-        setComment(recipeData.comment);
-        setAuthorName(recipeData.authorName);
-        setAuthorId(recipeData.authorId);
-        setFulltime(recipeData.fullTime);
-        setLoading(false);
-      },
-    );
-    return unsubscribe;
-  }, [currentRecipeId]);
+    if (currentRecipeId) {
+      const unsubscribe = onSnapshot(
+        doc(db, 'recipes', currentRecipeId),
+        (document) => {
+          const recipeData = document.data();
+          if (!recipeData) {
+            navigate({ pathname: '/home' });
+            return;
+          }
+          setTitle(recipeData.title);
+          setDifficulty(recipeData.difficulty);
+          setImgUrl(recipeData.mainImage);
+          setIngredients(recipeData.ingredients);
+          setSteps(recipeData.steps);
+          setComment(recipeData.comment);
+          setAuthorName(recipeData.authorName);
+          setAuthorId(recipeData.authorId);
+          setFulltime(recipeData.fullTime);
+          setLoading(false);
+        },
+      );
+      return unsubscribe;
+    }
+    navigate({ pathname: '/home' });
+    return undefined;
+  }, [currentRecipeId, navigate]);
 
   const copyText = ingredients.reduce((acc, i) => `${acc}${i.ingredientsTitle}:${i.ingredientsQuantity}公克,`, '');
 
   function exportIngredients() {
     if (navigator.share) {
+      navigator.clipboard.writeText(`【 ${title} 】食材內容: \n ${copyText}`);
+      navigator.clipboard.readText().then(() => showCustomAlert(`【 ${title} 】採買清單 \n\n已為您複製囉！ \n\n請自行選擇記錄方式`));
       navigator.share({
         title: `【 ${title} 】 食材內容`,
         text: `【 ${title} 】 食材內容: \n ${copyText}`,
       });
     } else {
       navigator.clipboard.writeText(`【 ${title} 】食材內容: \n ${copyText}`);
-      navigator.clipboard.readText().then((text) => showCustomAlert(`已成功複製\n${text}`));
+      navigator.clipboard.readText().then(() => showCustomAlert(`【 ${title} 】採買清單 \n\n已為您複製囉！ \n\n請自行選擇記錄方式`));
     }
   }
 
@@ -449,6 +541,7 @@ function ReadRecipe({ setUserInfo }) {
     const updatedMyFavorite = [...myFavorites, currentRecipeId];
     setMyFavorites(updatedMyFavorite);
     updateDoc(UserRef, { myFavorites: updatedMyFavorite });
+    showCustomAlert('已成功加入收藏清單\n\n請前往首頁查看');
   }
 
   function removeFromFavorites() {
@@ -458,7 +551,24 @@ function ReadRecipe({ setUserInfo }) {
       const updatedMyFavorite = myFavorites.filter((id) => id !== currentRecipeId);
       setMyFavorites(updatedMyFavorite);
       updateDoc(UserRef, { myFavorites: updatedMyFavorite });
+      showCustomAlert('已從收藏清單成功移除');
     }
+  }
+
+  if (checkingUser) {
+    return (
+      <>
+        <ReadRecipeHeader
+          authorId={authorId}
+          userId={userId}
+          addToFavorites={() => { addToFavorites(); }}
+          removeFromFavorites={() => { removeFromFavorites(); }}
+          myFavorites={myFavorites}
+          currentRecipeId={currentRecipeId}
+        />
+        <Loading />
+      </>
+    );
   }
 
   if (loading) {
@@ -510,11 +620,30 @@ function ReadRecipe({ setUserInfo }) {
           </ContentDiv>
         </ContentWrapper>
         <ContentWrapper>
-          <Img src={imgUrl || defaultImage} alt="stepImages" />
+          {/* <Img src={imgUrl || defaultImage} alt="mainImage" /> */}
+          {imgLoaded ? (
+            <Img
+              src={imgUrl || defaultImage}
+              alt="mainImage"
+            />
+          ) : (
+            <>
+              <Img
+                style={imgLoaded ? {} : { display: 'none' }}
+                src={imgUrl || defaultImage}
+                alt="mainImage"
+                onLoad={() => { setImgLoaded(true); }}
+              />
+              <ImgDefaultDiv />
+            </>
+          )}
           <IngredientContentDiv>
             <IngredientTitleDiv>
               <LargeDiv>食材</LargeDiv>
-              <Icon onClick={() => exportIngredients()}><IosShare /></Icon>
+              <Icon onClick={() => exportIngredients()}>
+                <IosShare />
+                <ToolTipText>匯出食材！方便記錄採買清單</ToolTipText>
+              </Icon>
             </IngredientTitleDiv>
             <AllIngredientsDiv>
               {ingredients.map((ingredient) => (
@@ -549,7 +678,23 @@ function ReadRecipe({ setUserInfo }) {
                   <StepContentDiv>
                     {steps[index].stepContent}
                   </StepContentDiv>
-                  <StepImg src={steps[index].stepImgUrl || defaultImage} alt="stepImages" />
+                  {/* <StepImg src={steps[index].stepImgUrl || defaultImage} alt="stepImages" /> */}
+                  {stepImgLoaded ? (
+                    <StepImg
+                      src={steps[index].stepImgUrl || defaultImage}
+                      alt="stepImages"
+                    />
+                  ) : (
+                    <>
+                      <StepImg
+                        style={stepImgLoaded ? {} : { display: 'none' }}
+                        src={steps[index].stepImgUrl || defaultImage}
+                        alt="stepImages"
+                        onLoad={() => { setStepImgLoaded(true); }}
+                      />
+                      <StepImgDefaultDiv />
+                    </>
+                  )}
                 </StepContentAndImgDiv>
               </StepTitleContentWrapper>
             </StepWrapper>
@@ -567,7 +712,7 @@ function ReadRecipe({ setUserInfo }) {
           </CommentContentDiv>
         </CommentDiv>
         <Link to={`/cooking?id=${location.search.split('=')[1]}`}>
-          <DoItYourSelfButton>小試身手</DoItYourSelfButton>
+          <DoItYourSelfButton>來料理吧</DoItYourSelfButton>
         </Link>
         <ToastContainer />
       </Background>

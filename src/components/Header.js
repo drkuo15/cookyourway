@@ -4,16 +4,18 @@ import { devices } from '../utils/StyleUtils';
 import logoImage from '../images/CookYourWay_logo_v1.png';
 
 const Background = styled.div`
-  width: 100vw;
+  width: 100%;
   height: calc(116*100vw/1920);
-  background-color: #E5D2C080;
+  background-color: #E5D2C0;
   display: flex;
   align-item: center;
   justify-content: space-between;
   padding: calc(26*100vw/1920);
   position: fixed;
   top: 0;
-  @media ${devices.Tablet} {
+  z-index: 200;
+  box-shadow: 0px 0px calc(30*100vw/1920) #fdfdfc;
+  @media ${devices.Tablet} and (orientation:portrait) {
     height: calc(320*100vw/1920);
   }
 `;
@@ -22,14 +24,14 @@ const LeftDiv = styled.div`
   gap: calc(26*100vw/1920);
   display: flex;
   align-items: center;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     gap: calc(60*100vw/1920);
   }
 `;
 
 const RightDiv = styled(LeftDiv)`
   gap: calc(20*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     gap: calc(50*100vw/1920);
   }
 `;
@@ -37,10 +39,15 @@ const RightDiv = styled(LeftDiv)`
 const ImgLink = styled(Link)`
   width: calc(64*100vw/1920);
   height: calc(64*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(180*100vw/1920);
     height: calc(180*100vw/1920);
   }
+`;
+
+const TitleLink = styled(Link)`
+  text-decoration: none;
+  color: inherit;
 `;
 
 const StyledLink = styled(Link)`
@@ -50,7 +57,7 @@ const StyledLink = styled(Link)`
 const Img = styled.img`
   width: calc(64*100vw/1920);
   height: calc(64*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(180*100vw/1920);
     height: calc(180*100vw/1920);
   }
@@ -61,7 +68,7 @@ const Title = styled.div`
   height: calc(64*100vw/1920);
   color: #EB811F;
   font-size: calc(48*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(1000*100vw/1920);
     height: calc(180*100vw/1920);
     font-size: calc(120*100vw/1920);
@@ -87,7 +94,7 @@ const DropBtn = styled.button`
     box-shadow: 0 2px 2px -2px #EB811F ;
     color: #000000;
   }
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(200*100vw/1920);
     height: calc(150*100vw/1920);
     font-size: calc(70*100vw/1920);
@@ -96,7 +103,7 @@ const DropBtn = styled.button`
 
 const Padding = styled.div`
   height: calc(116*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     height: calc(320*100vw/1920);
   }
 `;
@@ -109,7 +116,7 @@ function Header() {
           <ImgLink to="/">
             <Img src={logoImage} alt="logoImage" />
           </ImgLink>
-          <Title>Cook Your Way</Title>
+          <TitleLink to="/"><Title>Cook Your Way</Title></TitleLink>
         </LeftDiv>
         <RightDiv>
           <StyledLink to="/login">

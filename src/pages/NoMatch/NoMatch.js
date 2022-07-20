@@ -122,7 +122,7 @@ const Pulse = keyframes`
 const Background = styled.div`
   background-color: #EB811F75;
   height: 100vh;
-  width: 100vw;
+  width: 100%;
   overflow: hidden;
 `;
 
@@ -130,7 +130,7 @@ const Text = styled.div`
   position: relative;
   margin: 0 auto;
   top: 25vh;
-  width: 100vw;
+  width: 100%;
   text-align: center;
   font-family: "Roboto";
   font-size: 8vh;

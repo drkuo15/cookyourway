@@ -9,38 +9,38 @@ import ramenDining from '../images/foodSVG/ramen_dining_FILL0_wght400_GRAD0_opsz
 import { devices } from '../utils/StyleUtils';
 
 const Background = styled.div`
-  width: 100vw;
+  width: 100%;
   height: calc(250*100vw/1920);
   display: flex;
   justify-content: space-around;
   align-items: center;
   position: relative;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     height: calc(500*100vw/1920);
   }
 `;
 
 const UpWrapper = styled.div`
-  width: 100vw;
+  width: 96%;
   display: flex;
   justify-content: space-between;
   align-items: center;
   position: absolute;
   top: calc(-100*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     justify-content: space-around;
     top: calc(50*100vw/1920);
   }
 `;
 
 const DownWrapper = styled.div`
-  width: 90vw;
+  width: 90%;
   display: flex;
   justify-content: space-around;
   align-items: center;
   position: absolute;
   bottom: calc(-35*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     bottom: calc(-250*100vw/1920);
   }
   
@@ -51,7 +51,7 @@ const ImageUp = styled.img`
   height: calc(230*100vw/1920);
   opacity: 0.3;
   transform: rotate(20deg);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(345*100vw/1920);
     height: calc(345*100vw/1920);
   }
@@ -62,7 +62,7 @@ const ImageDown = styled.img`
   height: calc(230*100vw/1920);
   opacity: 0.3;
   transform: rotate(-15deg);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(345*100vw/1920);
     height: calc(345*100vw/1920);
   }

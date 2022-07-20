@@ -6,12 +6,11 @@ import {
 } from 'firebase/firestore';
 import {
   getDownloadURL, uploadBytes, ref,
-  deleteObject,
 } from 'firebase/storage';
 import styled from 'styled-components/macro';
 import { v4 } from 'uuid';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { motion, useAnimation } from 'framer-motion'; // npm i react-intersection-observer framer-motion
+import { motion, useAnimation } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import PropTypes from 'prop-types';
 import { db, storage } from '../../firestore';
@@ -34,13 +33,12 @@ const Div = styled.div`
   justify-content: space-between;
 `;
 
-// Title
 const TitleWrapper = styled(Div)`
   margin: auto;
   margin-top: calc(46*100vw/1920);
   margin-bottom: calc(50*100vw/1920);
   width: calc(800*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     flex-direction: column;
     align-items: center;
       width: calc(1600*100vw/1920);
@@ -49,7 +47,7 @@ const TitleWrapper = styled(Div)`
 
 const MediumLargeDiv = styled.div`
   font-size: calc(36*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     font-size: calc(72*100vw/1920);
   }
 `;
@@ -71,7 +69,7 @@ const TitleInput = styled.input`
   &:focus {
     border-color: #EB811F;
   }
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
       font-size: calc(96*100vw/1920);
   }
 `;
@@ -81,18 +79,17 @@ const ErrorMsg = styled.div`
   color: red;
   margin-top: calc(10*100vw/1920);
   text-align: end;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
       font-size: calc(48*100vw/1920);
   }
 `;
 
-// Content
 const ContentWrapper = styled.div`
   display: flex;
   gap: calc(88*100vw/1920);
   align-items: center;
   margin-bottom: calc(50*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     flex-direction: column;
     align-items: center;
   }
@@ -103,7 +100,7 @@ const ContentDiv = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(1600*100vw/1920);
   }
 
@@ -117,7 +114,7 @@ const FoodImg = styled.img`
   width: calc(800*100vw/1920);
   height: calc(600*100vw/1920);
   border-radius: calc(15*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(1600*100vw/1920);
     height: calc(1200*100vw/1920);
   }
@@ -134,7 +131,7 @@ const Label = styled.label`
   height: calc(600*100vw/1920);
   position: absolute;
   top: 0;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(1600*100vw/1920);
     height: calc(1200*100vw/1920);
   }
@@ -151,7 +148,7 @@ const UploadImgP = styled.p`
   letter-spacing: calc(2*100vw/1920);
   font-size: calc(36*100vw/1920);
   border-radius: calc(15*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(568*100vw/1920);
     height: calc(128*100vw/1920); 
     font-size: calc(72*100vw/1920);
@@ -161,7 +158,6 @@ const UploadImgP = styled.p`
   }
 `;
 
-// Ingredient
 const IngredientContentDiv = styled.div`
   display: flex;
   flex-direction: column;
@@ -171,7 +167,7 @@ const IngredientContentDiv = styled.div`
   justify-content: space-around;
   width: calc(800*100vw/1920);
   height: calc(600*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(1600*100vw/1920);
     height: calc(1200*100vw/1920);
   }
@@ -192,7 +188,7 @@ const AllIngredientsDiv = styled.div`
   font-size: calc(36*100vw/1920);
   flex-grow: 1;
   overflow-y: auto;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     font-size: calc(72*100vw/1920);
     padding-top: calc(50*100vw/1920);
     gap: calc(30*100vw/1920);
@@ -215,7 +211,7 @@ const Input = styled.input`
   &:focus {
     border-color: #EB811F;
   }
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(650*100vw/1920);
     height: calc(112*100vw/1920);
     padding: calc(4*100vw/1920) calc(16*100vw/1920);
@@ -236,7 +232,7 @@ const QuantityInput = styled(Input)`
   &::-webkit-inner-spin-button {
     -webkit-appearance: none;
   }
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(270*100vw/1920);
   }
 `;
@@ -246,7 +242,7 @@ const DeleteButton = styled.button`
   background-color: transparent;
   cursor: pointer;
   border: 0;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     height: calc(90 * 100vw / 1920);
   }
 `;
@@ -254,7 +250,7 @@ const DeleteButton = styled.button`
 const IconImg = styled.img`
   width: calc(45*100vw/1920);
   height: calc(45*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     height: calc(90 * 100vw / 1920);
     width: calc(90*100vw/1920);
   }
@@ -263,7 +259,7 @@ const IconImg = styled.img`
 const StepDeleteButton = styled(DeleteButton)`
   height: calc(56 * 100vw / 1920);
   margin-top: calc(20*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     height: calc(112 * 100vw / 1920);
     margin-top: calc(40*100vw/1920);
   }
@@ -272,7 +268,7 @@ const StepDeleteButton = styled(DeleteButton)`
 const StepIconImg = styled(IconImg)`
   width: calc(56*100vw/1920);
   height: calc(56*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     height: calc(112 * 100vw / 1920);
     width: calc(112*100vw/1920);
   }
@@ -282,7 +278,7 @@ const AddIngredientDiv = styled.div`
   width: 100%;
   text-align: center;
   margin-top: calc(16*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
       margin-top: calc(32*100vw/1920);
       margin-bottom: calc(32*100vw/1920);
   }
@@ -300,18 +296,17 @@ const AddIngredientButton = styled.button`
   &:hover {
     background-color: #4c3732;
   }
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
       width: calc(400*100vw/1920);
     height: calc(100*100vw/1920);
     font-size: calc(56*100vw/1920);
   }
 `;
 
-// Step
 const StepWrapper = styled.div`
   display: flex;
   justify-content: space-between;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     justify-content: center;
     gap: calc(20*100vw/1920);
   }
@@ -324,7 +319,7 @@ const StepCircleDiv = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(300*100vw/1920);
   }
 `;
@@ -340,7 +335,7 @@ const Circle = styled.div`
   text-align: center;
   justify-content: center;
   align-items: center;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(200*100vw/1920);
     height: calc(200*100vw/1920);
     font-size: calc(96*100vw/1920);
@@ -351,7 +346,7 @@ const Line = styled.div`
   width: calc(2.5*100vw/1920);
   height: calc(625*100vw/1920);
   background-color: #2B2A29;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(5*100vw/1920);
     height: calc(1400*100vw/1920);
   }
@@ -361,7 +356,7 @@ const AddStepDiv = styled.div`
   height: calc(525*100vw/1920);
   display: flex;
   margin-top: calc(100*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     height: calc(1050*100vw/1920);
     margin-top: calc(200*100vw/1920);
   }
@@ -384,7 +379,7 @@ const AddStepButton = styled.div`
     &:hover {
     background-color: #4c3732;
   }
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(100*100vw/1920);
     height: calc(400*100vw/1920);
     font-size: calc(56*100vw/1920);
@@ -394,7 +389,7 @@ const AddStepButton = styled.div`
 const StepTitleContentWrapper = styled.div`
   height: calc(650*100vw/1920);
   padding-top: calc(18 * 100vw / 1920);
-    @media ${devices.Tablet} {
+    @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(1100*100vw/1920);
     height: calc(1000*100vw/1920);
   }
@@ -404,7 +399,7 @@ const StepTitleAndTimeDiv = styled(Div)`
   font-size: calc(48*100vw/1920);
   border-bottom: calc(5*100vw/1920)  #2B2A29 solid;
   padding-bottom: calc(50*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     font-size: calc(96*100vw/1920);
     flex-direction: column;
     gap: calc(50*100vw/1920);
@@ -423,7 +418,7 @@ const StepInput = styled.input`
     border-color: #EB811F;
   }
   padding-left: calc(15*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(1100*100vw/1920);
     height: calc(120*100vw/1920);
     font-size: calc(72*100vw/1920);
@@ -451,7 +446,7 @@ const TimeInput = styled.input`
   &::-webkit-inner-spin-button {
     -webkit-appearance: none;
   }
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(300*100vw/1920);
     height: calc(120*100vw/1920);
     font-size: calc(76*100vw/1920);
@@ -461,7 +456,7 @@ const TimeInput = styled.input`
 const StepContentAndImgDiv = styled(Div)`
   align-items: center;
   margin-top: calc(36*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     margin-top: calc(0*100vw/1920);
     flex-direction: column;
     justify-content: center;
@@ -472,15 +467,15 @@ const StepContentDiv = styled.div`
   font-size: calc(36*100vw/1920);
   width: calc(800*100vw/1920);
   height: calc(500*100vw/1920);
-  overflow: scroll;
+  overflow: auto;
   display: flex;
   align-items: center;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(1100*100vw/1920);
     height: calc(300*100vw/1920);
     font-size: calc(72*100vw/1920);
     line-height: calc(100*100vw/1920);
-    overflow-y: scroll;
+    overflow-y: auto;
     white-space: nowrap;
   }
 `;
@@ -497,7 +492,7 @@ const TextArea = styled.textarea`
   &:focus{
     border-color:  #EB811F;
   }
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(1100*100vw/1920);
     height: calc(200*100vw/1920);
     font-size: calc(72*100vw/1920);
@@ -511,7 +506,7 @@ const StepImg = styled.img`
   width: calc(600*100vw/1920);
   height: calc(450*100vw/1920);
   border-radius: calc(15*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(900*100vw/1920);
     height: calc(675*100vw/1920);
   }
@@ -520,7 +515,7 @@ const StepImg = styled.img`
 const StepLabel = styled(Label)`
   width: calc(600*100vw/1920);
   height: calc(450*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(900*100vw/1920);
     height: calc(675*100vw/1920);
   }
@@ -533,7 +528,7 @@ const StepUploadImgP = styled(UploadImgP)`
   top: calc(325*100vw/1920);
   left: calc(175*100vw/1920);
   font-size: calc(28*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(568*100vw/1920);
     height: calc(128*100vw/1920); 
     font-size: calc(56*100vw/1920);
@@ -543,7 +538,6 @@ const StepUploadImgP = styled(UploadImgP)`
   }
 `;
 
-// Comment
 const CommentDiv = styled.div`
   width: calc(1688*100vw/1920);
   height: calc(312*100vw/1920);
@@ -551,7 +545,7 @@ const CommentDiv = styled.div`
   background-color: #E5D2C050;
   border-radius: calc(15*100vw/1920);
   margin-bottom: calc(50*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     padding: calc(60*100vw/1920);
     margin-top: calc(90*100vw/1920);
     width: 100%;
@@ -562,7 +556,7 @@ const CommentDiv = styled.div`
 const CommentContentDiv = styled.div`
   font-size: calc(36*100vw/1920);
   margin-top: calc(25*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     margin-top: calc(60*100vw/1920);
     font-size: calc(72*100vw/1920);
   }
@@ -571,7 +565,7 @@ const CommentContentDiv = styled.div`
 const CommentTitleSpan = styled.span`
   font-size: calc(36*100vw/1920);
   font-weight: 500;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     font-size: calc(72*100vw/1920);
   }
 `;
@@ -591,7 +585,7 @@ const TipsDiv = styled.div`
 const TipImg = styled.img`
   width: calc(60*100vw/1920);
   height: calc(60*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(90*100vw/1920);
     height: calc(90*100vw/1920);
   }
@@ -601,7 +595,7 @@ const CommentTextArea = styled(TextArea)`
   width: 100%;
   height: calc(150*100vw/1920);
   line-height: calc(64*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     height: calc(300*100vw/1920);
     line-height: calc(100*100vw/1920);
   }
@@ -624,14 +618,13 @@ const RightSaveButton = styled.button`
   &:hover{
     background-color:#fa8921;
   }
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(100*100vw/1920);
     height: calc(400*100vw/1920);
     font-size: calc(60*100vw/1920);
   }
 `;
 
-// https://blog.logrocket.com/react-scroll-animations-framer-motion/
 const LineVariant = {
   visible: { opacity: 1, scale: 1, transition: { duration: 1.5 } },
   hidden: { opacity: 0, scale: 0 },
@@ -672,7 +665,7 @@ function ModifyRecipe() {
   const [title, setTitle] = useState('');
   const [oldTitle, setOldTitle] = useState('');
   const [titleKeywords, setTitleKeyWords] = useState([]);
-  const [difficulty, setDifficulty] = useState(1);
+  const [difficulty, setDifficulty] = useState(0);
   const [ingredients, setIngredients] = useState([{
     ingredientsQuantity: '',
     ingredientsTitle: '',
@@ -697,12 +690,28 @@ function ModifyRecipe() {
   const [imgUrl, setImgUrl] = useState('');
   const [authorId, setAuthorId] = useState('');
   const userInfo = useContext(AuthContext);
-  const userId = userInfo.uid;
-  const userName = userInfo.name;
+  const userId = userInfo?.uid || '';
+  const userName = userInfo?.name || '';
   const fullTime = steps.reduce((accValue, step) => accValue + Number(step.stepTime), 0);
   const navigate = useNavigate();
   const location = useLocation();
   const [loading, setLoading] = useState(true);
+  const [checkingUser, setCheckingUser] = useState(true);
+
+  // 判斷是否登入
+  // 第一次render尚未收到onAuthStateChange資料為空字串
+  // 第二次render拿到資料，若未登入是null，如果登入則可以拿到userId
+  useEffect(() => {
+    if (userInfo === '') {
+      setCheckingUser(true);
+    }
+    if (userInfo === null) {
+      navigate({ pathname: '/' });
+    }
+    if (userId) {
+      setCheckingUser(false);
+    }
+  }, [navigate, userId, userInfo]);
 
   // 取得當前食譜id的資料，放入編輯列
   useEffect(() => {
@@ -741,9 +750,6 @@ function ModifyRecipe() {
           storage,
           `recipe/${new Date().getTime()} - ${img.name}`,
         );
-        if (imgPath) {
-          await deleteObject(ref(storage, imgPath));
-        }
         const snap = await uploadBytes(imgRef, img);
         const url = await getDownloadURL(ref(storage, snap.ref.fullPath));
         setImgUrl(url);
@@ -790,26 +796,53 @@ function ModifyRecipe() {
       authorId: userId,
 
     };
-    const hasEmptyIngValue = (obj) => Object.values(obj).some((value) => value === '');
+    const hasEmptyIngValue = (obj) => Object.values(obj).some((value) => value === '' || value === 0);
     const hasEmptyIngredientInput = ingredients.some((ingredient) => hasEmptyIngValue(ingredient));
     const hasEmptyStepValue = (obj) => Object.values(obj).some((value) => value === '');
-    const hasEmptyStepInput = steps.some((step) => hasEmptyStepValue(step));
+    const hasEmptyStepInput = steps.some((step) => hasEmptyStepValue(step) || step.stepTime === 0);
     const hasEmptyOtherInput = Object.values(newRecipeData).some((value) => !value);
+
     if (hasEmptyOtherInput) {
       if (!title) {
         showCustomAlert('請填寫食譜名稱');
+      } else if (!difficulty) {
+        showCustomAlert('請選擇難易度');
       } else if (!imgUrl) {
         showCustomAlert('請上傳食譜封面照');
       } else if (!comment) {
-        showCustomAlert('請填寫叮嚀事項');
+        showCustomAlert('請填寫小秘訣');
+      } else if (hasEmptyStepInput) {
+        showCustomAlert('步驟時間不可以都是0喔');
       }
       return;
-    } if (hasEmptyIngredientInput) {
-      showCustomAlert('請填寫完整食材內容');
-      return;
-    } if (hasEmptyStepInput) {
-      showCustomAlert('請填寫完整步驟內容');
-      return;
+    }
+    if (hasEmptyIngredientInput) {
+      if (ingredients.some((ingredient) => ingredient.ingredientsTitle === '')) {
+        showCustomAlert('請填寫食材名稱');
+        return;
+      }
+      if (ingredients.some((ingredient) => ingredient.ingredientsQuantity === 0)) {
+        showCustomAlert('請填寫食材數量');
+        return;
+      }
+    }
+    if (hasEmptyStepInput) {
+      if (steps.some((step) => step.stepTitle === '')) {
+        showCustomAlert('請填寫步驟簡稱');
+        return;
+      }
+      if (steps.some((step) => step.stepContent === '')) {
+        showCustomAlert('請填寫步驟內容');
+        return;
+      }
+      if (steps.some((step) => step.stepTime === 0)) {
+        showCustomAlert('步驟時間不可以都是0喔');
+        return;
+      }
+      if (steps.some((step) => step.stepImgUrl === '')) {
+        showCustomAlert('請上傳步驟照片');
+        return;
+      }
     }
     // 知道collection name, document name，新建資料
     setDoc(doc(db, 'recipes', docId), newRecipeData);
@@ -852,27 +885,53 @@ function ModifyRecipe() {
       authorName: userName,
       authorId: userId,
     };
-    const hasEmptyIngValue = (obj) => Object.values(obj).some((value) => value === '');
+    const hasEmptyIngValue = (obj) => Object.values(obj).some((value) => value === '' || value === 0);
     const hasEmptyIngredientInput = ingredients.some((ingredient) => hasEmptyIngValue(ingredient));
     const hasEmptyStepValue = (obj) => Object.values(obj).some((value) => value === '');
-    const hasEmptyStepInput = steps.some((step) => hasEmptyStepValue(step));
+    const hasEmptyStepInput = steps.some((step) => hasEmptyStepValue(step) || step.stepTime === 0);
     const hasEmptyOtherInput = Object.values(newRecipeData).some((value) => !value);
 
     if (hasEmptyOtherInput) {
       if (!title) {
         showCustomAlert('請填寫食譜名稱');
+      } else if (!difficulty) {
+        showCustomAlert('請選擇難易度');
       } else if (!imgUrl) {
         showCustomAlert('請上傳食譜封面照');
       } else if (!comment) {
-        showCustomAlert('請填寫叮嚀事項');
+        showCustomAlert('請填寫小秘訣');
+      } else if (hasEmptyStepInput) {
+        showCustomAlert('步驟時間不可以都是0喔');
       }
       return;
-    } if (hasEmptyIngredientInput) {
-      showCustomAlert('請填寫完整食材內容');
-      return;
-    } if (hasEmptyStepInput) {
-      showCustomAlert('請填寫完整步驟內容');
-      return;
+    }
+    if (hasEmptyIngredientInput) {
+      if (ingredients.some((ingredient) => ingredient.ingredientsTitle === '')) {
+        showCustomAlert('請填寫食材名稱');
+        return;
+      }
+      if (ingredients.some((ingredient) => ingredient.ingredientsQuantity === 0)) {
+        showCustomAlert('請填寫食材數量');
+        return;
+      }
+    }
+    if (hasEmptyStepInput) {
+      if (steps.some((step) => step.stepTitle === '')) {
+        showCustomAlert('請填寫步驟簡稱');
+        return;
+      }
+      if (steps.some((step) => step.stepContent === '')) {
+        showCustomAlert('請填寫步驟內容');
+        return;
+      }
+      if (steps.some((step) => step.stepTime === 0)) {
+        showCustomAlert('步驟時間不可以都是0喔');
+        return;
+      }
+      if (steps.some((step) => step.stepImgUrl === '')) {
+        showCustomAlert('請上傳步驟照片');
+        return;
+      }
     }
     updateDoc(RecipeRef, newRecipeData);
     navigate({ pathname: '/read_recipe', search: `?id=${currentRecipeId}` });
@@ -894,8 +953,10 @@ function ModifyRecipe() {
 
   function updateQuantityValue(e, targetIndex) {
     const newIngredients = [...ingredients];
-    const input = e.target.value;
-    newIngredients[targetIndex].ingredientsQuantity = input;
+    if (Number(e.target.value) < 0) {
+      e.target.value = 0;
+    }
+    newIngredients[targetIndex].ingredientsQuantity = e.target.value;
     setIngredients(newIngredients);
   }
   function updateTitleValue(e, index) {
@@ -926,14 +987,31 @@ function ModifyRecipe() {
   function updateStepMinuteValue(e, index) {
     const newSteps = [...steps];
     newSteps[index].stepMinute = e.target.value;
-    newSteps[index].stepTime = newSteps[index].stepMinute * 60 + newSteps[index].stepSecond;
+    if (Number(newSteps[index].stepMinute) < 0) {
+      newSteps[index].stepMinute = 0;
+    }
+    if (Number(newSteps[index].stepMinute) % 1 !== 0) {
+      newSteps[index].stepMinute = Math.floor(e.target.value);
+    }
+    newSteps[index].stepTime = Number(newSteps[index].stepMinute) * 60
+      + Number(newSteps[index].stepSecond);
     setSteps(newSteps);
   }
 
   function updateStepSecondValue(e, index) {
     const newSteps = [...steps];
     newSteps[index].stepSecond = e.target.value;
-    newSteps[index].stepTime = newSteps[index].stepMinute * 60 + newSteps[index].stepSecond;
+    if (Number(newSteps[index].stepSecond) > 59) {
+      newSteps[index].stepSecond = 59;
+    }
+    if (Number(newSteps[index].stepSecond) < 0) {
+      newSteps[index].stepSecond = 0;
+    }
+    if (Number(newSteps[index].stepMinute) % 1 !== 0) {
+      newSteps[index].stepMinute = Math.floor(e.target.value);
+    }
+    newSteps[index].stepTime = Number(newSteps[index].stepMinute) * 60
+      + Number(newSteps[index].stepSecond);
     setSteps(newSteps);
   }
 
@@ -954,14 +1032,8 @@ function ModifyRecipe() {
         storage,
         `recipeStep/${new Date().getTime()} - ${e.target.files[0].name}`,
       );
-
-      if (steps[index].stepImgPath) {
-        await deleteObject(ref(storage, steps[index].stepImgPath));
-      }
-
       const snap = await uploadBytes(imgRef, e.target.files[0]);
       const url = await getDownloadURL(ref(storage, snap.ref.fullPath));
-
       const newSteps = [...steps];
       newSteps[index].stepImgUrl = url;
       newSteps[index].stepImgPath = snap.ref.fullPath;
@@ -990,6 +1062,15 @@ function ModifyRecipe() {
 
   function submitData() {
     decideToUpdateOrSetRecipe();
+  }
+
+  if (checkingUser) {
+    return (
+      <>
+        <AuthHeader />
+        <Loading />
+      </>
+    );
   }
 
   if (loading) {
@@ -1115,6 +1196,7 @@ function ModifyRecipe() {
                       placeholder="0"
                       type="number"
                       min="0"
+                      max="59"
                     />
                     <MediumLargeDiv>秒</MediumLargeDiv>
                   </StepTimeDiv>

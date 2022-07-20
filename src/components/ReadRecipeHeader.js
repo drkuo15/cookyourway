@@ -13,16 +13,18 @@ import AuthContext from './AuthContext';
 import chefImage from '../images/chef.png';
 
 const Background = styled.div`
-  width: 100vw;
+  width: 100%;
   height: calc(116*100vw/1920);
-  background-color: #E5D2C080;
+  background-color: #E5D2C0;
   display: flex;
   align-item: center;
   justify-content: space-between;
   padding: calc(26*100vw/1920);
   position: fixed;
   top: 0;
-  @media ${devices.Tablet} {
+  z-index: 200;
+  box-shadow: 0px 0px calc(30*100vw/1920) #fdfdfc;
+  @media ${devices.Tablet} and (orientation:portrait) {
     height: calc(320*100vw/1920);
   }
 `;
@@ -31,14 +33,14 @@ const LeftDiv = styled.div`
   gap: calc(26*100vw/1920);
   display: flex;
   align-items: center;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     gap: calc(60*100vw/1920);
   }
 `;
 
 const RightDiv = styled(LeftDiv)`
   gap: calc(20*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     gap: calc(50*100vw/1920);
   }
 `;
@@ -47,16 +49,21 @@ const ImgLink = styled(Link)`
   width: calc(64*100vw/1920);
   height: calc(64*100vw/1920);
   display: flex;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(180*100vw/1920);
     height: calc(180*100vw/1920);
   }
 `;
 
+const TitleLink = styled(Link)`
+  text-decoration: none;
+  color: inherit;
+`;
+
 const Img = styled.img`
   width: calc(64*100vw/1920);
   height: calc(64*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(180*100vw/1920);
     height: calc(180*100vw/1920);
   }
@@ -67,7 +74,7 @@ const Title = styled.div`
   height: calc(64*100vw/1920);
   color: #EB811F;
   font-size: calc(48*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(1000*100vw/1920);
     height: calc(200*100vw/1920);
     font-size: calc(120*100vw/1920);
@@ -89,7 +96,7 @@ const SignOutButton = styled.button`
   font-size: calc(28*100vw/1920);
   color: #2B2A29;
   border: 0;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(300*100vw/1920);
     height: calc(150*100vw/1920);
     font-size: calc(70*100vw/1920);
@@ -106,9 +113,9 @@ const MemberPhoto = styled.img`
   align-items: center;
   box-shadow: 0px 0px 3px #e0e0e0;
   object-fit: cover;
-  @media ${devices.Tablet} {
-    width: calc(180*100vw/1920);
-    height: calc(180*100vw/1920);
+  @media ${devices.Tablet} and (orientation:portrait) {
+    width: calc(160*100vw/1920);
+    height: calc(160*100vw/1920);
   }
 `;
 
@@ -125,9 +132,9 @@ const MemberWord = styled.div`
   justify-content: center;
   align-items: center;
   box-shadow: 0px 0px 3px #e0e0e0;
-  @media ${devices.Tablet} {
-    width: calc(180*100vw/1920);
-    height: calc(180*100vw/1920);
+  @media ${devices.Tablet} and (orientation:portrait) {
+    width: calc(160*100vw/1920);
+    height: calc(160*100vw/1920);
     font-size: calc(70*100vw/1920);
   }
 `;
@@ -155,12 +162,31 @@ const DropdownDiv = styled.div`
 
 const Padding = styled.div`
   height: calc(116*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     height: calc(320*100vw/1920);
   }
 `;
 
+const ToolTipText = styled.span`
+  visibility: hidden;
+  width: calc(440*100vw/1920);
+  background-color: #26262590;
+  font-size: calc(26*100vw/1920);
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: calc(20*100vw/1920); 0;
+  position: absolute;
+  z-index: 1;
+  bottom: -230%;
+  left: -100%;
+  margin-left: calc(-250*100vw/1920);;
+  opacity: 0;
+  transition: opacity 1s;
+`;
+
 const Icon = styled.span`
+  position: relative;
   cursor: pointer;
   font-size: calc(40*100vw/1920);
   display: flex;
@@ -176,7 +202,11 @@ const Icon = styled.span`
   & > svg:hover {
     color: ${(props) => ((props.selected))};
   }
-  @media ${devices.Tablet} {
+  &:hover > ${ToolTipText} {
+    visibility: visible;
+    opacity: 1;
+  }
+  @media ${devices.Tablet} and (orientation:portrait) {
     & > svg{
     width: calc(160*100vw/1920);
     height: calc(160*100vw/1920);
@@ -223,22 +253,42 @@ function ReadRecipeHeader({
           <ImgLink to="/home">
             <Img src={logoImage} alt="logoImage" />
           </ImgLink>
-          <Title>Cook Your Way</Title>
+          <TitleLink to="/home"><Title>Cook Your Way</Title></TitleLink>
         </LeftDiv>
         <RightDiv>
           {myFavorites.includes(currentRecipeId)
-            ? <Icon colorCode="#BE0028" selected="#dd1b44" onClick={removeFromFavorites}><Favorite /></Icon>
-            : <Icon colorCode="#808080" selected="#b2b0b0" onClick={addToFavorites}><FavoriteBorder /></Icon>}
+            ? (
+              <Icon colorCode="#BE0028" selected="#dd1b44" onClick={removeFromFavorites}>
+                <Favorite />
+                <ToolTipText>
+                  點擊取消收藏
+                  <br />
+                  嗚嗚～我的心碎了一地
+                </ToolTipText>
+              </Icon>
+            )
+            : (
+              <Icon colorCode="#808080" selected="#b2b0b0" onClick={addToFavorites}>
+                <FavoriteBorder />
+                <ToolTipText>喜歡我嗎？趕緊加入收藏吧！</ToolTipText>
+              </Icon>
+            )}
           <ButtonLink to={`/modify_recipe?id=${location.search.split('=')[1]}`}>
             {userId === authorId
               ? (
                 <Icon colorCode="#808080" selected="#b2b0b0">
                   <Edit />
+                  <ToolTipText>有些新想法嗎？ 來編輯食譜吧！</ToolTipText>
                 </Icon>
               )
               : (
                 <Icon colorCode="#808080" selected="#b2b0b0">
                   <ContentCopy />
+                  <ToolTipText>
+                    複製食譜！
+                    <br />
+                    將天馬行空的點子寫進食譜吧！
+                  </ToolTipText>
                 </Icon>
               )}
           </ButtonLink>
@@ -274,6 +324,10 @@ ReadRecipeHeader.propTypes = {
   addToFavorites: PropTypes.func.isRequired,
   removeFromFavorites: PropTypes.func.isRequired,
   myFavorites: PropTypes.arrayOf(PropTypes.string).isRequired,
-  currentRecipeId: PropTypes.string.isRequired,
+  currentRecipeId: PropTypes.string,
+};
+
+ReadRecipeHeader.defaultProps = {
+  currentRecipeId: '',
 };
 export default ReadRecipeHeader;

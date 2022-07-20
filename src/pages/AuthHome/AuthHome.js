@@ -4,8 +4,8 @@ import {
 import {
   collection, query, where, getDocs, onSnapshot, doc,
 } from 'firebase/firestore';
-import styled from 'styled-components/macro';
-import { Link } from 'react-router-dom';
+import styled, { keyframes } from 'styled-components/macro';
+import { Link, useNavigate } from 'react-router-dom';
 import { db } from '../../firestore';
 import { devices } from '../../utils/StyleUtils';
 import Stars from '../../components/DisplayStars';
@@ -22,7 +22,7 @@ import blueberry from '../../images/fruits/blueberry.jpg';
 const Background = styled.div`
   padding-bottom: calc(80*100vw/1920);
   color: #2B2A29;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     padding-bottom: calc(160*100vw/1920);
   }
 `;
@@ -57,12 +57,12 @@ const Background = styled.div`
 // `;
 
 const SectionWithBackground = styled.div`
-  width: 100vw;
+  width: 100%;
   position: relative;
 `;
 
 const Section = styled.div`
-  width: 100vw;
+  width: 100%;
   position: relative;
 `;
 
@@ -71,7 +71,7 @@ const SectionTitle = styled.div`
   padding: calc(80*100vw/1920) 0 calc(40*100vw/1920) calc(129*100vw/1920);
   position: relative;
   font-weight: 400;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     font-size: calc(100*100vw/1920);
   }
 `;
@@ -81,13 +81,13 @@ const Mark = styled.mark`
   line-height: 0;
   padding-bottom: calc(40*100vw/1920);
   background-color: #fec74099;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     padding-bottom: calc(80*100vw/1920);
   }
 `;
 
 const FullContentWrapper = styled.div`
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     display: -webkit-box;
     overflow: auto;
     position: relative;
@@ -98,7 +98,7 @@ const ContentWrapper = styled.div`
   display: flex;
   gap: calc(81*100vw/1920);
   padding: 0 calc(129*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(3450*100vw/1920);
   }
 `;
@@ -110,7 +110,7 @@ const ContentDiv = styled.div`
   height: calc(600*100vw/1920);
   background-color: #E5D2C0;
   border-radius: calc(15*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(1000*100vw/1920);
     height: calc(1200*100vw/1920);
   }
@@ -130,7 +130,26 @@ const Img = styled.img`
   &:hover {
     transform: scale(1.1,1.1);
   }
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
+    width: calc(1000*100vw/1920);
+    height: calc(700*100vw/1920);
+  }
+`;
+const Shine = keyframes`
+  to {
+    background-position-x: -200%;
+  }
+`;
+
+const ImgDefaultDiv = styled.div`
+  width: calc(500*100vw/1920);
+  height: calc(350*100vw/1920);
+  border-radius: calc(15*100vw/1920);
+  background: #eee;
+  background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
+  background-size: 200% 100%;
+  animation: 1.5s ${Shine} linear infinite;
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(1000*100vw/1920);
     height: calc(700*100vw/1920);
   }
@@ -140,7 +159,7 @@ const ImgDiv = styled.div`
   width: calc(500*100vw/1920);
   height: calc(350*100vw/1920);
   overflow: hidden;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(1000*100vw/1920);
     height: calc(700*100vw/1920);
   }
@@ -153,7 +172,7 @@ const ContentFirstRow = styled.div`
   justify-content: space-around;
   align-items: baseline;
   padding: calc(15*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     padding: calc(30*100vw/1920);
   }
 `;
@@ -161,7 +180,7 @@ const ContentFirstRow = styled.div`
 const ContentTitle = styled.div`
   font-size: calc(36*100vw/1920);
   font-weight: 600;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     font-size: calc(90*100vw/1920);
   }
 `;
@@ -171,7 +190,7 @@ const ContentAuthor = styled.div`
   margin-top: calc(20*100vw/1920);
   margin-left: calc(4*100vw/1920);
   margin-bottom: calc(20*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     font-size: calc(70*100vw/1920);
     margin-top: calc(40*100vw/1920);
     margin-left: calc(8*100vw/1920);
@@ -180,14 +199,14 @@ const ContentAuthor = styled.div`
 `;
 
 const DefaultText = styled.div`
-  height: calc(600*100vw/1920);
+  height: calc(300*100vw/1920);
   width: calc(1662*100vw/1920);
   font-size: calc(48*100vw/1920);
   display: flex;
   justify-content: center;
   align-items: center;
-  @media ${devices.Tablet} {
-    height: calc(1200*100vw/1920);
+  @media ${devices.Tablet} and (orientation:portrait) {
+    height: calc(600*100vw/1920);
     font-size: calc(120*100vw/1920);
   }
 `;
@@ -213,7 +232,7 @@ const LeftArrow = styled.button`
   &:hover{
     background-color: #EB811F;
   }
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     ${'' /* position: static; */}
     width: calc(150*100vw/1920);
     height: calc(150*100vw/1920);
@@ -225,7 +244,7 @@ const LeftArrow = styled.button`
 const RightArrow = styled(LeftArrow)`
   right: calc(80*100vw/1920);
   left: auto;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     right: calc(-1450*100vw/1920);
   }
 `;
@@ -233,7 +252,7 @@ const RightArrow = styled(LeftArrow)`
 const ArrowIcon = styled.img`
   width: calc(40*100vw/1920);
   height: calc(40*100vw/1920);
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(80*100vw/1920);
     height: calc(80*100vw/1920);
   }
@@ -242,7 +261,7 @@ const ArrowIcon = styled.img`
 const StarRow = styled.div`
   font-size: calc(20*100vw/1920);
   color: #808080;
-  @media ${devices.Tablet} {
+  @media ${devices.Tablet} and (orientation:portrait) {
     font-size: calc(50*100vw/1920);
   }
 `;
@@ -273,12 +292,20 @@ const Selective = styled.div`
     background-image: url(${(props) => (props.mainImage)})
 `;
 
+const DefaultSelective = styled.div`
+  height: 150px;
+  border-radius: 5px;
+  background: #eee;
+  background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
+  background-size: 200% 100%;
+  animation: 1.5s ${Shine} linear infinite;
+`;
+
 const SelectiveContext = styled.div`
   color: #fff;
-  font-size: 2em;
+  font-size: 1.8em;
   font-weight: 500;
   letter-spacing: 2px;
-  z-index: 100;
   &::after{
     content: "";
     width: 100%;
@@ -299,7 +326,7 @@ const SelectiveContext = styled.div`
 
 function AuthHome() {
   const userInfo = useContext(AuthContext);
-  const [userId, setUserId] = useState('');
+  const userId = userInfo?.uid || '';
   const [userRecipes, setUserRecipes] = useState([]);
   const [userRecipeIndex, setUserRecipeIndex] = useState(0);
   const [averageDifficulty, setAverageDifficulty] = useState(1);
@@ -317,14 +344,23 @@ function AuthHome() {
   const userRef = useRef(null);
   const favoriteRef = useRef(null);
 
-  // 當userInfo存在時，取得uid
+  const [checkingUser, setCheckingUser] = useState(true);
+  const navigate = useNavigate();
+
+  const [imgLoaded, setImgLoaded] = useState(false);
+  const [sectionImgLoaded, setSectionImgLoaded] = useState(false);
+
   useEffect(() => {
-    if (userInfo) {
-      setUserId(userInfo.uid);
-    } else {
-      setUserId('');
+    if (userInfo === '') {
+      setCheckingUser(true);
     }
-  }, [userInfo]);
+    if (userInfo === null) {
+      navigate({ pathname: '/' });
+    }
+    if (userId) {
+      setCheckingUser(false);
+    }
+  }, [navigate, userId, userInfo]);
 
   // 抓出所有食譜
   useEffect(() => {
@@ -396,7 +432,7 @@ function AuthHome() {
     });
   }, [averageDifficulty, userId]);
 
-  // 抓出我的最愛食譜清單
+  // 抓出我的收藏食譜清單
   useEffect(() => {
     if (userId) {
       const UserRef = doc(db, 'users', userId);
@@ -414,7 +450,7 @@ function AuthHome() {
     return undefined;
   }, [userId]);
 
-  // 依照最愛清單的食譜id抓出食譜資料
+  // 依照收藏清單的食譜id抓出食譜資料
   useEffect(() => {
     const recipeRef = collection(db, 'recipes');
     getDocs(recipeRef)
@@ -457,6 +493,15 @@ function AuthHome() {
 
   const scrollToRef = (ref) => { ref.current.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'end' }); };
 
+  if (checkingUser) {
+    return (
+      <>
+        <AuthHomeHeader />
+        <Loading />
+      </>
+    );
+  }
+
   if (loading) {
     return (
       <>
@@ -471,18 +516,78 @@ function AuthHome() {
       <AuthHomeHeader />
       <Background>
         <Selections>
-          <Selective onClick={() => { scrollToRef(allRef); }} mainImage={strawberry}>
+          {/* <Selective onClick={() => { scrollToRef(allRef); }} mainImage={strawberry}>
             <SelectiveContext>全部料理</SelectiveContext>
-          </Selective>
-          <Selective onClick={() => { scrollToRef(recommendRef); }} mainImage={mandarin}>
+          </Selective> */}
+          {sectionImgLoaded ? (
+            <Selective onClick={() => { scrollToRef(allRef); }} mainImage={strawberry}>
+              <SelectiveContext>全部料理</SelectiveContext>
+            </Selective>
+          ) : (
+            <>
+              <Img
+                style={sectionImgLoaded ? {} : { display: 'none' }}
+                src={strawberry}
+                alt="食譜封面照"
+                onLoad={() => { setSectionImgLoaded(true); }}
+              />
+              <DefaultSelective />
+            </>
+          )}
+          {/* <Selective onClick={() => { scrollToRef(recommendRef); }} mainImage={mandarin}>
             <SelectiveContext>推薦料理</SelectiveContext>
-          </Selective>
-          <Selective onClick={() => { scrollToRef(userRef); }} mainImage={pineapple}>
+          </Selective> */}
+          {sectionImgLoaded ? (
+            <Selective onClick={() => { scrollToRef(recommendRef); }} mainImage={mandarin}>
+              <SelectiveContext>推薦料理</SelectiveContext>
+            </Selective>
+          ) : (
+            <>
+              <Img
+                style={sectionImgLoaded ? {} : { display: 'none' }}
+                src={strawberry}
+                alt="食譜封面照"
+                onLoad={() => { setSectionImgLoaded(true); }}
+              />
+              <DefaultSelective />
+            </>
+          )}
+          {/* <Selective onClick={() => { scrollToRef(userRef); }} mainImage={pineapple}>
             <SelectiveContext>我的料理</SelectiveContext>
-          </Selective>
-          <Selective onClick={() => { scrollToRef(favoriteRef); }} mainImage={blueberry}>
-            <SelectiveContext>最愛料理</SelectiveContext>
-          </Selective>
+          </Selective> */}
+          {sectionImgLoaded ? (
+            <Selective onClick={() => { scrollToRef(userRef); }} mainImage={pineapple}>
+              <SelectiveContext>我的料理</SelectiveContext>
+            </Selective>
+          ) : (
+            <>
+              <Img
+                style={sectionImgLoaded ? {} : { display: 'none' }}
+                src={strawberry}
+                alt="食譜封面照"
+                onLoad={() => { setSectionImgLoaded(true); }}
+              />
+              <DefaultSelective />
+            </>
+          )}
+          {/* <Selective onClick={() => { scrollToRef(favoriteRef); }} mainImage={blueberry}>
+            <SelectiveContext>收藏料理</SelectiveContext>
+          </Selective> */}
+          {sectionImgLoaded ? (
+            <Selective onClick={() => { scrollToRef(favoriteRef); }} mainImage={blueberry}>
+              <SelectiveContext>收藏料理</SelectiveContext>
+            </Selective>
+          ) : (
+            <>
+              <Img
+                style={sectionImgLoaded ? {} : { display: 'none' }}
+                src={mandarin}
+                alt="食譜封面照"
+                onLoad={() => { setSectionImgLoaded(true); }}
+              />
+              <DefaultSelective />
+            </>
+          )}
         </Selections>
         <Section ref={allRef}>
           <SectionTitle>
@@ -498,7 +603,22 @@ function AuthHome() {
                   <ContentDiv key={allRecipe.recipeId}>
                     <StyledLink to={`/read_recipe?id=${allRecipe.recipeId}`}>
                       <ImgDiv>
-                        <Img src={allRecipe.mainImage} alt="食譜封面照" />
+                        {imgLoaded ? (
+                          <Img
+                            src={allRecipe.mainImage}
+                            alt="食譜封面照"
+                          />
+                        ) : (
+                          <>
+                            <Img
+                              style={imgLoaded ? {} : { display: 'none' }}
+                              src={allRecipe.mainImage}
+                              alt="食譜封面照"
+                              onLoad={() => { setImgLoaded(true); }}
+                            />
+                            <ImgDefaultDiv />
+                          </>
+                        )}
                       </ImgDiv>
                       <ContentFirstRow>
                         <ContentTitle>{allRecipe.title}</ContentTitle>
@@ -535,7 +655,23 @@ function AuthHome() {
                   <ContentDiv key={recommendRecipe.recipeId}>
                     <StyledLink to={`/read_recipe?id=${recommendRecipe.recipeId}`}>
                       <ImgDiv>
-                        <Img src={recommendRecipe.mainImage} alt="食譜封面照" />
+                        {/* <Img src={recommendRecipe.mainImage} alt="食譜封面照" /> */}
+                        {imgLoaded ? (
+                          <Img
+                            src={recommendRecipe.mainImage}
+                            alt="食譜封面照"
+                          />
+                        ) : (
+                          <>
+                            <Img
+                              style={imgLoaded ? {} : { display: 'none' }}
+                              src={recommendRecipe.mainImage}
+                              alt="食譜封面照"
+                              onLoad={() => { setImgLoaded(true); }}
+                            />
+                            <ImgDefaultDiv />
+                          </>
+                        )}
                       </ImgDiv>
                       <ContentFirstRow>
                         <ContentTitle>{recommendRecipe.title}</ContentTitle>
@@ -572,7 +708,23 @@ function AuthHome() {
                   <ContentDiv key={userRecipe.recipeId}>
                     <StyledLink to={`/read_recipe?id=${userRecipe.recipeId}`}>
                       <ImgDiv>
-                        <Img src={userRecipe.mainImage} alt="食譜封面照" />
+                        {/* <Img src={userRecipe.mainImage} alt="食譜封面照" /> */}
+                        {imgLoaded ? (
+                          <Img
+                            src={userRecipe.mainImage}
+                            alt="食譜封面照"
+                          />
+                        ) : (
+                          <>
+                            <Img
+                              style={imgLoaded ? {} : { display: 'none' }}
+                              src={userRecipe.mainImage}
+                              alt="食譜封面照"
+                              onLoad={() => { setImgLoaded(true); }}
+                            />
+                            <ImgDefaultDiv />
+                          </>
+                        )}
                       </ImgDiv>
                       <ContentFirstRow>
                         <ContentTitle>{userRecipe.title}</ContentTitle>
@@ -599,7 +751,7 @@ function AuthHome() {
         </Section>
         <SectionWithBackground ref={favoriteRef}>
           <SectionTitle>
-            <Mark>最愛料理</Mark>
+            <Mark>收藏料理</Mark>
           </SectionTitle>
           <FullContentWrapper>
             {favoriteRecipeIndex >= 1
@@ -612,7 +764,23 @@ function AuthHome() {
                   <ContentDiv key={favoriteRecipe.recipeId}>
                     <StyledLink to={`/read_recipe?id=${favoriteRecipe.recipeId}`}>
                       <ImgDiv>
-                        <Img src={favoriteRecipe.mainImage} alt="食譜封面照" />
+                        {/* <Img src={favoriteRecipe.mainImage} alt="食譜封面照" /> */}
+                        {imgLoaded ? (
+                          <Img
+                            src={favoriteRecipe.mainImage}
+                            alt="食譜封面照"
+                          />
+                        ) : (
+                          <>
+                            <Img
+                              style={imgLoaded ? {} : { display: 'none' }}
+                              src={favoriteRecipe.mainImage}
+                              alt="食譜封面照"
+                              onLoad={() => { setImgLoaded(true); }}
+                            />
+                            <ImgDefaultDiv />
+                          </>
+                        )}
                       </ImgDiv>
                       <ContentFirstRow>
                         <ContentTitle>{favoriteRecipe.title}</ContentTitle>
