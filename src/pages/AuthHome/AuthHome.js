@@ -27,35 +27,6 @@ const Background = styled.div`
   }
 `;
 
-// const SearchInput = styled.input`
-//   width: calc(1282*100vw/1920);
-//   height: calc(64*100vw/1920);
-//   border: calc(1*100vw/1920) #2B2A29 solid;
-//   border-radius: calc(15*100vw/1920);
-//   font-size: calc(28*100vw/1920);
-//   text-align: center;
-//   &::-webkit-search-decoration,
-//   &::-webkit-search-cancel-button,
-//   &::-webkit-search-results-button,
-//   &::-webkit-search-results-decoration { display: none; }
-// `;
-
-// const SearchImg = styled.img`
-//   width: calc(58*100vw/1920);
-//   height: calc(58*100vw/1920);
-//   position: absolute;
-//   right: calc(330*100vw/1920);
-//   cursor: pointer;
-// `;
-
-// const SearchDiv = styled.div`
-//   display: flex;
-//   justify-content: center;
-//   margin-top: calc(48*100vw/1920);
-//   margin-bottom: calc(68*100vw/1920);
-//   position: relative;
-// `;
-
 const SectionWithBackground = styled.div`
   width: 100%;
   position: relative;
@@ -362,7 +333,6 @@ function AuthHome() {
     }
   }, [navigate, userId, userInfo]);
 
-  // 抓出所有食譜
   useEffect(() => {
     const recipeRef = collection(db, 'recipes');
     let queryDataArray = [];
@@ -376,7 +346,6 @@ function AuthHome() {
     });
   }, [userId]);
 
-  // 抓出我的食譜
   useEffect(() => {
     const recipeRef = collection(db, 'recipes');
     if (userId) {
@@ -393,7 +362,6 @@ function AuthHome() {
     }
   }, [userId]);
 
-  // 抓出平均食譜難度
   useEffect(() => {
     const recipeRef = collection(db, 'recipes');
     if (userId) {
@@ -405,7 +373,6 @@ function AuthHome() {
             queryDifficultyArray = [...queryDifficultyArray, document.data().difficulty];
           },
         );
-        // setUserRecipes(queryDataArray);
         const sum = queryDifficultyArray.reduce((cur, acc) => cur + acc, 0);
         const avg = sum / queryDifficultyArray.length;
         if (avg) {
@@ -415,7 +382,6 @@ function AuthHome() {
     }
   }, [userId]);
 
-  // 抓出超過平均食譜難度的食譜
   useEffect(() => {
     const recipeRef = collection(db, 'recipes');
     const q = query(recipeRef, where('difficulty', '>=', averageDifficulty));
@@ -432,7 +398,6 @@ function AuthHome() {
     });
   }, [averageDifficulty, userId]);
 
-  // 抓出我的收藏食譜清單
   useEffect(() => {
     if (userId) {
       const UserRef = doc(db, 'users', userId);
@@ -450,7 +415,6 @@ function AuthHome() {
     return undefined;
   }, [userId]);
 
-  // 依照收藏清單的食譜id抓出食譜資料
   useEffect(() => {
     const recipeRef = collection(db, 'recipes');
     getDocs(recipeRef)
@@ -516,9 +480,6 @@ function AuthHome() {
       <Header />
       <Background>
         <Selections>
-          {/* <Selective onClick={() => { scrollToRef(allRef); }} mainImage={strawberry}>
-            <SelectiveContext>全部料理</SelectiveContext>
-          </Selective> */}
           {sectionImgLoaded ? (
             <Selective onClick={() => { scrollToRef(allRef); }} mainImage={strawberry}>
               <SelectiveContext>全部料理</SelectiveContext>
@@ -534,9 +495,6 @@ function AuthHome() {
               <DefaultSelective />
             </>
           )}
-          {/* <Selective onClick={() => { scrollToRef(recommendRef); }} mainImage={mandarin}>
-            <SelectiveContext>推薦料理</SelectiveContext>
-          </Selective> */}
           {sectionImgLoaded ? (
             <Selective onClick={() => { scrollToRef(recommendRef); }} mainImage={mandarin}>
               <SelectiveContext>推薦料理</SelectiveContext>
@@ -552,9 +510,6 @@ function AuthHome() {
               <DefaultSelective />
             </>
           )}
-          {/* <Selective onClick={() => { scrollToRef(userRef); }} mainImage={pineapple}>
-            <SelectiveContext>我的料理</SelectiveContext>
-          </Selective> */}
           {sectionImgLoaded ? (
             <Selective onClick={() => { scrollToRef(userRef); }} mainImage={pineapple}>
               <SelectiveContext>我的料理</SelectiveContext>
@@ -570,9 +525,6 @@ function AuthHome() {
               <DefaultSelective />
             </>
           )}
-          {/* <Selective onClick={() => { scrollToRef(favoriteRef); }} mainImage={blueberry}>
-            <SelectiveContext>收藏料理</SelectiveContext>
-          </Selective> */}
           {sectionImgLoaded ? (
             <Selective onClick={() => { scrollToRef(favoriteRef); }} mainImage={blueberry}>
               <SelectiveContext>收藏料理</SelectiveContext>
@@ -655,7 +607,6 @@ function AuthHome() {
                   <ContentDiv key={recommendRecipe.recipeId}>
                     <StyledLink to={`/read_recipe?id=${recommendRecipe.recipeId}`}>
                       <ImgDiv>
-                        {/* <Img src={recommendRecipe.mainImage} alt="食譜封面照" /> */}
                         {imgLoaded ? (
                           <Img
                             src={recommendRecipe.mainImage}
@@ -708,7 +659,6 @@ function AuthHome() {
                   <ContentDiv key={userRecipe.recipeId}>
                     <StyledLink to={`/read_recipe?id=${userRecipe.recipeId}`}>
                       <ImgDiv>
-                        {/* <Img src={userRecipe.mainImage} alt="食譜封面照" /> */}
                         {imgLoaded ? (
                           <Img
                             src={userRecipe.mainImage}
@@ -764,7 +714,6 @@ function AuthHome() {
                   <ContentDiv key={favoriteRecipe.recipeId}>
                     <StyledLink to={`/read_recipe?id=${favoriteRecipe.recipeId}`}>
                       <ImgDiv>
-                        {/* <Img src={favoriteRecipe.mainImage} alt="食譜封面照" /> */}
                         {imgLoaded ? (
                           <Img
                             src={favoriteRecipe.mainImage}

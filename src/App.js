@@ -7,7 +7,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import styled, { createGlobalStyle } from 'styled-components';
 import Cooking from './pages/Cooking';
 import ModifyRecipe from './pages/ModifyRecipe/ModifyRecipe';
-import ReadRecipe from './pages/ReadRecipe/readRecipe';
+import ReadRecipe from './pages/ReadRecipe/ReadRecipe';
 import SearchRecipe from './pages/SearchRecipe/SearchRecipe';
 import AuthHome from './pages/AuthHome/AuthHome';
 import Register from './pages/Register/Register';
@@ -34,16 +34,9 @@ const BodyDiv = styled.div`
 
 function App() {
   const [userInfo, setUserInfo] = useState('');
-  // const [userId, setUserId] = useState('');
-  // const [userFavorites, setUserFavorites] = useState([]);
-  // // 再將資料傳入Context;
-  // const userInformation = [userId, userFavorites];
-
-  // onAuthStateChange 只會管理登入登出，與userId相關，應該只用來管理uid
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        // 取得uid，再利用uid取得使用者資料
         const { uid } = user;
         const userRef = doc(db, 'users', uid);
         const getUserData = async () => {
@@ -54,35 +47,10 @@ function App() {
           setUserInfo(data);
         });
       } else {
-        // 清除使用者資料
         setUserInfo(user);
       }
     });
   }, []);
-
-  // useEffect(() => {
-  //   onAuthStateChanged(auth, (user) => {
-  //     if (user) {
-  //       // 取得uid，再利用uid設定userId
-  //       const { uid } = user;
-  //       setUserId(uid);
-  //     }
-  //   });
-  // }, []);
-
-  // // 至於資料的更新應該用onSnapShot，當使用者登入，取得uid之後，
-  // useEffect(() => {
-  //   if (!userId) return undefined;
-  //   // onSnapshot(userDoc=> setUserData(newData));
-  //   const unsubscribe = onSnapshot(
-  //     doc(db, 'users', userId),
-  //     (document) => {
-  //       const userData = document.data();
-  //       setUserFavorites(userData.myFavorites);
-  //     },
-  //   );
-  //   return unsubscribe;
-  // }, [userId]);
 
   return (
     <>

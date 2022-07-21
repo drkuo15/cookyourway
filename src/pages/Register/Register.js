@@ -9,8 +9,6 @@ import FoodBackground from '../../components/FoodBackgroud';
 import helpImage from '../../images/help_center_FILL0_wght400_GRAD0_opsz48.svg';
 import { ToastContainer, showCustomAlert } from '../../components/CustomAlert';
 import { devices } from '../../utils/StyleUtils';
-// import googleImage from '../../images/google.svg';
-// import metaImage from '../../images/meta.png';
 
 const Wrapper = styled.div`
   display: flex;
@@ -36,39 +34,6 @@ const RegisterBox = styled.div`
     height: calc(1144*100vw/1920);
   }
 `;
-
-// const SSOs = styled.div`
-//   display: flex;
-//   justify-content: space-around;
-//   gap: calc(78*100vw/1920);
-//   margin-top: calc(28*100vw/1920);
-// `;
-
-// const SSORegister = styled.div`
-//   display: flex;
-//   align-items: center;
-//   justify-content: center;
-//   gap: calc(28*100vw/1920);
-//   font-size: calc(28*100vw/1920);
-//   color: #2B2A29;
-//   background-color: #FDFDFC;
-//   width: calc(317*100vw/1920);
-//   height: calc(72*100vw/1920);
-//   line-height: calc(72*100vw/1920);
-//   border-radius: calc(15*100vw/1920);
-//   cursor: pointer;
-// `;
-
-// const SSOImg = styled.img`
-//   width: calc(46*100vw/1920);
-//   height: calc(46*100vw/1920);
-// `;
-
-// const HorizontalLine = styled.div`
-//   width: calc(707*100vw/1920);
-//   height: calc(2*100vw/1920);
-//   background-color: #B3B3AC;
-// `;
 
 const ManualRegister = styled.div`
   display: flex;
@@ -252,17 +217,6 @@ function Register() {
         </Question>
         <VerticalLine />
         <RegisterBox>
-          {/* <SSOs>
-            <SSORegister>
-              <SSOImg src={googleImage} alt="googleImage" />
-              Google 註冊
-            </SSORegister>
-            <SSORegister>
-              <SSOImg src={metaImage} alt="metaImage" />
-              Meta 註冊
-            </SSORegister>
-          </SSOs>
-          <HorizontalLine /> */}
           <ManualRegister>
             <ManualInput
               type="text"

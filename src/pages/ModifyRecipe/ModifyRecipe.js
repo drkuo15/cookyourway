@@ -698,9 +698,6 @@ function ModifyRecipe() {
   const [loading, setLoading] = useState(true);
   const [checkingUser, setCheckingUser] = useState(true);
 
-  // 判斷是否登入
-  // 第一次render尚未收到onAuthStateChange資料為空字串
-  // 第二次render拿到資料，若未登入是null，如果登入則可以拿到userId
   useEffect(() => {
     if (userInfo === '') {
       setCheckingUser(true);
@@ -713,7 +710,6 @@ function ModifyRecipe() {
     }
   }, [navigate, userId, userInfo]);
 
-  // 取得當前食譜id的資料，放入編輯列
   useEffect(() => {
     const queryString = location.search;
     const currentRecipeId = location.search.split('=')[1];
@@ -742,7 +738,6 @@ function ModifyRecipe() {
     return undefined;
   }, [location]);
 
-  // 上傳圖片時，並取得圖片網址，再將圖片網址設定回imgUrl。
   useEffect(() => {
     if (img) {
       const uploadImg = async () => {
@@ -1001,7 +996,6 @@ function ModifyRecipe() {
     }
   }
 
-  // 送出資料，檢查資料是否都有填寫，跳出完成提示，清除欄位，進入食譜閱覽頁面
   function decideToUpdateOrSetRecipe() {
     const queryString = location.search;
     if (queryString) {

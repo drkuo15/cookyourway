@@ -221,11 +221,9 @@ const IngredientsDiv = styled.div`
   display: flex;
   justify-content: start;
   gap: calc(20*100vw/1920);
-  ${'' /* text-overflow: ellipsis; */}
   overflow-x: auto;
   white-space: nowrap;
   width: calc(700*100vw/1920);
-  ${'' /* height: calc(60*100vw/1920); */}
   height: 100%;
   @media ${devices.Tablet} and (orientation:portrait) {
     width: calc(800*100vw/1920);
@@ -325,7 +323,6 @@ function SearchRecipe() {
           <ResultDiv key={recipe.recipeId}>
             <StyledLink to={`/read_recipe?id=${recipe.recipeId}`}>
               <ImgDiv>
-                {/* <Img src={recipe.mainImage} alt="食譜封面照" /> */}
                 {imgLoaded ? (
                   <Img
                     src={recipe.mainImage}
