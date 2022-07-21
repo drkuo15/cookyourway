@@ -3,7 +3,7 @@ import styled, { keyframes } from 'styled-components/macro';
 import { doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { motion, useAnimation } from 'framer-motion'; // npm i react-intersection-observer framer-motion
+import { motion, useAnimation } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { IosShare } from '@styled-icons/material-rounded';
 import { db } from '../../firestore';
@@ -12,7 +12,7 @@ import Stars from '../../components/DisplayStars';
 import defaultImage from '../../images/upload.png';
 import { ToastContainer, showCustomAlert } from '../../components/CustomAlert';
 import AuthContext from '../../components/AuthContext';
-import ReadRecipeHeader from '../../components/ReadRecipeHeader';
+import Header from '../../components/Header';
 import tipImage from '../../images/tips.png';
 import Loading from '../../components/Loading';
 
@@ -351,7 +351,6 @@ const Mark = styled.mark`
   background-color: #fec740;
 `;
 
-// https://blog.logrocket.com/react-scroll-animations-framer-motion/
 const LineVariant = {
   visible: { opacity: 1, scale: 1, transition: { duration: 1.5 } },
   hidden: { opacity: 0, scale: 0 },
@@ -382,7 +381,6 @@ function MotionLine() {
   );
 }
 
-// https://www.w3schools.com/css/css_tooltip.asp
 const ToolTipText = styled.span`
   visibility: hidden;
   width: calc(440*100vw/1920);
@@ -432,8 +430,6 @@ function ReadRecipe({ setUserInfo }) {
   const userInfo = useContext(AuthContext);
   const userId = userInfo?.uid || '';
   const myFavorites = userInfo?.myFavorites || [];
-  // const [userId, setUserId] = useState('');
-  // const [myFavorites, setMyFavorites] = useState([]);
   const [title, setTitle] = useState('');
   const [difficulty, setDifficulty] = useState(1);
   const [ingredients, setIngredients] = useState([]);
@@ -453,27 +449,6 @@ function ReadRecipe({ setUserInfo }) {
   const setMyFavorites = (newMyFavorites) => {
     setUserInfo({ ...userInfo, myFavorites: newMyFavorites });
   };
-
-  // 判斷是否存在食譜id，不存在則導入首頁。
-  // useEffect(() => {
-  // eslint-disable-next-line max-len
-  //   if (!location.search || location.search.split('=')[0] !== '?id' || location.search.split('=')[1] === '') {
-  //     navigate({ pathname: '/home' });
-  //   }
-  // }, [location.search, navigate]);
-
-  // 當userInfo存在時，取得uid
-  // useEffect(() => {
-  //   if (userInfo) {
-  //     setUserId(userInfo.uid);
-  //     if (myFavorites.length === 0) {
-  //       setMyFavorites(userInfo.myFavorites);
-  //     }
-  //     return;
-  //   }
-  //   setUserId('');
-  //   setMyFavorites([]);
-  // }, [userInfo, myFavorites.length]);
 
   useEffect(() => {
     if (userInfo === '') {
@@ -558,7 +533,7 @@ function ReadRecipe({ setUserInfo }) {
   if (checkingUser) {
     return (
       <>
-        <ReadRecipeHeader
+        <Header
           authorId={authorId}
           userId={userId}
           addToFavorites={() => { addToFavorites(); }}
@@ -574,7 +549,7 @@ function ReadRecipe({ setUserInfo }) {
   if (loading) {
     return (
       <>
-        <ReadRecipeHeader
+        <Header
           authorId={authorId}
           userId={userId}
           addToFavorites={() => { addToFavorites(); }}
@@ -589,7 +564,7 @@ function ReadRecipe({ setUserInfo }) {
 
   return (
     <>
-      <ReadRecipeHeader
+      <Header
         authorId={authorId}
         userId={userId}
         addToFavorites={() => { addToFavorites(); }}
@@ -620,7 +595,6 @@ function ReadRecipe({ setUserInfo }) {
           </ContentDiv>
         </ContentWrapper>
         <ContentWrapper>
-          {/* <Img src={imgUrl || defaultImage} alt="mainImage" /> */}
           {imgLoaded ? (
             <Img
               src={imgUrl || defaultImage}
@@ -678,7 +652,6 @@ function ReadRecipe({ setUserInfo }) {
                   <StepContentDiv>
                     {steps[index].stepContent}
                   </StepContentDiv>
-                  {/* <StepImg src={steps[index].stepImgUrl || defaultImage} alt="stepImages" /> */}
                   {stepImgLoaded ? (
                     <StepImg
                       src={steps[index].stepImgUrl || defaultImage}

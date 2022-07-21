@@ -8,7 +8,7 @@ const Player = ({ url, isCounting }) => {
 
   useEffect(() => {
     audio.current = new Audio(url);
-    audio.current.load(); // 改放於此避免暫停後 play 前重新 load，造成音樂重頭開始
+    audio.current.load();
   }, [audio, url]);
 
   useEffect(

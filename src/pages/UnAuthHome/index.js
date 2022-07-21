@@ -282,17 +282,6 @@ function UnAuthHome() {
             帶您體驗料理新樂趣
           </SubTitle>
           <RegisterBox>
-            {/* <SSOs>
-            <SSORegister>
-              <SSOImg src={googleImage} alt="googleImage" />
-              Google 註冊
-            </SSORegister>
-            <SSORegister>
-              <SSOImg src={metaImage} alt="metaImage" />
-              Meta 註冊
-            </SSORegister>
-          </SSOs>
-          <HorizontalLine /> */}
             <ManualRegister>
               <ManualInput
                 type="text"

@@ -174,7 +174,6 @@ function Recipe({
   function renderSwitch() {
     switch (true) {
       case (stepIndex === 0):
-        // console.log('first');
         return steps
           .filter((_, index) => index <= stepIndex + 2)
           .map((step, index) => (
@@ -184,9 +183,7 @@ function Recipe({
               <TitleText>{step.stepTitle}</TitleText>
             </StepArea>
           ));
-      // 當是最後一步，而且總步驟長度不是2。
       case (stepIndex === steps.length - 1 && steps.length !== 2):
-        // console.log('last');
         return steps.filter((_, index) => index >= stepIndex - 2)
           .map((step, index) => (
             <StepArea selected={index === 2} key={step.stepTitle}>
@@ -196,7 +193,6 @@ function Recipe({
             </StepArea>
           ));
       default:
-        // console.log('default');
         return steps.filter((_, index) => index <= (stepIndex + 1) && index >= (stepIndex - 1))
           .map(((step, index) => (
             <StepArea selected={index === 1} key={step.stepTitle}>
@@ -244,7 +240,6 @@ function Recipe({
               </ExpectTime>
             ) : ''}
           </WrapperStep>
-          {/* <Img src={step.stepImgUrl} alt="stepImage" /> */}
           {imgLoaded ? (
             <Img
               src={step.stepImgUrl}
@@ -272,14 +267,12 @@ function Recipe({
             </Icon>
           )
           : <Icon onClick={() => { handlePrevStep(); }}><West /></Icon>}
-        {/* <Button type="button" onClick={() => { handlePrevStep(); }}>上一步</Button>} */}
         {stepIndex + 1 === steps.length && !isNextStep ? (
           <Icon onClick={() => { handleEnding(); }}>
             <LocalDining />
             結束料理
           </Icon>
         ) : <Icon onClick={() => { handleNextStep(); }}><East /></Icon>}
-        {/* <Button type="button" onClick={() => { handleNextStep(); }}>下一步</Button> */}
       </WrapperStepButton>
     </RecipeArea>
   );
