@@ -83,7 +83,6 @@ function Counter({
       <MusicDisc isCounting={isCounting} />
       <ButtonDiv>
         <Button type="button" onClick={toggleCounting}>
-          {/* {isCounting ? '暫停倒數' : '開始倒數'} */}
           {isCounting ? <Icon><PauseCircle /></Icon> : <Icon><PlayCircle /></Icon>}
         </Button>
         <Time>{`${Math.floor(time / 60) > 9 ? Math.floor(time / 60) : `0${Math.floor(time / 60)}`} : ${time % 60 < 10 ? `0${time % 60}` : time % 60}`}</Time>
