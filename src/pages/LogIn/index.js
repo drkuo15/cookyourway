@@ -1,16 +1,14 @@
-import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
-import { doc, setDoc } from 'firebase/firestore';
-import { auth, db } from '../../firestore';
+import {
+  signInWithEmailAndPassword, setPersistence, browserSessionPersistence,
+} from 'firebase/auth';
+import styled from 'styled-components/macro';
+import { auth } from '../../firestore/index';
 import CenterTopHeader from '../../components/CenterTopHeader';
 import FoodBackground from '../../components/FoodBackgroud';
 import helpImage from '../../images/help_center_FILL0_wght400_GRAD0_opsz48.svg';
-import { ToastContainer, showCustomAlert } from '../../components/CustomAlert';
 import { devices } from '../../utils/StyleUtils';
-// import googleImage from '../../images/google.svg';
-// import metaImage from '../../images/meta.png';
 
 const Wrapper = styled.div`
   display: flex;
@@ -22,7 +20,7 @@ const Wrapper = styled.div`
   }
 `;
 
-const RegisterBox = styled.div`
+const LoginBox = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -37,45 +35,12 @@ const RegisterBox = styled.div`
   }
 `;
 
-// const SSOs = styled.div`
-//   display: flex;
-//   justify-content: space-around;
-//   gap: calc(78*100vw/1920);
-//   margin-top: calc(28*100vw/1920);
-// `;
-
-// const SSORegister = styled.div`
-//   display: flex;
-//   align-items: center;
-//   justify-content: center;
-//   gap: calc(28*100vw/1920);
-//   font-size: calc(28*100vw/1920);
-//   color: #2B2A29;
-//   background-color: #FDFDFC;
-//   width: calc(317*100vw/1920);
-//   height: calc(72*100vw/1920);
-//   line-height: calc(72*100vw/1920);
-//   border-radius: calc(15*100vw/1920);
-//   cursor: pointer;
-// `;
-
-// const SSOImg = styled.img`
-//   width: calc(46*100vw/1920);
-//   height: calc(46*100vw/1920);
-// `;
-
-// const HorizontalLine = styled.div`
-//   width: calc(707*100vw/1920);
-//   height: calc(2*100vw/1920);
-//   background-color: #B3B3AC;
-// `;
-
-const ManualRegister = styled.div`
+const ManualSignIn = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-around;
-  height: calc(400*100vw/1920);
+  height: calc(320*100vw/1920);
   @media ${devices.Tablet} and (orientation:portrait) {
     height: calc(800*100vw/1920);
   }
@@ -102,7 +67,7 @@ const ManualInput = styled.input`
   }
 `;
 
-const RegisterButton = styled.div`
+const LoginButton = styled.div`
   text-align: center;
   vertical-align: middle;
   font-size: calc(28*100vw/1920);
@@ -164,7 +129,7 @@ const HelpImg = styled.img`
   }
 `;
 
-const LoginButton = styled.div`
+const RegisterButton = styled.div`
   text-align: center;
   vertical-align: middle;
   font-size: calc(28*100vw/1920);
@@ -193,19 +158,27 @@ const ErrorMsg = styled.p`
   }
 `;
 
-function Register() {
-  const navigate = useNavigate();
+const TestMsg = styled.p`
+  font-size: calc(24*100vw/1920);
+  width: 100%;
+  text-align: center;
+  @media ${devices.Tablet} and (orientation:portrait) {
+    font-size: calc(60*100vw/1920);
+  }
+`;
+
+function Login() {
   const [data, setData] = useState({
-    name: '',
-    email: '',
-    password: '',
+    email: 'test@test.test',
+    password: 123456,
     error: null,
     loading: false,
   });
-  const {
-    name, email, password, error, loading,
-  } = data;
+  const navigate = useNavigate();
 
+  const {
+    email, password, error, loading,
+  } = data;
   const handleChange = (e) => {
     setData({ ...data, [e.target.name]: e.target.value });
   };
@@ -213,64 +186,31 @@ function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setData({ ...data, error: null, loading: true });
-    if (!name || !email || !password) {
+    if (!email || !password) {
       setData({ ...data, error: '所有欄位都需要填寫呦！' });
+      return;
     }
-    try {
-      const result = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password,
-      );
-      await setDoc(doc(db, 'users', result.user.uid), {
-        uid: result.user.uid,
-        name,
-        email,
-        myFavorites: [],
-      });
-      setData({
-        name: '',
-        email: '',
-        password: '',
-        error: null,
-        loading: false,
-      });
-      showCustomAlert('您已註冊成功，即將轉跳首頁');
-      setTimeout(() => { navigate('/home', { replace: true }); }, 4000);
-    } catch (err) {
-      setData({ ...data, error: err.message, loading: false });
-    }
+    setPersistence(auth, browserSessionPersistence)
+      .then(() => signInWithEmailAndPassword(auth, email, password))
+      .then(() => {
+        setTimeout(() => {
+          setData({
+            email: '',
+            password: '',
+            error: null,
+            loading: false,
+          });
+          navigate('/home', { replace: true });
+        }, 800);
+      })
+      .catch((err) => { setData({ ...data, error: err.message, loading: false }); });
   };
   return (
-    <section>
+    <>
       <CenterTopHeader />
       <Wrapper>
-        <Question to="/login">
-          已經有註冊過了？
-          <HelpImg src={helpImage} alt="helpImage" />
-          <LoginButton>登入</LoginButton>
-        </Question>
-        <VerticalLine />
-        <RegisterBox>
-          {/* <SSOs>
-            <SSORegister>
-              <SSOImg src={googleImage} alt="googleImage" />
-              Google 註冊
-            </SSORegister>
-            <SSORegister>
-              <SSOImg src={metaImage} alt="metaImage" />
-              Meta 註冊
-            </SSORegister>
-          </SSOs>
-          <HorizontalLine /> */}
-          <ManualRegister>
-            <ManualInput
-              type="text"
-              name="name"
-              placeholder="使用者名稱"
-              value={name}
-              onChange={handleChange}
-            />
+        <LoginBox>
+          <ManualSignIn>
             <ManualInput
               type="text"
               name="email"
@@ -285,16 +225,28 @@ function Register() {
               value={password}
               onChange={handleChange}
             />
-            <RegisterButton onClick={handleSubmit}>
-              {loading ? '帳號註冊中...' : '註冊'}
-            </RegisterButton>
-            {error && <ErrorMsg>{error}</ErrorMsg>}
-          </ManualRegister>
-        </RegisterBox>
+            <LoginButton onClick={handleSubmit}>
+              {loading ? '登入中...' : '登入'}
+            </LoginButton>
+            {error ? <ErrorMsg>{error}</ErrorMsg> : (
+              <TestMsg>
+                測試帳號: test@test.test
+                &nbsp;
+                測試密碼: 123456
+              </TestMsg>
+            )}
+          </ManualSignIn>
+        </LoginBox>
+        <VerticalLine />
+        <Question to="/register">
+          還沒註冊過嗎？
+          <HelpImg src={helpImage} alt="helpImage" />
+          <RegisterButton>註冊</RegisterButton>
+        </Question>
       </Wrapper>
       <FoodBackground />
-      <ToastContainer />
-    </section>
+    </>
   );
 }
-export default Register;
+
+export default Login;
