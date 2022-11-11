@@ -3,7 +3,7 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { doc, setDoc } from 'firebase/firestore';
-import mainImage from '../../images/healthy.jpg';
+import mainImage from '../../images/healthy.webp';
 import Header from '../../components/Header';
 import { auth, db } from '../../firestore';
 import { devices } from '../../utils/StyleUtils';
@@ -289,7 +289,7 @@ function UnAuthHome() {
 
             音樂自動化步驟指引
             <br />
-            解決您切換食譜步驟的煩惱
+            帶您體驗料理新樂趣
           </SubTitle>
           <RegisterBox>
             <ManualRegister>

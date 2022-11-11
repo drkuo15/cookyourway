@@ -12,12 +12,12 @@ import Stars from '../../components/DisplayStars';
 import AuthContext from '../../components/AuthContext';
 import Header from '../../components/Header';
 import Loading from '../../components/Loading';
-import nextIcon from '../../images/next.png';
-import beforeIcon from '../../images/before.png';
-import mandarin from '../../images/fruits/mandarin.jpg';
-import pineapple from '../../images/fruits/pineapple.jpg';
-import strawberry from '../../images/fruits/strawberry.jpg';
-import blueberry from '../../images/fruits/blueberry.jpg';
+import nextIcon from '../../images/next.webp';
+import beforeIcon from '../../images/before.webp';
+import mandarin from '../../images/fruits/mandarin.webp';
+import pineapple from '../../images/fruits/pineapple.webp';
+import strawberry from '../../images/fruits/strawberry.webp';
+import blueberry from '../../images/fruits/blueberry.webp';
 
 const Background = styled.div`
   padding-bottom: calc(80*100vw/1920);
