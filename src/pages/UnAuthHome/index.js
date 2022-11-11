@@ -200,6 +200,16 @@ const ErrorMsg = styled.p`
   }
 `;
 
+const TestMsg = styled.p`
+  font-size: calc(24*100vw/1920);
+  font-weight: bold;
+  width: 100%;
+  text-align: center;
+  @media ${devices.Tablet} and (orientation:portrait) {
+    font-size: calc(60*100vw/1920);
+  }
+`;
+
 function UnAuthHome() {
   const [imgLoaded, setImgLoaded] = useState(false);
   const navigate = useNavigate();
@@ -279,7 +289,7 @@ function UnAuthHome() {
 
             音樂自動化步驟指引
             <br />
-            帶您體驗料理新樂趣
+            解決您切換食譜步驟的煩惱
           </SubTitle>
           <RegisterBox>
             <ManualRegister>
@@ -307,7 +317,11 @@ function UnAuthHome() {
               <RegisterButton onClick={handleSubmit}>
                 {loading ? '帳號註冊中...' : '註冊'}
               </RegisterButton>
-              {error && <ErrorMsg>{error}</ErrorMsg>}
+              {error ? <ErrorMsg>{error}</ErrorMsg> : (
+                <TestMsg>
+                  請直接點擊右上角登入按鈕進行測試！
+                </TestMsg>
+              )}
             </ManualRegister>
           </RegisterBox>
         </Wrapper>
