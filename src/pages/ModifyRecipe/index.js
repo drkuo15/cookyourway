@@ -773,7 +773,11 @@ function ModifyRecipe() {
     if (Number(e.target.value) < 0) {
       e.target.value = 0;
     }
-    newIngredients[targetIndex].ingredientsQuantity = e.target.value;
+    if (e.target.value < 6) {
+      newIngredients[targetIndex].ingredientsQuantity = e.target.value;
+    } else {
+      newIngredients[targetIndex].ingredientsQuantity = e.target.value.slice(0, 5);
+    }
     setIngredients(newIngredients);
   }
   function updateTitleValue(e, index) {
@@ -803,7 +807,6 @@ function ModifyRecipe() {
 
   function updateStepMinuteValue(e, index) {
     const newSteps = [...steps];
-    newSteps[index].stepMinute = e.target.value;
     if (Number(newSteps[index].stepMinute) < 0) {
       newSteps[index].stepMinute = 0;
     }
@@ -1043,6 +1046,7 @@ function ModifyRecipe() {
           <TittleInputWrapper>
             <TitleInput
               value={title}
+              maxLength="10"
               onChange={(e) => { setTitle(e.target.value); setTitleKeyWords(e.target.value.split('')); }}
               placeholder="請輸入食譜名稱..."
             />
@@ -1085,6 +1089,7 @@ function ModifyRecipe() {
                 <IngredientDiv key={ingredient.id}>
                   <Input
                     value={ingredient.ingredientsTitle}
+                    maxLength="10"
                     onChange={(e) => { updateTitleValue(e, index); }}
                     placeholder="請輸入食材名稱..."
                   />
@@ -1131,6 +1136,7 @@ function ModifyRecipe() {
                 <StepTitleAndTimeDiv>
                   <StepInput
                     value={step.stepTitle}
+                    maxLength="10"
                     onChange={(e) => { updateStepTitleValue(e, index); }}
                     placeholder="請輸入步驟簡稱..."
                   />
@@ -1141,6 +1147,7 @@ function ModifyRecipe() {
                       placeholder="0"
                       type="number"
                       min="0"
+                      max="800"
                     />
                     <MediumLargeDiv>分</MediumLargeDiv>
                     <TimeInput
@@ -1158,6 +1165,7 @@ function ModifyRecipe() {
                   <StepContentDiv>
                     <TextArea
                       value={steps[index].stepContent}
+                      maxLength="100"
                       onChange={(e) => { updateStepContentValue(e, index); }}
                       placeholder="請描述步驟"
                     />
@@ -1190,6 +1198,7 @@ function ModifyRecipe() {
           <CommentContentDiv>
             <CommentTextArea
               value={comment}
+              maxLength="100"
               onChange={(e) => setComment(e.target.value)}
               placeholder="有什麼我們可以注意的地方嗎？"
             />
