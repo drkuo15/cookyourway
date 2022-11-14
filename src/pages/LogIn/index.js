@@ -203,7 +203,13 @@ function Login() {
           navigate('/home', { replace: true });
         }, 800);
       })
-      .catch((err) => { setData({ ...data, error: err.message, loading: false }); });
+      .catch((err) => {
+        setData({
+          ...data,
+          error: err.message === 'Firebase: Error (auth/wrong-password).' ? '帳號密碼錯誤，請重新嘗試' : err.message,
+          loading: false,
+        });
+      });
   };
   return (
     <>

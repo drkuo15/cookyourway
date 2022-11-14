@@ -175,6 +175,15 @@ function Register() {
     setData({ ...data, [e.target.name]: e.target.value });
   };
 
+  const renderError = (err) => {
+    if (err.message === 'Firebase: Password should be at least 6 characters (auth/weak-password).') {
+      return '密碼至少要六位數呦！';
+    } if (err.message === 'Firebase: Error (auth/email-already-in-use).') {
+      return '帳號已存在，請嘗試其它帳號';
+    }
+    return err.message;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setData({ ...data, error: null, loading: true });
@@ -203,7 +212,11 @@ function Register() {
       showCustomAlert('您已註冊成功，即將轉跳首頁');
       setTimeout(() => { navigate('/home', { replace: true }); }, 4000);
     } catch (err) {
-      setData({ ...data, error: err.message, loading: false });
+      setData({
+        ...data,
+        error: renderError(err),
+        loading: false,
+      });
     }
   };
   return (
