@@ -52,6 +52,10 @@ function App() {
     });
   }, []);
 
+  const onChangeMyFavorites = (newMyFavorites) => {
+    setUserInfo({ ...userInfo, myFavorites: newMyFavorites });
+  };
+
   return (
     <>
       <BodyDiv>
@@ -61,7 +65,7 @@ function App() {
             <Routes>
               <Route path="/cooking" element={<Cooking />} />
               <Route path="/modify_recipe" element={<ModifyRecipe />} />
-              <Route path="/read_recipe" element={<ReadRecipe setUserInfo={setUserInfo} />} />
+              <Route path="/read_recipe" element={<ReadRecipe onChangeMyFavorites={onChangeMyFavorites} />} />
               <Route path="/search_recipe" element={<SearchRecipe />} />
               <Route path="/home" element={<AuthHome />} />
               <Route path="/register" element={<Register />} />

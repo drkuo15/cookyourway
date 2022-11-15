@@ -426,7 +426,7 @@ const Icon = styled.span`
   }
 `;
 
-function ReadRecipe({ setUserInfo }) {
+function ReadRecipe({ onChangeMyFavorites }) {
   const userInfo = useContext(AuthContext);
   const userId = userInfo?.uid || '';
   const myFavorites = userInfo?.myFavorites || [];
@@ -445,10 +445,6 @@ function ReadRecipe({ setUserInfo }) {
   const [checkingUser, setCheckingUser] = useState(true);
   const [imgLoaded, setImgLoaded] = useState(false);
   const [stepImgLoaded, setStepImgLoaded] = useState(false);
-
-  const setMyFavorites = (newMyFavorites) => {
-    setUserInfo({ ...userInfo, myFavorites: newMyFavorites });
-  };
 
   useEffect(() => {
     if (userInfo === '') {
@@ -514,7 +510,7 @@ function ReadRecipe({ setUserInfo }) {
       return;
     }
     const updatedMyFavorite = [...myFavorites, currentRecipeId];
-    setMyFavorites(updatedMyFavorite);
+    onChangeMyFavorites(updatedMyFavorite);
     updateDoc(UserRef, { myFavorites: updatedMyFavorite });
     showCustomAlert('已成功加入收藏清單\n\n請前往首頁查看');
   }
@@ -524,7 +520,7 @@ function ReadRecipe({ setUserInfo }) {
     const isRecipeExisting = myFavorites.some((id) => id === currentRecipeId);
     if (isRecipeExisting) {
       const updatedMyFavorite = myFavorites.filter((id) => id !== currentRecipeId);
-      setMyFavorites(updatedMyFavorite);
+      onChangeMyFavorites(updatedMyFavorite);
       updateDoc(UserRef, { myFavorites: updatedMyFavorite });
       showCustomAlert('已從收藏清單成功移除');
     }
@@ -694,7 +690,7 @@ function ReadRecipe({ setUserInfo }) {
 }
 
 ReadRecipe.propTypes = {
-  setUserInfo: PropTypes.func.isRequired,
+  onChangeMyFavorites: PropTypes.func.isRequired,
 };
 
 Stars.propTypes = {
