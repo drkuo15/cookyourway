@@ -430,15 +430,21 @@ function ReadRecipe({ onChangeMyFavorites }) {
   const userInfo = useContext(AuthContext);
   const userId = userInfo?.uid || '';
   const myFavorites = userInfo?.myFavorites || [];
-  const [title, setTitle] = useState('');
-  const [difficulty, setDifficulty] = useState(1);
-  const [ingredients, setIngredients] = useState([]);
-  const [steps, setSteps] = useState([]);
-  const [comment, setComment] = useState('');
-  const [imgUrl, setImgUrl] = useState('');
-  const [authorName, setAuthorName] = useState('');
-  const [authorId, setAuthorId] = useState('');
-  const [fullTime, setFulltime] = useState(0);
+  const initialRecipe = {
+    title: '',
+    difficulty: 1,
+    ingredients: [],
+    steps: [],
+    comment: '',
+    imgUrl: '',
+    authorName: '',
+    authorId: '',
+    fullTime: 0,
+  };
+  const [recipeData, setRecipeData] = useState(initialRecipe);
+  const {
+    title, difficulty, ingredients, steps, comment, imgUrl, authorName, authorId, fullTime,
+  } = recipeData;
   const location = useLocation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -464,20 +470,22 @@ function ReadRecipe({ onChangeMyFavorites }) {
       const unsubscribe = onSnapshot(
         doc(db, 'recipes', currentRecipeId),
         (document) => {
-          const recipeData = document.data();
-          if (!recipeData) {
+          const data = document.data();
+          if (!data) {
             navigate({ pathname: '/home' });
             return;
           }
-          setTitle(recipeData.title);
-          setDifficulty(recipeData.difficulty);
-          setImgUrl(recipeData.mainImage);
-          setIngredients(recipeData.ingredients);
-          setSteps(recipeData.steps);
-          setComment(recipeData.comment);
-          setAuthorName(recipeData.authorName);
-          setAuthorId(recipeData.authorId);
-          setFulltime(recipeData.fullTime);
+          setRecipeData({
+            title: data.title,
+            difficulty: data.difficulty,
+            imgUrl: data.mainImage,
+            ingredients: data.ingredients,
+            steps: data.steps,
+            comment: data.comment,
+            authorName: data.authorName,
+            authorId: data.authorId,
+            fullTime: data.fullTime,
+          });
           setLoading(false);
         },
       );
