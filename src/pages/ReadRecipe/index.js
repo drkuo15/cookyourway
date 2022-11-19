@@ -1,12 +1,11 @@
 import { useState, useEffect, useContext } from 'react';
 import styled, { keyframes } from 'styled-components/macro';
-import { doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { motion, useAnimation } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { IosShare } from '@styled-icons/material-rounded';
-import { db } from '../../firestore';
+import { onRecipeSnapshot, updateUserDoc } from '../../firestore';
 import { devices } from '../../utils/StyleUtils';
 import Stars from '../../components/DisplayStars';
 import defaultImage from '../../images/upload.png';
@@ -451,6 +450,7 @@ function ReadRecipe({ onChangeMyFavorites }) {
   const [checkingUser, setCheckingUser] = useState(true);
   const [imgLoaded, setImgLoaded] = useState(false);
   const [stepImgLoaded, setStepImgLoaded] = useState(false);
+  const currentRecipeId = location.search.split('=')[1];
 
   useEffect(() => {
     if (userInfo === '') {
@@ -464,31 +464,10 @@ function ReadRecipe({ onChangeMyFavorites }) {
     }
   }, [navigate, userId, userInfo]);
 
-  const currentRecipeId = location.search.split('=')[1];
   useEffect(() => {
     if (currentRecipeId) {
-      const unsubscribe = onSnapshot(
-        doc(db, 'recipes', currentRecipeId),
-        (document) => {
-          const data = document.data();
-          if (!data) {
-            navigate({ pathname: '/home' });
-            return;
-          }
-          setRecipeData({
-            title: data.title,
-            difficulty: data.difficulty,
-            imgUrl: data.mainImage,
-            ingredients: data.ingredients,
-            steps: data.steps,
-            comment: data.comment,
-            authorName: data.authorName,
-            authorId: data.authorId,
-            fullTime: data.fullTime,
-          });
-          setLoading(false);
-        },
-      );
+      const unsubscribe = onRecipeSnapshot(currentRecipeId, setRecipeData, 'authorName', 'fullTime');
+      setLoading(false);
       return unsubscribe;
     }
     navigate({ pathname: '/home' });
@@ -512,25 +491,23 @@ function ReadRecipe({ onChangeMyFavorites }) {
   }
 
   function addToFavorites() {
-    const UserRef = doc(db, 'users', userId);
     const isRecipeExisting = myFavorites.some((id) => id === currentRecipeId);
     if (isRecipeExisting) {
       return;
     }
     const updatedMyFavorite = [...myFavorites, currentRecipeId];
     onChangeMyFavorites(updatedMyFavorite);
-    updateDoc(UserRef, { myFavorites: updatedMyFavorite });
-    showCustomAlert('已成功加入收藏清單\n\n請前往首頁查看');
+    updateUserDoc(userId, updatedMyFavorite)
+      .then(() => showCustomAlert('已成功加入收藏清單\n\n請前往首頁查看'));
   }
 
   function removeFromFavorites() {
-    const UserRef = doc(db, 'users', userId);
     const isRecipeExisting = myFavorites.some((id) => id === currentRecipeId);
     if (isRecipeExisting) {
       const updatedMyFavorite = myFavorites.filter((id) => id !== currentRecipeId);
       onChangeMyFavorites(updatedMyFavorite);
-      updateDoc(UserRef, { myFavorites: updatedMyFavorite });
-      showCustomAlert('已從收藏清單成功移除');
+      updateUserDoc(userId, updatedMyFavorite)
+        .then(() => showCustomAlert('已從收藏清單成功移除'));
     }
   }
 

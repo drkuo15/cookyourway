@@ -1,11 +1,8 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import {
-  collection, query, where, getDocs,
-} from 'firebase/firestore';
 import { useState, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components/macro';
 import { Search } from '@styled-icons/material-rounded';
-import { db } from '../../firestore';
+import { getSearchArray } from '../../firestore';
 import { devices } from '../../utils/StyleUtils';
 import Stars from '../../components/DisplayStars';
 import Header from '../../components/Header';
@@ -262,23 +259,11 @@ function SearchRecipe() {
 
   useEffect(() => {
     if (searchName) {
-      const searchNameArray = searchName.split('');
-      const recipeRef = collection(db, 'recipes');
-      const q = query(recipeRef, where('titleKeywords', 'array-contains', searchNameArray[0]));
-      let queryDataArray = [];
-      getDocs(q).then((querySnapshot) => {
-        if (!querySnapshot.empty) {
-          querySnapshot.forEach(
-            (doc) => {
-              if (doc.data().title.includes(searchName)) {
-                queryDataArray = [...queryDataArray, doc.data()];
-              }
-            },
-          );
-        }
-        setSearchResult(queryDataArray);
-        setLoading(false);
-      });
+      getSearchArray(searchName)
+        .then((queryDataArray) => {
+          setSearchResult(queryDataArray);
+          setLoading(false);
+        });
     } else {
       setSearchResult([]);
       setLoading(false);

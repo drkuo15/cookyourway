@@ -1,11 +1,9 @@
 import styled, { keyframes } from 'styled-components';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { doc, setDoc } from 'firebase/firestore';
+import { registerUser } from '../../firestore';
 import mainImage from '../../images/healthy.webp';
 import Header from '../../components/Header';
-import { auth, db } from '../../firestore';
 import { devices } from '../../utils/StyleUtils';
 import { ToastContainer, showCustomAlert } from '../../components/CustomAlert';
 import backgroundImg from '../../images/BG.svg';
@@ -244,17 +242,7 @@ function UnAuthHome() {
       setData({ ...data, error: '所有欄位都需要填寫呦！' });
     }
     try {
-      const result = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password,
-      );
-      await setDoc(doc(db, 'users', result.user.uid), {
-        uid: result.user.uid,
-        name,
-        email,
-        myFavorites: [],
-      });
+      await registerUser(email, password, name);
       setData({
         name: '',
         email: '',

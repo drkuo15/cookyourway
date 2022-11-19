@@ -2,7 +2,6 @@ import { useEffect, useState, useContext } from 'react';
 import styled from 'styled-components/macro';
 import { ScreenRotation } from '@styled-icons/material-rounded';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { doc, getDoc } from 'firebase/firestore';
 import Counter from './Counter';
 import Player from './Music';
 import Recipe from './Recipe';
@@ -12,7 +11,7 @@ import music2 from '../../music/music2.m4a';
 import music3 from '../../music/music3.m4a';
 import music4 from '../../music/music4.m4a';
 import Loading from '../../components/Loading';
-import { db } from '../../firestore';
+import { getCurrentData } from '../../firestore';
 import AuthContext from '../../components/AuthContext';
 
 const ForceLandscapeAlert = styled.div`
@@ -106,17 +105,15 @@ function Cooking() {
   const currentRecipeId = location.search.split('=')[1];
   useEffect(() => {
     async function getData() {
-      const docRef = doc(db, 'recipes', currentRecipeId);
-      const docSnap = await getDoc(docRef);
-      const docData = docSnap.data();
-      if (!docData) {
+      const currentData = await getCurrentData(currentRecipeId);
+      if (!currentData) {
         navigate({ pathname: '/home' });
         return;
       }
-      setSteps(docData.steps);
-      setTitle(docData.title);
-      setInitialTime((docData.steps[stepIndex].stepTime));
-      setStepsLength(docData.steps.length);
+      setSteps(currentData.steps);
+      setTitle(currentData.title);
+      setInitialTime((currentData.steps[stepIndex].stepTime));
+      setStepsLength(currentData.steps.length);
       setLoading(false);
     }
     if (currentRecipeId) {

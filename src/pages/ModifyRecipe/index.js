@@ -1,19 +1,12 @@
 import {
   useEffect, useState, useContext, useReducer, useRef,
 } from 'react';
-import {
-  collection, doc, setDoc, onSnapshot, updateDoc,
-} from 'firebase/firestore';
-import {
-  getDownloadURL, uploadBytes, ref,
-} from 'firebase/storage';
 import styled from 'styled-components/macro';
 import { v4 } from 'uuid';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, useAnimation } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import PropTypes from 'prop-types';
-import { db, storage } from '../../firestore';
 import { devices } from '../../utils/StyleUtils';
 import defaultImage from '../../images/upload.png';
 import StarRating from '../../components/Stars';
@@ -23,6 +16,9 @@ import Header from '../../components/Header';
 import binImage from '../../images/bin.png';
 import tipImage from '../../images/tips.png';
 import Loading from '../../components/Loading';
+import {
+  uploadImg, onRecipeSnapshot, setRecipeDoc, updateRecipeDoc, recipeDoc,
+} from '../../firestore';
 
 const Background = styled.div`
   padding: 0 calc(116*100vw/1920);
@@ -704,6 +700,8 @@ function ModifyRecipe() {
   const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [checkingUser, setCheckingUser] = useState(true);
+  const currentRecipeId = location.search.split('=')[1];
+  const docId = recipeDoc.id;
 
   useEffect(() => {
     if (userInfo === '') {
@@ -719,48 +717,23 @@ function ModifyRecipe() {
 
   useEffect(() => {
     const queryString = location.search;
-    const currentRecipeId = location.search.split('=')[1];
     if (queryString) {
-      const unsubscribe = onSnapshot(
-        doc(db, 'recipes', currentRecipeId),
-        (document) => {
-          const data = document.data();
-          setRecipeData({
-            title: data.title,
-            oldTitle: data.title,
-            titleKeywords: data.titleKeywords,
-            difficulty: data.difficulty,
-            imgUrl: data.mainImage,
-            imgPath: data.mainImagePath,
-            ingredients: data.ingredients,
-            steps: data.steps,
-            comment: data.comment,
-            authorId: data.authorId,
-          });
-          setLoading(false);
-        },
-      );
+      const unsubscribe = onRecipeSnapshot(currentRecipeId, setRecipeData, 'oldTitle', 'titleKeywords', 'imgPath');
+      setLoading(false);
       return unsubscribe;
     }
     setLoading(false);
-
     return undefined;
-  }, [location]);
+  }, [currentRecipeId, location]);
 
   useEffect(() => {
     if (img) {
-      const uploadImg = async () => {
-        const imgRef = ref(
-          storage,
-          `recipe/${new Date().getTime()} - ${img.name}`,
-        );
-        const snap = await uploadBytes(imgRef, img);
-        const url = await getDownloadURL(ref(storage, snap.ref.fullPath));
-        setRecipeData({
-          imgUrl: url, imgPath: snap.ref.fullPath, img: undefined,
-        });
-      };
-      uploadImg();
+      uploadImg(img, 'recipe')
+        .then((data) => setRecipeData({
+          imgUrl: data.imgUrl,
+          imgPath: data.imgPath,
+          img: undefined,
+        }));
     }
   }, [img]);
 
@@ -777,6 +750,7 @@ function ModifyRecipe() {
     const newIngredients = ingredients.filter((_, index) => i !== index);
     setRecipeData({ ingredients: newIngredients });
   }
+
   function updateQuantityValue(e, targetIndex) {
     const newIngredients = [...ingredients];
     if (Number(e.target.value) < 0) {
@@ -862,19 +836,13 @@ function ModifyRecipe() {
   }
 
   function UpdateImageValue(e, index) {
-    const uploadImg = async () => {
-      const imgRef = ref(
-        storage,
-        `recipeStep/${new Date().getTime()} - ${e.target.files[0].name}`,
-      );
-      const snap = await uploadBytes(imgRef, e.target.files[0]);
-      const url = await getDownloadURL(ref(storage, snap.ref.fullPath));
-      const newSteps = [...steps];
-      newSteps[index].stepImgUrl = url;
-      newSteps[index].stepImgPath = snap.ref.fullPath;
-      setRecipeData({ steps: newSteps });
-    };
-    uploadImg();
+    uploadImg(e.target.files[0], 'recipeStep')
+      .then((data) => {
+        const newSteps = [...steps];
+        newSteps[index].stepImgUrl = data.imgUrl;
+        newSteps[index].stepImgPath = data.imgPath;
+        setRecipeData({ steps: newSteps });
+      });
   }
 
   function parseIngredientsQuantity() {
@@ -957,12 +925,11 @@ function ModifyRecipe() {
     }
   }
 
-  async function setNewRecipeAndNavigate() {
-    const docId = doc(collection(db, 'recipes')).id;
+  async function updateRecipeDBAndNavigate(id, updateCallback) {
     const parsedIngredients = parseIngredientsQuantity();
     const parsedSteps = parseStepsTime();
     const newRecipeData = {
-      recipeId: docId,
+      recipeId: id,
       createTime: new Date(),
       title,
       titleKeywords,
@@ -978,37 +945,8 @@ function ModifyRecipe() {
     };
     const isInputCompleted = checkInputValue(newRecipeData);
     if (isInputCompleted) {
-      setDoc(doc(db, 'recipes', docId), newRecipeData);
-      navigate({ pathname: '/read_recipe', search: `?id=${docId}` });
-    } else {
-      alertUnfinishedInput();
-    }
-  }
-
-  async function updateRecipeAndNavigate() {
-    const currentRecipeId = location.search.split('=')[1];
-    const RecipeRef = doc(db, 'recipes', currentRecipeId);
-    const parsedIngredients = parseIngredientsQuantity();
-    const parsedSteps = parseStepsTime();
-    const newRecipeData = {
-      recipeId: currentRecipeId,
-      createTime: new Date(),
-      title,
-      titleKeywords,
-      difficulty,
-      fullTime,
-      mainImage: imgUrl,
-      mainImagePath: imgPath,
-      ingredients: parsedIngredients,
-      steps: parsedSteps,
-      comment,
-      authorName: userName,
-      authorId: userId,
-    };
-    const isInputCompleted = checkInputValue(newRecipeData);
-    if (isInputCompleted) {
-      updateDoc(RecipeRef, newRecipeData);
-      navigate({ pathname: '/read_recipe', search: `?id=${currentRecipeId}` });
+      await updateCallback(id, newRecipeData);
+      navigate({ pathname: '/read_recipe', search: `?id=${id}` });
     } else {
       alertUnfinishedInput();
     }
@@ -1018,17 +956,17 @@ function ModifyRecipe() {
     const queryString = location.search;
     if (queryString) {
       if (userId === authorId) {
-        updateRecipeAndNavigate();
+        updateRecipeDBAndNavigate(currentRecipeId, updateRecipeDoc);
       } else {
         if (title === oldTitle) {
           showCustomAlert('請更改食譜名稱');
           return;
         }
-        setNewRecipeAndNavigate();
+        updateRecipeDBAndNavigate(docId, setRecipeDoc);
       }
       return;
     }
-    setNewRecipeAndNavigate();
+    updateRecipeDBAndNavigate(docId, setRecipeDoc);
   }
 
   function submitData() {
@@ -1088,7 +1026,7 @@ function ModifyRecipe() {
         </ContentWrapper>
         <ContentWrapper>
           <ImgWrapper>
-            <FoodImg src={imgUrl || defaultImage} alt="stepImages" />
+            <FoodImg src={imgUrl || defaultImage} alt="Images" />
             <Label htmlFor="photo">
               <UploadImgP>點擊上傳圖片</UploadImgP>
             </Label>

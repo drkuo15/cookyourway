@@ -1,9 +1,7 @@
-import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { doc, setDoc } from 'firebase/firestore';
-import { auth, db } from '../../firestore';
+import { registerUser } from '../../firestore';
 import CenterTopHeader from '../../components/CenterTopHeader';
 import FoodBackground from '../../components/FoodBackgroud';
 import helpImage from '../../images/help_center_FILL0_wght400_GRAD0_opsz48.svg';
@@ -191,17 +189,7 @@ function Register() {
       setData({ ...data, error: '所有欄位都需要填寫呦！' });
     }
     try {
-      const result = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password,
-      );
-      await setDoc(doc(db, 'users', result.user.uid), {
-        uid: result.user.uid,
-        name,
-        email,
-        myFavorites: [],
-      });
+      await registerUser(email, password, name);
       setData({
         name: '',
         email: '',
