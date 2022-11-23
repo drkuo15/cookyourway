@@ -1,15 +1,13 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import {
-  collection, query, where, getDocs,
-} from 'firebase/firestore';
 import { useState, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components/macro';
 import { Search } from '@styled-icons/material-rounded';
-import { db } from '../../firestore';
+import { getSearchArray } from '../../firestore';
 import { devices } from '../../utils/StyleUtils';
 import Stars from '../../components/DisplayStars';
 import Header from '../../components/Header';
 import Loading from '../../components/Loading';
+import useCheckingUser from '../../components/useCheckingUser';
 
 const SearchInput = styled.input`
   width: calc(1282*100vw/1920);
@@ -257,35 +255,24 @@ function SearchRecipe() {
   const location = useLocation();
   const [searchName, setSearchName] = useState(decodeURI(location.search.split('=')[1]));
   const [searchResult, setSearchResult] = useState([]);
+  const { userId, checkingUser } = useCheckingUser();
   const [loading, setLoading] = useState(true);
   const [imgLoaded, setImgLoaded] = useState(false);
 
   useEffect(() => {
-    if (searchName) {
-      const searchNameArray = searchName.split('');
-      const recipeRef = collection(db, 'recipes');
-      const q = query(recipeRef, where('titleKeywords', 'array-contains', searchNameArray[0]));
-      let queryDataArray = [];
-      getDocs(q).then((querySnapshot) => {
-        if (!querySnapshot.empty) {
-          querySnapshot.forEach(
-            (doc) => {
-              if (doc.data().title.includes(searchName)) {
-                queryDataArray = [...queryDataArray, doc.data()];
-              }
-            },
-          );
-        }
-        setSearchResult(queryDataArray);
-        setLoading(false);
-      });
+    if (searchName && userId) {
+      getSearchArray(searchName)
+        .then((queryDataArray) => {
+          setSearchResult(queryDataArray);
+          setLoading(false);
+        });
     } else {
       setSearchResult([]);
       setLoading(false);
     }
-  }, [searchName]);
+  }, [searchName, userId]);
 
-  if (loading) {
+  if (checkingUser || loading) {
     return (
       <>
         <Header />
@@ -307,6 +294,7 @@ function SearchRecipe() {
             }
           }}
           onChange={(e) => { setSearchName(e.target.value); }}
+          autoFocus
         />
         <SearchImg>
           <Search onClick={() => {

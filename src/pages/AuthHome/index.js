@@ -1,23 +1,22 @@
 import {
-  useState, useEffect, useContext, useRef,
+  useState, useEffect, useRef, useReducer,
 } from 'react';
-import {
-  collection, query, where, getDocs, onSnapshot, doc,
-} from 'firebase/firestore';
 import styled, { keyframes } from 'styled-components/macro';
-import { Link, useNavigate } from 'react-router-dom';
-import { db } from '../../firestore';
+import { Link } from 'react-router-dom';
+import {
+  getAllRecipes, getAverageDifficulty, onUserSnapshot, getRecommendRecipes, getUserRecipes,
+} from '../../firestore';
 import { devices } from '../../utils/StyleUtils';
 import Stars from '../../components/DisplayStars';
-import AuthContext from '../../components/AuthContext';
 import Header from '../../components/Header';
 import Loading from '../../components/Loading';
-import nextIcon from '../../images/next.png';
-import beforeIcon from '../../images/before.png';
-import mandarin from '../../images/fruits/mandarin.jpg';
-import pineapple from '../../images/fruits/pineapple.jpg';
-import strawberry from '../../images/fruits/strawberry.jpg';
-import blueberry from '../../images/fruits/blueberry.jpg';
+import nextIcon from '../../images/next.webp';
+import beforeIcon from '../../images/before.webp';
+import mandarin from '../../images/fruits/mandarin.webp';
+import pineapple from '../../images/fruits/pineapple.webp';
+import strawberry from '../../images/fruits/strawberry.webp';
+import blueberry from '../../images/fruits/blueberry.webp';
+import useCheckingUser from '../../components/useCheckingUser';
 
 const Background = styled.div`
   padding-bottom: calc(80*100vw/1920);
@@ -296,177 +295,79 @@ const SelectiveContext = styled.div`
 `;
 
 function AuthHome() {
-  const userInfo = useContext(AuthContext);
-  const userId = userInfo?.uid || '';
-  const [userRecipes, setUserRecipes] = useState([]);
-  const [userRecipeIndex, setUserRecipeIndex] = useState(0);
-  const [averageDifficulty, setAverageDifficulty] = useState(1);
-  const [recommendRecipes, setRecommendRecipes] = useState([]);
-  const [recommendRecipeIndex, setRecommendRecipeIndex] = useState(0);
-  const [myFavorites, setMyFavorites] = useState([]);
-  const [favoriteRecipes, setFavoriteRecipes] = useState([]);
-  const [favoriteRecipeIndex, setFavoriteRecipeIndex] = useState(0);
+  const { userId, checkingUser } = useCheckingUser();
+  const initialIndices = {
+    userIndex: 0,
+    recommendIndex: 0,
+    favoriteIndex: 0,
+    allIndex: 0,
+  };
+  const reducer = (state, action) => {
+    switch (action.type) {
+      case 'IncreaseUserIndex':
+        return { ...state, userIndex: state.userIndex + 1 };
+      case 'DecreaseUserIndex':
+        return { ...state, userIndex: state.userIndex - 1 };
+      case 'IncreaseRecommendIndex':
+        return { ...state, recommendIndex: state.recommendIndex + 1 };
+      case 'DecreaseRecommendIndex':
+        return { ...state, recommendIndex: state.recommendIndex - 1 };
+      case 'IncreaseFavoriteIndex':
+        return { ...state, favoriteIndex: state.favoriteIndex + 1 };
+      case 'DecreaseFavoriteIndex':
+        return { ...state, favoriteIndex: state.favoriteIndex - 1 };
+      case 'IncreaseAllIndex':
+        return { ...state, allIndex: state.allIndex + 1 };
+      case 'DecreaseAllIndex':
+        return { ...state, allIndex: state.allIndex - 1 };
+      default: throw new Error();
+    }
+  };
+  const [indices, dispatch] = useReducer(reducer, initialIndices);
   const [allRecipes, setAllRecipes] = useState([]);
-  const [allRecipeIndex, setAllRecipeIndex] = useState(0);
+  const [userRecipes, setUserRecipes] = useState([]);
+  const [recommendRecipes, setRecommendRecipes] = useState([]);
+  const [favoriteRecipes, setFavoriteRecipes] = useState([]);
+  const [myFavorites, setMyFavorites] = useState([]);
+  const [averageDifficulty, setAverageDifficulty] = useState(1);
   const [loading, setLoading] = useState(true);
-
+  const [imgLoaded, setImgLoaded] = useState(false);
+  const [sectionImgLoaded, setSectionImgLoaded] = useState(false);
   const allRef = useRef(null);
   const recommendRef = useRef(null);
   const userRef = useRef(null);
   const favoriteRef = useRef(null);
 
-  const [checkingUser, setCheckingUser] = useState(true);
-  const navigate = useNavigate();
-
-  const [imgLoaded, setImgLoaded] = useState(false);
-  const [sectionImgLoaded, setSectionImgLoaded] = useState(false);
-
   useEffect(() => {
-    if (userInfo === '') {
-      setCheckingUser(true);
-    }
-    if (userInfo === null) {
-      navigate({ pathname: '/' });
+    async function setDataFromFirebase() {
+      const data = await Promise.all([
+        getAllRecipes(), getUserRecipes(userId),
+        getAverageDifficulty(userId), getRecommendRecipes(userId, averageDifficulty),
+      ]);
+      setAllRecipes(data[0]);
+      setUserRecipes(data[1]);
+      setAverageDifficulty(data[2]);
+      setRecommendRecipes(data[3]);
+      const myFavoriteArray = data[0].filter((each) => myFavorites.includes(each.recipeId));
+      setFavoriteRecipes(myFavoriteArray);
     }
     if (userId) {
-      setCheckingUser(false);
+      setDataFromFirebase()
+        .then(() => { setLoading(false); });
     }
-  }, [navigate, userId, userInfo]);
-
-  useEffect(() => {
-    const recipeRef = collection(db, 'recipes');
-    let queryDataArray = [];
-    getDocs(recipeRef).then((querySnapshot) => {
-      querySnapshot.forEach(
-        (document) => {
-          queryDataArray = [...queryDataArray, document.data()];
-        },
-      );
-      setAllRecipes(queryDataArray);
-    });
-  }, [userId]);
-
-  useEffect(() => {
-    const recipeRef = collection(db, 'recipes');
-    if (userId) {
-      const q = query(recipeRef, where('authorId', '==', userId));
-      let queryDataArray = [];
-      getDocs(q).then((querySnapshot) => {
-        querySnapshot.forEach(
-          (document) => {
-            queryDataArray = [...queryDataArray, document.data()];
-          },
-        );
-        setUserRecipes(queryDataArray);
-      });
-    }
-  }, [userId]);
-
-  useEffect(() => {
-    const recipeRef = collection(db, 'recipes');
-    if (userId) {
-      const q = query(recipeRef, where('authorId', '==', userId));
-      let queryDifficultyArray = [];
-      getDocs(q).then((querySnapshot) => {
-        querySnapshot.forEach(
-          (document) => {
-            queryDifficultyArray = [...queryDifficultyArray, document.data().difficulty];
-          },
-        );
-        const sum = queryDifficultyArray.reduce((cur, acc) => cur + acc, 0);
-        const avg = sum / queryDifficultyArray.length;
-        if (avg) {
-          setAverageDifficulty(avg);
-        }
-      });
-    }
-  }, [userId]);
-
-  useEffect(() => {
-    const recipeRef = collection(db, 'recipes');
-    const q = query(recipeRef, where('difficulty', '>=', averageDifficulty));
-    let queryRecipeArray = [];
-    getDocs(q).then((querySnapshot) => {
-      querySnapshot.forEach(
-        (document) => {
-          queryRecipeArray = [...queryRecipeArray, document.data()];
-        },
-      );
-      const filterRecipeArray = queryRecipeArray.filter((recipe) => recipe.authorId !== userId);
-      setRecommendRecipes(filterRecipeArray);
-      setLoading(false);
-    });
-  }, [averageDifficulty, userId]);
+  }, [averageDifficulty, myFavorites, userId]);
 
   useEffect(() => {
     if (userId) {
-      const UserRef = doc(db, 'users', userId);
-      const unsubscribe = onSnapshot(
-        UserRef,
-        (document) => {
-          const userdata = document.data();
-          if (userdata.myFavorites) {
-            setMyFavorites(userdata.myFavorites);
-          }
-        },
-      );
-      return () => { unsubscribe(); };
+      const unsubscribe = onUserSnapshot(userId, setMyFavorites);
+      return unsubscribe;
     }
     return undefined;
   }, [userId]);
 
-  useEffect(() => {
-    const recipeRef = collection(db, 'recipes');
-    getDocs(recipeRef)
-      .then((res) => res.docs.map((docc) => docc.data()))
-      .then((data) => data.filter((each) => myFavorites.includes(each.recipeId)))
-      .then((dataArray) => setFavoriteRecipes(dataArray));
-  }, [myFavorites]);
-
-  const showUserNextRecipe = () => {
-    setUserRecipeIndex((prev) => prev + 1);
-  };
-
-  const showUserPrevRecipe = () => {
-    setUserRecipeIndex((prev) => prev - 1);
-  };
-
-  const showRecommendNextRecipe = () => {
-    setRecommendRecipeIndex((prev) => prev + 1);
-  };
-
-  const showRecommendPrevRecipe = () => {
-    setRecommendRecipeIndex((prev) => prev - 1);
-  };
-
-  const showFavoriteNextRecipe = () => {
-    setFavoriteRecipeIndex((prev) => prev + 1);
-  };
-
-  const showFavoritePrevRecipe = () => {
-    setFavoriteRecipeIndex((prev) => prev - 1);
-  };
-
-  const showAllNextRecipe = () => {
-    setAllRecipeIndex((prev) => prev + 1);
-  };
-
-  const showAllPrevRecipe = () => {
-    setAllRecipeIndex((prev) => prev - 1);
-  };
-
   const scrollToRef = (ref) => { ref.current.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'end' }); };
 
-  if (checkingUser) {
-    return (
-      <>
-        <Header />
-        <Loading />
-      </>
-    );
-  }
-
-  if (loading) {
+  if (checkingUser || loading) {
     return (
       <>
         <Header />
@@ -546,11 +447,11 @@ function AuthHome() {
             <Mark>全部料理</Mark>
           </SectionTitle>
           <FullContentWrapper>
-            {allRecipeIndex >= 1
-              ? <LeftArrow onClick={showAllPrevRecipe}><ArrowIcon src={beforeIcon} alt="beforeNavigateIcon" /></LeftArrow>
+            {indices.allIndex >= 1
+              ? <LeftArrow onClick={() => dispatch({ type: 'DecreaseAllIndex' })}><ArrowIcon src={beforeIcon} alt="beforeNavigateIcon" /></LeftArrow>
               : ''}
             <ContentWrapper>
-              {allRecipes.slice(allRecipeIndex, allRecipeIndex + 3)
+              {allRecipes.slice(indices.allIndex, indices.allIndex + 3)
                 .map((allRecipe) => (
                   <ContentDiv key={allRecipe.recipeId}>
                     <StyledLink to={`/read_recipe?id=${allRecipe.recipeId}`}>
@@ -588,8 +489,8 @@ function AuthHome() {
                   </ContentDiv>
                 ))}
             </ContentWrapper>
-            {allRecipeIndex <= allRecipes.length - 4
-              ? <RightArrow onClick={showAllNextRecipe}><ArrowIcon src={nextIcon} alt="nextIconImage" /></RightArrow>
+            {indices.allIndex <= allRecipes.length - 4
+              ? <RightArrow onClick={() => dispatch({ type: 'IncreaseAllIndex' })}><ArrowIcon src={nextIcon} alt="nextIconImage" /></RightArrow>
               : ''}
           </FullContentWrapper>
         </Section>
@@ -598,11 +499,14 @@ function AuthHome() {
             <Mark>推薦料理</Mark>
           </SectionTitle>
           <FullContentWrapper>
-            {recommendRecipeIndex >= 1
-              ? <LeftArrow onClick={showRecommendPrevRecipe}><ArrowIcon src={beforeIcon} alt="beforeNavigateIcon" /></LeftArrow>
+            {indices.recommendIndex >= 1
+              ? <LeftArrow onClick={() => dispatch({ type: 'DecreaseRecommendIndex' })}><ArrowIcon src={beforeIcon} alt="beforeNavigateIcon" /></LeftArrow>
               : ''}
             <ContentWrapper>
-              {recommendRecipes.slice(recommendRecipeIndex, recommendRecipeIndex + 3)
+              {recommendRecipes.slice(
+                indices.recommendIndex,
+                indices.recommendIndex + 3,
+              )
                 .map((recommendRecipe) => (
                   <ContentDiv key={recommendRecipe.recipeId}>
                     <StyledLink to={`/read_recipe?id=${recommendRecipe.recipeId}`}>
@@ -640,8 +544,8 @@ function AuthHome() {
                   </ContentDiv>
                 ))}
             </ContentWrapper>
-            {recommendRecipeIndex <= recommendRecipes.length - 4
-              ? <RightArrow onClick={showRecommendNextRecipe}><ArrowIcon src={nextIcon} alt="nextIconImage" /></RightArrow>
+            {indices.recommendIndex <= recommendRecipes.length - 4
+              ? <RightArrow onClick={() => dispatch({ type: 'IncreaseRecommendIndex' })}><ArrowIcon src={nextIcon} alt="nextIconImage" /></RightArrow>
               : ''}
           </FullContentWrapper>
         </SectionWithBackground>
@@ -650,11 +554,14 @@ function AuthHome() {
             <Mark>我的料理</Mark>
           </SectionTitle>
           <FullContentWrapper>
-            {userRecipeIndex >= 1
-              ? <LeftArrow onClick={showUserPrevRecipe}><ArrowIcon src={beforeIcon} alt="beforeNavigateIcon" /></LeftArrow>
+            {indices.userIndex >= 1
+              ? <LeftArrow onClick={() => dispatch({ type: 'DecreaseUserIndex' })}><ArrowIcon src={beforeIcon} alt="beforeNavigateIcon" /></LeftArrow>
               : ''}
             <ContentWrapper>
-              {userRecipes.length !== 0 ? userRecipes.slice(userRecipeIndex, userRecipeIndex + 3)
+              {userRecipes.length !== 0 ? userRecipes.slice(
+                indices.userIndex,
+                indices.userIndex + 3,
+              )
                 .map((userRecipe) => (
                   <ContentDiv key={userRecipe.recipeId}>
                     <StyledLink to={`/read_recipe?id=${userRecipe.recipeId}`}>
@@ -693,8 +600,8 @@ function AuthHome() {
                 ))
                 : <DefaultText>尚未建立任何食譜</DefaultText>}
             </ContentWrapper>
-            {userRecipeIndex <= userRecipes.length - 4
-              ? <RightArrow onClick={showUserNextRecipe}><ArrowIcon src={nextIcon} alt="nextIconImage" /></RightArrow>
+            {indices.userIndex <= userRecipes.length - 4
+              ? <RightArrow onClick={() => dispatch({ type: 'IncreaseUserIndex' })}><ArrowIcon src={nextIcon} alt="nextIconImage" /></RightArrow>
               : ''}
 
           </FullContentWrapper>
@@ -704,12 +611,12 @@ function AuthHome() {
             <Mark>收藏料理</Mark>
           </SectionTitle>
           <FullContentWrapper>
-            {favoriteRecipeIndex >= 1
-              ? <LeftArrow onClick={showFavoritePrevRecipe}><ArrowIcon src={beforeIcon} alt="beforeNavigateIcon" /></LeftArrow>
+            {indices.favoriteIndex >= 1
+              ? <LeftArrow onClick={() => dispatch({ type: 'DecreaseFavoriteIndex' })}><ArrowIcon src={beforeIcon} alt="beforeNavigateIcon" /></LeftArrow>
               : ''}
             <ContentWrapper>
               {favoriteRecipes.length !== 0 ? favoriteRecipes
-                .slice(favoriteRecipeIndex, favoriteRecipeIndex + 3)
+                .slice(indices.favoriteIndex, indices.favoriteIndex + 3)
                 .map((favoriteRecipe) => (
                   <ContentDiv key={favoriteRecipe.recipeId}>
                     <StyledLink to={`/read_recipe?id=${favoriteRecipe.recipeId}`}>
@@ -747,8 +654,8 @@ function AuthHome() {
                   </ContentDiv>
                 )) : <DefaultText>尚未收藏任何食譜</DefaultText>}
             </ContentWrapper>
-            {favoriteRecipeIndex <= favoriteRecipes.length - 4
-              ? <RightArrow onClick={showFavoriteNextRecipe}><ArrowIcon src={nextIcon} alt="nextIconImage" /></RightArrow>
+            {indices.favoriteIndex <= favoriteRecipes.length - 4
+              ? <RightArrow onClick={() => dispatch({ type: 'IncreaseFavoriteIndex' })}><ArrowIcon src={nextIcon} alt="nextIconImage" /></RightArrow>
               : ''}
 
           </FullContentWrapper>
