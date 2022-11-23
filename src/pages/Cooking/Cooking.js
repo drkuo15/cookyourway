@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
 import { ScreenRotation } from '@styled-icons/material-rounded';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -12,7 +12,7 @@ import music3 from '../../music/music3.m4a';
 import music4 from '../../music/music4.m4a';
 import Loading from '../../components/Loading';
 import { getCurrentData } from '../../firestore';
-import AuthContext from '../../components/AuthContext';
+import useCheckingUser from '../../components/useCheckingUser';
 
 const ForceLandscapeAlert = styled.div`
   display:none;
@@ -82,21 +82,7 @@ function Cooking() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [steps, setSteps] = useState([]);
-  const userInfo = useContext(AuthContext);
-  const userId = userInfo?.uid || '';
-  const [checkingUser, setCheckingUser] = useState(true);
-
-  useEffect(() => {
-    if (userInfo === '') {
-      setCheckingUser(true);
-    }
-    if (userInfo === null) {
-      navigate({ pathname: '/' });
-    }
-    if (userId) {
-      setCheckingUser(false);
-    }
-  }, [navigate, userId, userInfo]);
+  const { checkingUser } = useCheckingUser();
 
   useEffect(() => {
     setTime(initialTime);
@@ -123,16 +109,7 @@ function Cooking() {
     }
   }, [currentRecipeId, navigate, stepIndex]);
 
-  if (checkingUser) {
-    return (
-      <>
-        <Header setIsCounting={setIsCounting} />
-        <Loading />
-      </>
-    );
-  }
-
-  if (loading) {
+  if (checkingUser || loading) {
     return (
       <>
         <Header setIsCounting={setIsCounting} />

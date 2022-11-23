@@ -1,5 +1,5 @@
 import {
-  useEffect, useState, useContext, useReducer, useRef,
+  useEffect, useState, useReducer, useRef,
 } from 'react';
 import styled from 'styled-components/macro';
 import { v4 } from 'uuid';
@@ -11,7 +11,6 @@ import { devices } from '../../utils/StyleUtils';
 import defaultImage from '../../images/upload.png';
 import StarRating from '../../components/Stars';
 import { ToastContainer, showCustomAlert } from '../../components/CustomAlert';
-import AuthContext from '../../components/AuthContext';
 import Header from '../../components/Header';
 import binImage from '../../images/bin.png';
 import tipImage from '../../images/tips.png';
@@ -19,6 +18,7 @@ import Loading from '../../components/Loading';
 import {
   uploadImg, onRecipeSnapshot, setRecipeDoc, updateRecipeDoc, recipeDoc,
 } from '../../firestore';
+import useCheckingUser from '../../components/useCheckingUser';
 
 const Background = styled.div`
   padding: 0 calc(116*100vw/1920);
@@ -692,28 +692,14 @@ function ModifyRecipe() {
     comment, imgPath, imgUrl, authorId,
   } = recipeData;
   const [img, setImg] = useState('');
-  const userInfo = useContext(AuthContext);
-  const userId = userInfo?.uid || '';
-  const userName = userInfo?.name || '';
   const fullTime = steps.reduce((accValue, step) => accValue + Number(step.stepTime), 0);
   const navigate = useNavigate();
   const location = useLocation();
   const [loading, setLoading] = useState(true);
-  const [checkingUser, setCheckingUser] = useState(true);
+  const { userInfo, userId, checkingUser } = useCheckingUser();
+  const userName = userInfo?.name || '';
   const currentRecipeId = location.search.split('=')[1];
   const docId = recipeDoc.id;
-
-  useEffect(() => {
-    if (userInfo === '') {
-      setCheckingUser(true);
-    }
-    if (userInfo === null) {
-      navigate({ pathname: '/' });
-    }
-    if (userId) {
-      setCheckingUser(false);
-    }
-  }, [navigate, userId, userInfo]);
 
   useEffect(() => {
     const queryString = location.search;
@@ -973,16 +959,7 @@ function ModifyRecipe() {
     decideToUpdateOrSetRecipe();
   }
 
-  if (checkingUser) {
-    return (
-      <>
-        <Header />
-        <Loading />
-      </>
-    );
-  }
-
-  if (loading) {
+  if (checkingUser || loading) {
     return (
       <>
         <Header />

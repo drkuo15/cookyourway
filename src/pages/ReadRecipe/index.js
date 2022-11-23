@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components/macro';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
@@ -10,10 +10,10 @@ import { devices } from '../../utils/StyleUtils';
 import Stars from '../../components/DisplayStars';
 import defaultImage from '../../images/upload.png';
 import { ToastContainer, showCustomAlert } from '../../components/CustomAlert';
-import AuthContext from '../../components/AuthContext';
 import Header from '../../components/Header';
 import tipImage from '../../images/tips.png';
 import Loading from '../../components/Loading';
+import useCheckingUser from '../../components/useCheckingUser';
 
 const Background = styled.div`
   padding: 0 calc(116*100vw/1920);
@@ -426,8 +426,7 @@ const Icon = styled.span`
 `;
 
 function ReadRecipe({ onChangeMyFavorites }) {
-  const userInfo = useContext(AuthContext);
-  const userId = userInfo?.uid || '';
+  const { userInfo, userId, checkingUser } = useCheckingUser();
   const myFavorites = userInfo?.myFavorites || [];
   const initialRecipe = {
     title: '',
@@ -447,22 +446,9 @@ function ReadRecipe({ onChangeMyFavorites }) {
   const location = useLocation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [checkingUser, setCheckingUser] = useState(true);
   const [imgLoaded, setImgLoaded] = useState(false);
   const [stepImgLoaded, setStepImgLoaded] = useState(false);
   const currentRecipeId = location.search.split('=')[1];
-
-  useEffect(() => {
-    if (userInfo === '') {
-      setCheckingUser(true);
-    }
-    if (userInfo === null) {
-      navigate({ pathname: '/' });
-    }
-    if (userId) {
-      setCheckingUser(false);
-    }
-  }, [navigate, userId, userInfo]);
 
   useEffect(() => {
     if (currentRecipeId) {
@@ -511,23 +497,7 @@ function ReadRecipe({ onChangeMyFavorites }) {
     }
   }
 
-  if (checkingUser) {
-    return (
-      <>
-        <Header
-          authorId={authorId}
-          userId={userId}
-          addToFavorites={() => { addToFavorites(); }}
-          removeFromFavorites={() => { removeFromFavorites(); }}
-          myFavorites={myFavorites}
-          currentRecipeId={currentRecipeId}
-        />
-        <Loading />
-      </>
-    );
-  }
-
-  if (loading) {
+  if (checkingUser || loading) {
     return (
       <>
         <Header

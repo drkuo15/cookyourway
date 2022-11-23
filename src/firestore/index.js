@@ -8,7 +8,7 @@ import {
   getStorage, getDownloadURL, uploadBytes, ref,
 } from 'firebase/storage';
 import {
-  getAuth, createUserWithEmailAndPassword,
+  getAuth, onAuthStateChanged, createUserWithEmailAndPassword,
   signInWithEmailAndPassword, setPersistence, browserSessionPersistence,
   signOut,
 } from 'firebase/auth';
@@ -32,6 +32,24 @@ export const auth = getAuth(firebaseApp);
 const recipeRef = collection(db, 'recipes');
 
 export const recipeDoc = doc(collection(db, 'recipes'));
+
+export const changeUserDataOnAuthState = async (setUserInfo) => {
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      const { uid } = user;
+      const userRef = doc(db, 'users', uid);
+      const getUserData = async () => {
+        const docSnap = await getDoc(userRef);
+        return docSnap.data();
+      };
+      getUserData().then((data) => {
+        setUserInfo(data);
+      });
+    } else {
+      setUserInfo(user);
+    }
+  });
+};
 
 export const registerUser = async (email, password, name) => {
   const result = await createUserWithEmailAndPassword(

@@ -2,9 +2,8 @@ import {
   Routes, Route, BrowserRouter as Router,
 } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
 import styled, { createGlobalStyle } from 'styled-components';
+import { changeUserDataOnAuthState } from './firestore';
 import Cooking from './pages/Cooking';
 import ModifyRecipe from './pages/ModifyRecipe';
 import ReadRecipe from './pages/ReadRecipe';
@@ -13,7 +12,6 @@ import AuthHome from './pages/AuthHome';
 import Register from './pages/Register';
 import UnAuthHome from './pages/UnAuthHome';
 import Login from './pages/LogIn';
-import { auth, db } from './firestore/index';
 import AuthContext from './components/AuthContext';
 import NoMatch from './pages/NoMatch';
 import Footer from './components/Footer';
@@ -35,21 +33,7 @@ const BodyDiv = styled.div`
 function App() {
   const [userInfo, setUserInfo] = useState('');
   useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        const { uid } = user;
-        const userRef = doc(db, 'users', uid);
-        const getUserData = async () => {
-          const docSnap = await getDoc(userRef);
-          return docSnap.data();
-        };
-        getUserData().then((data) => {
-          setUserInfo(data);
-        });
-      } else {
-        setUserInfo(user);
-      }
-    });
+    changeUserDataOnAuthState(setUserInfo);
   }, []);
 
   const onChangeMyFavorites = (newMyFavorites) => {

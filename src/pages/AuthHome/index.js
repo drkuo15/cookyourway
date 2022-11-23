@@ -1,14 +1,13 @@
 import {
-  useState, useEffect, useContext, useRef, useReducer,
+  useState, useEffect, useRef, useReducer,
 } from 'react';
 import styled, { keyframes } from 'styled-components/macro';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {
   getAllRecipes, getAverageDifficulty, onUserSnapshot, getRecommendRecipes, getUserRecipes,
 } from '../../firestore';
 import { devices } from '../../utils/StyleUtils';
 import Stars from '../../components/DisplayStars';
-import AuthContext from '../../components/AuthContext';
 import Header from '../../components/Header';
 import Loading from '../../components/Loading';
 import nextIcon from '../../images/next.webp';
@@ -17,6 +16,7 @@ import mandarin from '../../images/fruits/mandarin.webp';
 import pineapple from '../../images/fruits/pineapple.webp';
 import strawberry from '../../images/fruits/strawberry.webp';
 import blueberry from '../../images/fruits/blueberry.webp';
+import useCheckingUser from '../../components/useCheckingUser';
 
 const Background = styled.div`
   padding-bottom: calc(80*100vw/1920);
@@ -295,8 +295,7 @@ const SelectiveContext = styled.div`
 `;
 
 function AuthHome() {
-  const userInfo = useContext(AuthContext);
-  const userId = userInfo?.uid || '';
+  const { userId, checkingUser } = useCheckingUser();
   const initialIndices = {
     userIndex: 0,
     recommendIndex: 0,
@@ -332,75 +331,43 @@ function AuthHome() {
   const [myFavorites, setMyFavorites] = useState([]);
   const [averageDifficulty, setAverageDifficulty] = useState(1);
   const [loading, setLoading] = useState(true);
-
+  const [imgLoaded, setImgLoaded] = useState(false);
+  const [sectionImgLoaded, setSectionImgLoaded] = useState(false);
   const allRef = useRef(null);
   const recommendRef = useRef(null);
   const userRef = useRef(null);
   const favoriteRef = useRef(null);
 
-  const [checkingUser, setCheckingUser] = useState(true);
-  const navigate = useNavigate();
-
-  const [imgLoaded, setImgLoaded] = useState(false);
-  const [sectionImgLoaded, setSectionImgLoaded] = useState(false);
-
   useEffect(() => {
-    if (userInfo === '') {
-      setCheckingUser(true);
-    }
-    if (userInfo === null) {
-      navigate({ pathname: '/' });
+    async function setDataFromFirebase() {
+      const data = await Promise.all([
+        getAllRecipes(), getUserRecipes(userId),
+        getAverageDifficulty(userId), getRecommendRecipes(userId, averageDifficulty),
+      ]);
+      setAllRecipes(data[0]);
+      setUserRecipes(data[1]);
+      setAverageDifficulty(data[2]);
+      setRecommendRecipes(data[3]);
+      const myFavoriteArray = data[0].filter((each) => myFavorites.includes(each.recipeId));
+      setFavoriteRecipes(myFavoriteArray);
     }
     if (userId) {
-      setCheckingUser(false);
+      setDataFromFirebase()
+        .then(() => { setLoading(false); });
     }
-  }, [navigate, userId, userInfo]);
-
-  useEffect(() => {
-    getAllRecipes()
-      .then((data) => {
-        setAllRecipes(data);
-      });
-  }, []);
+  }, [averageDifficulty, myFavorites, userId]);
 
   useEffect(() => {
     if (userId) {
-      getUserRecipes(userId)
-        .then((data) => setUserRecipes(data));
-      getAverageDifficulty(userId)
-        .then((data) => setAverageDifficulty(data));
       const unsubscribe = onUserSnapshot(userId, setMyFavorites);
-      return () => { unsubscribe(); };
+      return unsubscribe;
     }
     return undefined;
   }, [userId]);
 
-  useEffect(() => {
-    getRecommendRecipes(userId, averageDifficulty)
-      .then((data) => {
-        setRecommendRecipes(data);
-        setLoading(false);
-      });
-  }, [averageDifficulty, userId]);
-
-  useEffect(() => {
-    getAllRecipes()
-      .then((data) => data.filter((each) => myFavorites.includes(each.recipeId)))
-      .then((dataArray) => setFavoriteRecipes(dataArray));
-  }, [myFavorites]);
-
   const scrollToRef = (ref) => { ref.current.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'end' }); };
 
-  if (checkingUser) {
-    return (
-      <>
-        <Header />
-        <Loading />
-      </>
-    );
-  }
-
-  if (loading) {
+  if (checkingUser || loading) {
     return (
       <>
         <Header />

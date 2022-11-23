@@ -7,6 +7,7 @@ import { devices } from '../../utils/StyleUtils';
 import Stars from '../../components/DisplayStars';
 import Header from '../../components/Header';
 import Loading from '../../components/Loading';
+import useCheckingUser from '../../components/useCheckingUser';
 
 const SearchInput = styled.input`
   width: calc(1282*100vw/1920);
@@ -254,11 +255,12 @@ function SearchRecipe() {
   const location = useLocation();
   const [searchName, setSearchName] = useState(decodeURI(location.search.split('=')[1]));
   const [searchResult, setSearchResult] = useState([]);
+  const { userId, checkingUser } = useCheckingUser();
   const [loading, setLoading] = useState(true);
   const [imgLoaded, setImgLoaded] = useState(false);
 
   useEffect(() => {
-    if (searchName) {
+    if (searchName && userId) {
       getSearchArray(searchName)
         .then((queryDataArray) => {
           setSearchResult(queryDataArray);
@@ -268,9 +270,9 @@ function SearchRecipe() {
       setSearchResult([]);
       setLoading(false);
     }
-  }, [searchName]);
+  }, [searchName, userId]);
 
-  if (loading) {
+  if (checkingUser || loading) {
     return (
       <>
         <Header />
