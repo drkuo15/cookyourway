@@ -49,10 +49,6 @@ function Counter({
 }) {
   const timerRef = useRef();
 
-  const toggleCounting = () => {
-    setIsCounting((prev) => !prev);
-  };
-
   useEffect(() => {
     if (!isCounting) {
       return undefined;
@@ -72,6 +68,10 @@ function Counter({
 
     return clearTimer;
   }, [isCounting, time, onTimeUp, setTime]);
+
+  const toggleCounting = () => {
+    setIsCounting((prev) => !prev);
+  };
 
   const resetTime = () => {
     setTime(initialTime);

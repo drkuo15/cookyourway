@@ -1,13 +1,12 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import styled from 'styled-components/macro';
-import { signOut } from 'firebase/auth';
 import { useContext, useEffect, useState } from 'react';
 import {
   Search, FavoriteBorder, Favorite, ContentCopy, Edit,
 } from '@styled-icons/material-rounded';
 import PropTypes from 'prop-types';
+import { signOutUser } from '../firestore';
 import logoImage from '../images/CookYourWay_logo_v1.png';
-import { auth } from '../firestore/index';
 import { devices } from '../utils/StyleUtils';
 import AuthContext from './AuthContext';
 import chefImage from '../images/chef.png';
@@ -342,10 +341,8 @@ const Button = styled(Link)`
 function SignOut() {
   const navigate = useNavigate();
   function handleSignOut() {
-    signOut(auth).then(() => {
-      navigate('/login', { replace: true });
-      // Sign-out successful.
-    });
+    signOutUser();
+    navigate('/login', { replace: true });
   }
 
   return (
