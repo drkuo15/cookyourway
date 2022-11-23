@@ -219,6 +219,7 @@ function Login() {
               placeholder="電子郵件"
               value={email}
               onChange={handleChange}
+              autoFocus
             />
             <ManualInput
               type="password"

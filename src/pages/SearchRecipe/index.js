@@ -294,6 +294,7 @@ function SearchRecipe() {
             }
           }}
           onChange={(e) => { setSearchName(e.target.value); }}
+          autoFocus
         />
         <SearchImg>
           <Search onClick={() => {

@@ -981,6 +981,7 @@ function ModifyRecipe() {
                 setRecipeData({ title: e.target.value, titleKeywords: e.target.value.split('') });
               }}
               placeholder="請輸入食譜名稱..."
+              autoFocus
             />
             {authorId && userId !== authorId && title === oldTitle ? <ErrorMsg>請為您的食譜取個新名稱</ErrorMsg> : ''}
           </TittleInputWrapper>

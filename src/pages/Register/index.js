@@ -225,6 +225,7 @@ function Register() {
               placeholder="使用者名稱"
               value={name}
               onChange={handleChange}
+              autoFocus
             />
             <ManualInput
               type="text"
