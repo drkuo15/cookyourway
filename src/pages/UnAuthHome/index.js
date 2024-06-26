@@ -136,7 +136,7 @@ const RegisterBox = styled.div`
   }
 `;
 
-const ManualRegister = styled.div`
+const ManualRegister = styled.form`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -289,6 +289,7 @@ function UnAuthHome() {
                 placeholder="使用者名稱"
                 value={name}
                 onChange={handleChange}
+                autoComplete="name"
               />
               <ManualInput
                 type="text"
@@ -296,6 +297,7 @@ function UnAuthHome() {
                 placeholder="電子郵件"
                 value={email}
                 onChange={handleChange}
+                autoComplete="email"
               />
               <ManualInput
                 type="password"
@@ -303,6 +305,7 @@ function UnAuthHome() {
                 placeholder="密碼"
                 value={password}
                 onChange={handleChange}
+                autoComplete="new-password"
               />
               <RegisterButton onClick={handleSubmit}>
                 {loading ? '帳號註冊中...' : '註冊'}

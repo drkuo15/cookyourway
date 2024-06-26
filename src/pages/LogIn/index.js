@@ -35,7 +35,7 @@ const LoginBox = styled.div`
   }
 `;
 
-const ManualSignIn = styled.div`
+const ManualSignIn = styled.form`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -169,8 +169,8 @@ const TestMsg = styled.p`
 
 function Login() {
   const [data, setData] = useState({
-    email: 'test@test.test',
-    password: 123456,
+    email: '',
+    password: '',
     error: null,
     loading: false,
   });
@@ -217,6 +217,7 @@ function Login() {
               placeholder="電子郵件"
               value={email}
               onChange={handleChange}
+              autoComplete="email"
             />
             <ManualInput
               type="password"
@@ -224,6 +225,7 @@ function Login() {
               placeholder="密碼"
               value={password}
               onChange={handleChange}
+              autoComplete="current-password"
             />
             <LoginButton onClick={handleSubmit}>
               {loading ? '登入中...' : '登入'}
