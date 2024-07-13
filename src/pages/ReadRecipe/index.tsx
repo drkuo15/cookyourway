@@ -1,12 +1,15 @@
-import { useState, useEffect, useContext } from 'react';
+import React, {
+  useState, useEffect, useContext, useCallback, Dispatch, SetStateAction,
+} from 'react';
 import styled, { keyframes } from 'styled-components/macro';
 import { doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import PropTypes from 'prop-types';
+// import PropTypes from 'prop-types';
 import { motion, useAnimation } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { IosShare } from '@styled-icons/material-rounded';
-import { db } from '../../firestore';
+import { onAuthStateChanged } from 'firebase/auth';
+import { db, auth } from '../../firestore';
 import { devices } from '../../utils/StyleUtils';
 import Stars from '../../components/DisplayStars';
 import defaultImage from '../../images/upload.png';
@@ -15,6 +18,10 @@ import AuthContext from '../../components/AuthContext';
 import Header from '../../components/Header';
 import tipImage from '../../images/tips.png';
 import Loading from '../../components/Loading';
+import { User } from '../../types/User';
+import { Ingredient } from '../../types/Ingredient';
+import { Recipe } from '../../types/Recipe';
+import { Step } from '../../types/Step';
 
 const Background = styled.div`
   padding: 0 calc(116*100vw/1920);
@@ -426,14 +433,18 @@ const Icon = styled.span`
   }
 `;
 
-function ReadRecipe({ setUserInfo }) {
+interface ReadRecipeProps {
+  setUserInfo: Dispatch<SetStateAction<User>>
+}
+
+function ReadRecipe({ setUserInfo }: ReadRecipeProps) {
   const userInfo = useContext(AuthContext);
   const userId = userInfo?.uid || '';
   const myFavorites = userInfo?.myFavorites || [];
   const [title, setTitle] = useState('');
   const [difficulty, setDifficulty] = useState(1);
-  const [ingredients, setIngredients] = useState([]);
-  const [steps, setSteps] = useState([]);
+  const [ingredients, setIngredients] = useState<Ingredient[]>([]);
+  const [steps, setSteps] = useState<Step[]>([]);
   const [comment, setComment] = useState('');
   const [imgUrl, setImgUrl] = useState('');
   const [authorName, setAuthorName] = useState('');
@@ -446,21 +457,19 @@ function ReadRecipe({ setUserInfo }) {
   const [imgLoaded, setImgLoaded] = useState(false);
   const [stepImgLoaded, setStepImgLoaded] = useState(false);
 
-  const setMyFavorites = (newMyFavorites) => {
-    setUserInfo({ ...userInfo, myFavorites: newMyFavorites });
+  const setMyFavorites = (newMyFavorites: User['myFavorites']) => {
+    setUserInfo({ ...userInfo!, myFavorites: newMyFavorites });
   };
 
   useEffect(() => {
-    if (userInfo === '') {
-      setCheckingUser(true);
-    }
-    if (userInfo === null) {
-      navigate({ pathname: '/' });
-    }
-    if (userId) {
-      setCheckingUser(false);
-    }
-  }, [navigate, userId, userInfo]);
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setCheckingUser(false);
+      } else {
+        navigate({ pathname: '/login' });
+      }
+    });
+  }, [navigate]);
 
   const currentRecipeId = location.search.split('=')[1];
   useEffect(() => {
@@ -468,7 +477,7 @@ function ReadRecipe({ setUserInfo }) {
       const unsubscribe = onSnapshot(
         doc(db, 'recipes', currentRecipeId),
         (document) => {
-          const recipeData = document.data();
+          const recipeData = document.data() as Recipe;
           if (!recipeData) {
             navigate({ pathname: '/home' });
             return;
@@ -491,9 +500,8 @@ function ReadRecipe({ setUserInfo }) {
     return undefined;
   }, [currentRecipeId, navigate]);
 
-  const copyText = ingredients.reduce((acc, i) => `${acc}${i.ingredientsTitle}:${i.ingredientsQuantity}公克,`, '');
-
-  function exportIngredients() {
+  const exportIngredients = useCallback(() => {
+    const copyText = ingredients.reduce((acc, i) => `${acc}${i.ingredientsTitle}:${i.ingredientsQuantity}公克,`, '');
     if (navigator.share) {
       navigator.clipboard.writeText(`【 ${title} 】食材內容: \n ${copyText}`);
       navigator.clipboard.readText().then(() => showCustomAlert(`【 ${title} 】採買清單 \n\n已為您複製囉！ \n\n請自行選擇記錄方式`));
@@ -505,7 +513,7 @@ function ReadRecipe({ setUserInfo }) {
       navigator.clipboard.writeText(`【 ${title} 】食材內容: \n ${copyText}`);
       navigator.clipboard.readText().then(() => showCustomAlert(`【 ${title} 】採買清單 \n\n已為您複製囉！ \n\n請自行選擇記錄方式`));
     }
-  }
+  }, [ingredients, title]);
 
   function addToFavorites() {
     const UserRef = doc(db, 'users', userId);
@@ -614,7 +622,7 @@ function ReadRecipe({ setUserInfo }) {
           <IngredientContentDiv>
             <IngredientTitleDiv>
               <LargeDiv>食材</LargeDiv>
-              <Icon onClick={() => exportIngredients()}>
+              <Icon onClick={exportIngredients}>
                 <IosShare />
                 <ToolTipText>匯出食材！方便記錄採買清單</ToolTipText>
               </Icon>
@@ -693,15 +701,15 @@ function ReadRecipe({ setUserInfo }) {
   );
 }
 
-ReadRecipe.propTypes = {
-  setUserInfo: PropTypes.func.isRequired,
-};
+// ReadRecipe.propTypes = {
+//   setUserInfo: PropTypes.func.isRequired,
+// };
 
-Stars.propTypes = {
-  stars: PropTypes.number.isRequired,
-  size: PropTypes.number.isRequired,
-  spacing: PropTypes.number.isRequired,
-  fill: PropTypes.string.isRequired,
-};
+// Stars.propTypes = {
+//   stars: PropTypes.number.isRequired,
+//   size: PropTypes.number.isRequired,
+//   spacing: PropTypes.number.isRequired,
+//   fill: PropTypes.string.isRequired,
+// };
 
 export default ReadRecipe;

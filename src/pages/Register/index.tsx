@@ -1,13 +1,13 @@
-import { useState } from 'react';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import {
-  signInWithEmailAndPassword, setPersistence, browserSessionPersistence,
-} from 'firebase/auth';
-import styled from 'styled-components/macro';
-import { auth } from '../../firestore/index';
+import styled from 'styled-components';
+import { doc, setDoc } from 'firebase/firestore';
+import { auth, db } from '../../firestore';
 import CenterTopHeader from '../../components/CenterTopHeader';
-import FoodBackground from '../../components/FoodBackgroud';
-import helpImage from '../../images/help_center_FILL0_wght400_GRAD0_opsz48.svg';
+import FoodBackground from '../../components/FoodBackground';
+import helpImage from '../../images/help.svg';
+import { ToastContainer, showCustomAlert } from '../../components/CustomAlert';
 import { devices } from '../../utils/StyleUtils';
 
 const Wrapper = styled.div`
@@ -20,7 +20,7 @@ const Wrapper = styled.div`
   }
 `;
 
-const LoginBox = styled.div`
+const RegisterBox = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -35,12 +35,12 @@ const LoginBox = styled.div`
   }
 `;
 
-const ManualSignIn = styled.form`
+const ManualRegister = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-around;
-  height: calc(320*100vw/1920);
+  height: calc(400*100vw/1920);
   @media ${devices.Tablet} and (orientation:portrait) {
     height: calc(800*100vw/1920);
   }
@@ -67,7 +67,7 @@ const ManualInput = styled.input`
   }
 `;
 
-const LoginButton = styled.div`
+const RegisterButton = styled.button`
   text-align: center;
   vertical-align: middle;
   font-size: calc(28*100vw/1920);
@@ -77,6 +77,7 @@ const LoginButton = styled.div`
   height: calc(72*100vw/1920);
   line-height: calc(72*100vw/1920);
   border-radius: calc(15*100vw/1920);
+  border-width: 0;
   cursor: pointer;
   z-index: 10;
   &:hover{
@@ -129,7 +130,7 @@ const HelpImg = styled.img`
   }
 `;
 
-const RegisterButton = styled.div`
+const LoginButton = styled.button`
   text-align: center;
   vertical-align: middle;
   font-size: calc(28*100vw/1920);
@@ -139,6 +140,7 @@ const RegisterButton = styled.div`
   height: calc(72*100vw/1920);
   line-height: calc(72*100vw/1920);
   border-radius: calc(15*100vw/1920);
+  border-width: 0;
   cursor: pointer;
   z-index: 10;
   &:hover {background-color: #4c3732;}
@@ -158,66 +160,79 @@ const ErrorMsg = styled.p`
   }
 `;
 
-const TestMsg = styled.p`
-  font-size: calc(24*100vw/1920);
-  width: 100%;
-  text-align: center;
-  @media ${devices.Tablet} and (orientation:portrait) {
-    font-size: calc(60*100vw/1920);
-  }
-`;
-
-function Login() {
+function Register() {
+  const navigate = useNavigate();
   const [data, setData] = useState({
+    name: '',
     email: '',
     password: '',
-    error: null,
+    error: '',
     loading: false,
   });
-  const navigate = useNavigate();
-
   const {
-    email, password, error, loading,
+    name, email, password, error, loading,
   } = data;
-  const handleChange = (e) => {
-    setData({ ...data, [e.target.name]: e.target.value });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setData({ ...data, [e.currentTarget.name]: e.currentTarget.value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    setData({ ...data, error: null, loading: true });
-    if (!email || !password) {
+    setData({ ...data, error: '', loading: true });
+    if (!name || !email || !password) {
       setData({ ...data, error: '所有欄位都需要填寫呦！' });
-      return;
     }
-    setPersistence(auth, browserSessionPersistence)
-      .then(() => signInWithEmailAndPassword(auth, email, password))
-      .then(() => {
-        setTimeout(() => {
-          setData({
-            email: '',
-            password: '',
-            error: null,
-            loading: false,
-          });
-          navigate('/home', { replace: true });
-        }, 800);
-      })
-      .catch((err) => { setData({ ...data, error: err.message, loading: false }); });
+    try {
+      const result = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password,
+      );
+      await setDoc(doc(db, 'users', result.user.uid), {
+        uid: result.user.uid,
+        name,
+        email,
+        myFavorites: [],
+      });
+      setData({
+        name: '',
+        email: '',
+        password: '',
+        error: '',
+        loading: false,
+      });
+      showCustomAlert('您已註冊成功，即將轉跳首頁');
+      setTimeout(() => { navigate('/home', { replace: true }); }, 4000);
+    } catch (err) {
+      setData({ ...data, error: err.message, loading: false });
+    }
   };
   return (
-    <>
+    <section>
       <CenterTopHeader />
       <Wrapper>
-        <LoginBox>
-          <ManualSignIn>
+        <Question to="/login">
+          已經有註冊過了？
+          <HelpImg src={helpImage} alt="helpImage" />
+          <LoginButton>登入</LoginButton>
+        </Question>
+        <VerticalLine />
+        <RegisterBox>
+          <ManualRegister>
+            <ManualInput
+              type="text"
+              name="name"
+              placeholder="使用者名稱"
+              value={name}
+              onChange={handleChange}
+            />
             <ManualInput
               type="text"
               name="email"
               placeholder="電子郵件"
               value={email}
               onChange={handleChange}
-              autoComplete="email"
             />
             <ManualInput
               type="password"
@@ -225,30 +240,17 @@ function Login() {
               placeholder="密碼"
               value={password}
               onChange={handleChange}
-              autoComplete="current-password"
             />
-            <LoginButton onClick={handleSubmit}>
-              {loading ? '登入中...' : '登入'}
-            </LoginButton>
-            {error ? <ErrorMsg>{error}</ErrorMsg> : (
-              <TestMsg>
-                測試帳號: test@test.test
-                &nbsp;
-                測試密碼: 123456
-              </TestMsg>
-            )}
-          </ManualSignIn>
-        </LoginBox>
-        <VerticalLine />
-        <Question to="/register">
-          還沒註冊過嗎？
-          <HelpImg src={helpImage} alt="helpImage" />
-          <RegisterButton>註冊</RegisterButton>
-        </Question>
+            <RegisterButton onClick={handleSubmit}>
+              {loading ? '帳號註冊中...' : '註冊'}
+            </RegisterButton>
+            {error && <ErrorMsg>{error}</ErrorMsg>}
+          </ManualRegister>
+        </RegisterBox>
       </Wrapper>
       <FoodBackground />
-    </>
+      <ToastContainer />
+    </section>
   );
 }
-
-export default Login;
+export default Register;

@@ -1,6 +1,6 @@
 import styled, { keyframes } from 'styled-components';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { doc, setDoc } from 'firebase/firestore';
 import mainImage from '../../images/healthy.jpg';
@@ -169,7 +169,7 @@ const ManualInput = styled.input`
   }
 `;
 
-const RegisterButton = styled.div`
+const RegisterButton = styled.button`
   text-align: center;
   vertical-align: middle;
   font-size: calc(28*100vw/1920);
@@ -179,6 +179,7 @@ const RegisterButton = styled.div`
   height: calc(72*100vw/1920);
   line-height: calc(72*100vw/1920);
   border-radius: calc(15*100vw/1920);
+  border-width: 0;
   cursor: pointer;
   z-index: 10;
   &:hover{
@@ -207,20 +208,20 @@ function UnAuthHome() {
     name: '',
     email: '',
     password: '',
-    error: null,
+    error: '',
     loading: false,
   });
   const {
     name, email, password, error, loading,
   } = data;
 
-  const handleChange = (e) => {
-    setData({ ...data, [e.target.name]: e.target.value });
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setData({ ...data, [e.currentTarget.name]: e.currentTarget.value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    setData({ ...data, error: null, loading: true });
+    setData({ ...data, error: '', loading: true });
     if (!name || !email || !password) {
       setData({ ...data, error: '所有欄位都需要填寫呦！' });
     }
@@ -240,7 +241,7 @@ function UnAuthHome() {
         name: '',
         email: '',
         password: '',
-        error: null,
+        error: '',
         loading: false,
       });
       showCustomAlert('您已註冊成功，即將轉跳首頁');

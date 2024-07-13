@@ -1,5 +1,7 @@
-import React, { useRef, useEffect } from 'react';
-import PropTypes from 'prop-types';
+import React, {
+  useRef, useEffect, Dispatch, SetStateAction,
+} from 'react';
+// import PropTypes from 'prop-types';
 import styled from 'styled-components/macro';
 import { PlayCircle, PauseCircle, ReplayCircleFilled } from '@styled-icons/material-rounded';
 import MusicDisc from '../../components/MusicDisc';
@@ -44,10 +46,20 @@ const Icon = styled.span`
     color:#EB811F;
   }
 `;
+
+interface CounterProps {
+  setIsCounting: Dispatch<SetStateAction<boolean>>
+  isCounting: boolean;
+  time: number;
+  setTime: Dispatch<SetStateAction<number>>;
+  initialTime: number;
+  onTimeUp: () => void;
+}
+
 function Counter({
   setIsCounting, isCounting, time, setTime, initialTime, onTimeUp,
-}) {
-  const timerRef = useRef();
+}: CounterProps) {
+  const timerRef = useRef<number | null>(null);
 
   const toggleCounting = () => {
     setIsCounting((prev) => !prev);
@@ -62,12 +74,14 @@ function Counter({
       onTimeUp();
     }
 
-    timerRef.current = setInterval(() => {
+    timerRef.current = window.setInterval(() => {
       setTime((prev) => prev - 1);
     }, 1000);
 
     const clearTimer = () => {
-      clearInterval(timerRef.current);
+      if (timerRef.current !== null) {
+        clearInterval(timerRef.current);
+      }
     };
 
     return clearTimer;
@@ -92,13 +106,13 @@ function Counter({
   );
 }
 
-Counter.propTypes = {
-  setIsCounting: PropTypes.func.isRequired,
-  isCounting: PropTypes.bool.isRequired,
-  time: PropTypes.number.isRequired,
-  setTime: PropTypes.func.isRequired,
-  initialTime: PropTypes.number.isRequired,
-  onTimeUp: PropTypes.func.isRequired,
-};
+// Counter.propTypes = {
+//   setIsCounting: PropTypes.func.isRequired,
+//   isCounting: PropTypes.bool.isRequired,
+//   time: PropTypes.number.isRequired,
+//   setTime: PropTypes.func.isRequired,
+//   initialTime: PropTypes.number.isRequired,
+//   onTimeUp: PropTypes.func.isRequired,
+// };
 
 export default Counter;

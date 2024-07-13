@@ -2,7 +2,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   collection, query, where, getDocs,
 } from 'firebase/firestore';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components/macro';
 import { Search } from '@styled-icons/material-rounded';
 import { db } from '../../firestore';
@@ -10,6 +10,7 @@ import { devices } from '../../utils/StyleUtils';
 import Stars from '../../components/DisplayStars';
 import Header from '../../components/Header';
 import Loading from '../../components/Loading';
+import { Recipe } from '../../types/Recipe';
 
 const SearchInput = styled.input`
   width: calc(1282*100vw/1920);
@@ -256,7 +257,7 @@ function SearchRecipe() {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchName, setSearchName] = useState(decodeURI(location.search.split('=')[1]));
-  const [searchResult, setSearchResult] = useState([]);
+  const [searchResult, setSearchResult] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
   const [imgLoaded, setImgLoaded] = useState(false);
 
@@ -265,13 +266,14 @@ function SearchRecipe() {
       const searchNameArray = searchName.split('');
       const recipeRef = collection(db, 'recipes');
       const q = query(recipeRef, where('titleKeywords', 'array-contains', searchNameArray[0]));
-      let queryDataArray = [];
+      let queryDataArray: Recipe[] = [];
       getDocs(q).then((querySnapshot) => {
         if (!querySnapshot.empty) {
           querySnapshot.forEach(
             (doc) => {
-              if (doc.data().title.includes(searchName)) {
-                queryDataArray = [...queryDataArray, doc.data()];
+              const data = doc.data() as Recipe;
+              if (data.title.includes(searchName)) {
+                queryDataArray = [...queryDataArray, data];
               }
             },
           );
@@ -301,9 +303,9 @@ function SearchRecipe() {
         <SearchInput
           type="search"
           placeholder="請輸入料理名稱"
-          onKeyPress={(e) => {
+          onKeyDown={(e) => {
             if (e.key === 'Enter') {
-              navigate({ pathname: '/search_recipe', search: `?q=${e.target.value}` });
+              navigate({ pathname: '/search_recipe', search: `?q=${e.currentTarget.value}` });
             }
           }}
           onChange={(e) => { setSearchName(e.target.value); }}

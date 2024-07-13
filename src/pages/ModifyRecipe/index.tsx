@@ -1,9 +1,10 @@
-import {
+import React, {
   useEffect, useState, useContext, useRef,
 } from 'react';
 import {
   collection, doc, setDoc, onSnapshot, updateDoc,
 } from 'firebase/firestore';
+import { onAuthStateChanged } from 'firebase/auth';
 import {
   getDownloadURL, uploadBytes, ref,
 } from 'firebase/storage';
@@ -12,8 +13,8 @@ import { v4 } from 'uuid';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, useAnimation } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import PropTypes from 'prop-types';
-import { db, storage } from '../../firestore';
+// import PropTypes from 'prop-types';
+import { db, storage, auth } from '../../firestore';
 import { devices } from '../../utils/StyleUtils';
 import defaultImage from '../../images/upload.png';
 import StarRating from '../../components/Stars';
@@ -23,6 +24,9 @@ import Header from '../../components/Header';
 import binImage from '../../images/bin.png';
 import tipImage from '../../images/tips.png';
 import Loading from '../../components/Loading';
+import { Ingredient } from '../../types/Ingredient';
+import { Recipe } from '../../types/Recipe';
+import { Step } from '../../types/Step';
 
 const Background = styled.div`
   padding: 0 calc(116*100vw/1920);
@@ -362,7 +366,7 @@ const AddStepDiv = styled.div`
   }
 `;
 
-const AddStepButton = styled.div`
+const AddStepButton = styled.button`
   cursor: pointer;
   white-space: normal;
   word-wrap: break-word;
@@ -655,37 +659,38 @@ function MotionLine() {
   );
 }
 
-function AlwaysScrollToBottom({ ingredients }) {
-  const elementRef = useRef();
-  useEffect(() => elementRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'end' }), [ingredients]);
+function AlwaysScrollToBottom({ ingredients }: { ingredients: Ingredient[] }) {
+  const elementRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => elementRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'end' }), [ingredients]);
   return <div ref={elementRef} />;
 }
 
 function ModifyRecipe() {
   const [title, setTitle] = useState('');
   const [oldTitle, setOldTitle] = useState('');
-  const [titleKeywords, setTitleKeyWords] = useState([]);
+  const [titleKeywords, setTitleKeyWords] = useState<string[]>([]);
   const [difficulty, setDifficulty] = useState(0);
-  const [ingredients, setIngredients] = useState([{
-    ingredientsQuantity: '',
+  const [ingredients, setIngredients] = useState<Ingredient[]>([{
+    ingredientsQuantity: 0,
     ingredientsTitle: '',
     id: v4(),
   },
   ]);
-  const [steps, setSteps] = useState(
+  const [steps, setSteps] = useState<Step[]>(
     [{
       stepTitle: '',
       stepContent: '',
-      stepMinute: '',
-      stepSecond: '',
-      stepTime: '',
+      stepMinute: 0,
+      stepSecond: 0,
+      stepTime: 0,
       stepImgUrl: '',
+      stepImgPath: '',
       id: v4(),
     },
     ],
   );
   const [comment, setComment] = useState('');
-  const [img, setImg] = useState('');
+  const [img, setImg] = useState<File>();
   const [imgPath, setImgPath] = useState('');
   const [imgUrl, setImgUrl] = useState('');
   const [authorId, setAuthorId] = useState('');
@@ -699,16 +704,14 @@ function ModifyRecipe() {
   const [checkingUser, setCheckingUser] = useState(true);
 
   useEffect(() => {
-    if (userInfo === '') {
-      setCheckingUser(true);
-    }
-    if (userInfo === null) {
-      navigate({ pathname: '/' });
-    }
-    if (userId) {
-      setCheckingUser(false);
-    }
-  }, [navigate, userId, userInfo]);
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setCheckingUser(false);
+      } else {
+        navigate({ pathname: '/login' });
+      }
+    });
+  }, [navigate]);
 
   useEffect(() => {
     const queryString = location.search;
@@ -717,7 +720,7 @@ function ModifyRecipe() {
       const unsubscribe = onSnapshot(
         doc(db, 'recipes', currentRecipeId),
         (document) => {
-          const recipeData = document.data();
+          const recipeData = document.data() as Recipe;
           setTitle(recipeData.title);
           setOldTitle(recipeData.title);
           setTitleKeyWords(recipeData.titleKeywords);
@@ -757,26 +760,26 @@ function ModifyRecipe() {
 
   function addIngredients() {
     const newIngredients = [...ingredients, {
-      ingredientsQuantity: '',
+      ingredientsQuantity: 0,
       ingredientsTitle: '',
       id: v4(),
     }];
     setIngredients(newIngredients);
   }
 
-  function deleteIngredients(i) {
+  function deleteIngredients(i: number) {
     const newIngredients = ingredients.filter((_, index) => i !== index);
     setIngredients(newIngredients);
   }
-  function updateQuantityValue(e, targetIndex) {
+  function updateQuantityValue(e: React.ChangeEvent<HTMLInputElement>, targetIndex: number) {
     const newIngredients = [...ingredients];
     if (Number(e.target.value) < 0) {
-      e.target.value = 0;
+      e.target.valueAsNumber = 0;
     }
-    newIngredients[targetIndex].ingredientsQuantity = e.target.value;
+    newIngredients[targetIndex].ingredientsQuantity = e.target.valueAsNumber;
     setIngredients(newIngredients);
   }
-  function updateTitleValue(e, index) {
+  function updateTitleValue(e: React.ChangeEvent<HTMLInputElement>, index: number) {
     const newIngredients = [...ingredients];
     newIngredients[index].ingredientsTitle = e.target.value;
     setIngredients(newIngredients);
@@ -786,70 +789,89 @@ function ModifyRecipe() {
     setSteps((prevSteps) => [...prevSteps, {
       stepTitle: '',
       stepContent: '',
-      stepMinute: '',
-      stepSecond: '',
-      stepTime: '',
+      stepMinute: 0,
+      stepSecond: 0,
+      stepTime: 0,
       stepImgUrl: '',
       stepImgPath: '',
       id: v4(),
     }]);
   }
 
-  function updateStepTitleValue(e, index) {
+  function updateStepTitleValue(e: React.ChangeEvent<HTMLInputElement>, index: number) {
     const newSteps = [...steps];
     newSteps[index].stepTitle = e.target.value;
     setSteps(newSteps);
   }
 
-  function updateStepMinuteValue(e, index) {
+  function updateStepMinuteValue(e: React.ChangeEvent<HTMLInputElement>, index: number) {
     const newSteps = [...steps];
-    newSteps[index].stepMinute = e.target.value;
-    if (Number(newSteps[index].stepMinute) < 0) {
+    newSteps[index].stepMinute = e.target.valueAsNumber;
+    if (newSteps[index].stepMinute < 0) {
       newSteps[index].stepMinute = 0;
     }
-    if (Number(newSteps[index].stepMinute) % 1 !== 0) {
-      newSteps[index].stepMinute = Math.floor(e.target.value);
+    if (newSteps[index].stepMinute % 1 !== 0) {
+      newSteps[index].stepMinute = Math.floor(e.target.valueAsNumber);
     }
-    newSteps[index].stepTime = Number(newSteps[index].stepMinute) * 60
-      + Number(newSteps[index].stepSecond);
+    newSteps[index].stepTime = newSteps[index].stepMinute * 60
+      + newSteps[index].stepSecond;
+    // if (Number(newSteps[index].stepMinute) < 0) {
+    //   newSteps[index].stepMinute = 0;
+    // }
+    // if (Number(newSteps[index].stepMinute) % 1 !== 0) {
+    //   newSteps[index].stepMinute = Math.floor(e.target.value);
+    // }
+    // newSteps[index].stepTime = Number(newSteps[index].stepMinute) * 60
+    //   + Number(newSteps[index].stepSecond);
     setSteps(newSteps);
   }
 
-  function updateStepSecondValue(e, index) {
+  function updateStepSecondValue(e: React.ChangeEvent<HTMLInputElement>, index: number) {
     const newSteps = [...steps];
-    newSteps[index].stepSecond = e.target.value;
-    if (Number(newSteps[index].stepSecond) > 59) {
+    newSteps[index].stepSecond = e.target.valueAsNumber;
+    if (newSteps[index].stepSecond > 59) {
       newSteps[index].stepSecond = 59;
     }
-    if (Number(newSteps[index].stepSecond) < 0) {
+    if (newSteps[index].stepSecond < 0) {
       newSteps[index].stepSecond = 0;
     }
-    if (Number(newSteps[index].stepMinute) % 1 !== 0) {
-      newSteps[index].stepMinute = Math.floor(e.target.value);
+    if (newSteps[index].stepMinute % 1 !== 0) {
+      newSteps[index].stepMinute = Math.floor(e.target.valueAsNumber);
     }
     newSteps[index].stepTime = Number(newSteps[index].stepMinute) * 60
       + Number(newSteps[index].stepSecond);
+    // if (Number(newSteps[index].stepSecond) > 59) {
+    //   newSteps[index].stepSecond = 59;
+    // }
+    // if (Number(newSteps[index].stepSecond) < 0) {
+    //   newSteps[index].stepSecond = 0;
+    // }
+    // if (Number(newSteps[index].stepMinute) % 1 !== 0) {
+    //   newSteps[index].stepMinute = Math.floor(e.target.value);
+    // }
+    // newSteps[index].stepTime = Number(newSteps[index].stepMinute) * 60
+    //   + Number(newSteps[index].stepSecond);
     setSteps(newSteps);
   }
 
-  function updateStepContentValue(e, index) {
+  function updateStepContentValue(e: React.ChangeEvent<HTMLTextAreaElement>, index: number) {
     const newSteps = [...steps];
     newSteps[index].stepContent = e.target.value;
     setSteps(newSteps);
   }
 
-  function DeleteSteps(i) {
+  function DeleteSteps(i: number) {
     const newSteps = steps.filter((_, index) => i !== index);
     setSteps(newSteps);
   }
 
-  function UpdateImageValue(e, index) {
+  function UpdateImageValue(e: React.ChangeEvent<HTMLInputElement>, index: number) {
     const uploadImg = async () => {
       const imgRef = ref(
         storage,
-        `recipeStep/${new Date().getTime()} - ${e.target.files[0].name}`,
+        `recipeStep/${new Date().getTime()} - ${e.target.files![0].name}`,
       );
-      const snap = await uploadBytes(imgRef, e.target.files[0]);
+      const snap = await uploadBytes(imgRef, e.target.files![0]);
       const url = await getDownloadURL(ref(storage, snap.ref.fullPath));
       const newSteps = [...steps];
       newSteps[index].stepImgUrl = url;
@@ -859,31 +881,31 @@ function ModifyRecipe() {
     uploadImg();
   }
 
-  function parseIngredientsQuantity() {
-    const parsedIngredients = [...ingredients];
-    parsedIngredients.forEach((ingredientObj) => {
-      const ingredientObjTemp = ingredientObj;
-      ingredientObjTemp.ingredientsQuantity = Number(ingredientObj.ingredientsQuantity);
-      return ingredientObjTemp;
-    });
-    return parsedIngredients;
-  }
+  // function parseIngredientsQuantity() {
+  //   const parsedIngredients = [...ingredients];
+  //   parsedIngredients.forEach((ingredientObj) => {
+  //     const ingredientObjTemp = ingredientObj;
+  //     ingredientObjTemp.ingredientsQuantity = Number(ingredientObj.ingredientsQuantity);
+  //     return ingredientObjTemp;
+  //   });
+  //   return parsedIngredients;
+  // }
 
-  function parseStepsTime() {
-    const parsedSteps = [...steps];
-    parsedSteps.forEach((stepObject) => {
-      const stepObjTemp = stepObject;
-      stepObjTemp.stepMinute = Number(stepObjTemp.stepMinute);
-      stepObjTemp.stepSecond = Number(stepObjTemp.stepSecond);
-      stepObjTemp.stepTime = Number(stepObjTemp.stepTime);
-    });
-    return parsedSteps;
-  }
+  // function parseStepsTime() {
+  //   const parsedSteps = [...steps];
+  //   parsedSteps.forEach((stepObject) => {
+  //     const stepObjTemp = stepObject;
+  //     stepObjTemp.stepMinute = Number(stepObjTemp.stepMinute);
+  //     stepObjTemp.stepSecond = Number(stepObjTemp.stepSecond);
+  //     stepObjTemp.stepTime = Number(stepObjTemp.stepTime);
+  //   });
+  //   return parsedSteps;
+  // }
 
-  function checkInputValue(newRecipeData) {
-    const hasEmptyIngValue = (obj) => Object.values(obj).some((value) => value === '' || value === 0);
+  function checkInputValue(newRecipeData: Recipe) {
+    const hasEmptyIngValue = (obj: Ingredient) => Object.values(obj).some((value) => value === '' || value === 0);
     const hasEmptyIngredientInput = ingredients.some((ingredient) => hasEmptyIngValue(ingredient));
-    const hasEmptyStepValue = (obj) => Object.values(obj).some((value) => value === '');
+    const hasEmptyStepValue = (obj: Step) => Object.values(obj).some((value) => value === '');
     const hasEmptyStepInput = steps.some((step) => hasEmptyStepValue(step) || step.stepTime === 0);
     const hasEmptyOtherInput = Object.values(newRecipeData).some((value) => !value);
 
@@ -941,8 +963,8 @@ function ModifyRecipe() {
 
   async function setNewRecipeAndNavigate() {
     const docId = doc(collection(db, 'recipes')).id;
-    const parsedIngredients = parseIngredientsQuantity();
-    const parsedSteps = parseStepsTime();
+    // const parsedIngredients = parseIngredientsQuantity();
+    // const parsedSteps = parseStepsTime();
     const newRecipeData = {
       recipeId: docId,
       createTime: new Date(),
@@ -952,8 +974,10 @@ function ModifyRecipe() {
       fullTime,
       mainImage: imgUrl,
       mainImagePath: imgPath,
-      ingredients: parsedIngredients,
-      steps: parsedSteps,
+      // ingredients: parsedIngredients,
+      ingredients,
+      steps,
+      // steps: parsedSteps,
       comment,
       authorName: userName,
       authorId: userId,
@@ -970,8 +994,8 @@ function ModifyRecipe() {
   async function updateRecipeAndNavigate() {
     const currentRecipeId = location.search.split('=')[1];
     const RecipeRef = doc(db, 'recipes', currentRecipeId);
-    const parsedIngredients = parseIngredientsQuantity();
-    const parsedSteps = parseStepsTime();
+    // const parsedIngredients = parseIngredientsQuantity();
+    // const parsedSteps = parseStepsTime();
     const newRecipeData = {
       recipeId: currentRecipeId,
       createTime: new Date(),
@@ -981,8 +1005,10 @@ function ModifyRecipe() {
       fullTime,
       mainImage: imgUrl,
       mainImagePath: imgPath,
-      ingredients: parsedIngredients,
-      steps: parsedSteps,
+      // ingredients: parsedIngredients,
+      ingredients,
+      steps,
+      // steps: parsedSteps,
       comment,
       authorName: userName,
       authorId: userId,
@@ -1073,7 +1099,7 @@ function ModifyRecipe() {
               accept="image/*"
               style={{ display: 'none' }}
               id="photo"
-              onChange={(e) => setImg(e.target.files[0])}
+              onChange={(e) => setImg(e.target.files![0])}
             />
           </ImgWrapper>
           <IngredientContentDiv>
@@ -1114,7 +1140,7 @@ function ModifyRecipe() {
         {steps.map((step, index) => (
           <div key={step.id}>
             <StepWrapper>
-              <StepDeleteButton type="button" onClick={() => { DeleteSteps(index); }}>
+              <StepDeleteButton onClick={() => { DeleteSteps(index); }}>
                 <StepIconImg src={binImage} alt="deleteImage" />
               </StepDeleteButton>
               <StepCircleDiv>
@@ -1122,7 +1148,7 @@ function ModifyRecipe() {
                 {index + 1 === steps.length
                   ? (
                     <AddStepDiv>
-                      <AddStepButton type="button" onClick={() => { addSteps(); }}>新增步驟</AddStepButton>
+                      <AddStepButton onClick={() => { addSteps(); }}>新增步驟</AddStepButton>
                     </AddStepDiv>
                   )
                   : <MotionLine />}
@@ -1202,8 +1228,8 @@ function ModifyRecipe() {
   );
 }
 
-AlwaysScrollToBottom.propTypes = {
-  ingredients: PropTypes.arrayOf(PropTypes.objectOf).isRequired,
-};
+// AlwaysScrollToBottom.propTypes = {
+//   ingredients: PropTypes.arrayOf(PropTypes.objectOf).isRequired,
+// };
 
 export default ModifyRecipe;

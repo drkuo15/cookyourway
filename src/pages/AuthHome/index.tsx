@@ -1,4 +1,4 @@
-import {
+import React, {
   useState, useEffect, useContext, useRef,
 } from 'react';
 import {
@@ -6,7 +6,8 @@ import {
 } from 'firebase/firestore';
 import styled, { keyframes } from 'styled-components/macro';
 import { Link, useNavigate } from 'react-router-dom';
-import { db } from '../../firestore';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth, db } from '../../firestore';
 import { devices } from '../../utils/StyleUtils';
 import Stars from '../../components/DisplayStars';
 import AuthContext from '../../components/AuthContext';
@@ -18,6 +19,8 @@ import mandarin from '../../images/fruits/mandarin.jpg';
 import pineapple from '../../images/fruits/pineapple.jpg';
 import strawberry from '../../images/fruits/strawberry.jpg';
 import blueberry from '../../images/fruits/blueberry.jpg';
+import { User } from '../../types/User';
+import { Recipe } from '../../types/Recipe';
 
 const Background = styled.div`
   padding-bottom: calc(80*100vw/1920);
@@ -248,6 +251,10 @@ const Selections = styled.div`
   margin-top: calc(100*100vw/1920);
 `;
 
+interface SelectiveProps {
+  mainImage: Recipe['mainImage'];
+}
+
 const Selective = styled.div`
     height: 150px;
     background-color: #e4e6e9;
@@ -260,7 +267,7 @@ const Selective = styled.div`
     border-radius: 5px;
     position: relative;
     cursor: pointer;
-    background-image: url(${(props) => (props.mainImage)})
+    background-image: url(${({ mainImage }: SelectiveProps) => (mainImage)})
 `;
 
 const DefaultSelective = styled.div`
@@ -298,22 +305,22 @@ const SelectiveContext = styled.div`
 function AuthHome() {
   const userInfo = useContext(AuthContext);
   const userId = userInfo?.uid || '';
-  const [userRecipes, setUserRecipes] = useState([]);
+  const [userRecipes, setUserRecipes] = useState<Recipe[]>([]);
   const [userRecipeIndex, setUserRecipeIndex] = useState(0);
   const [averageDifficulty, setAverageDifficulty] = useState(1);
-  const [recommendRecipes, setRecommendRecipes] = useState([]);
+  const [recommendRecipes, setRecommendRecipes] = useState<Recipe[]>([]);
   const [recommendRecipeIndex, setRecommendRecipeIndex] = useState(0);
-  const [myFavorites, setMyFavorites] = useState([]);
-  const [favoriteRecipes, setFavoriteRecipes] = useState([]);
+  const [myFavorites, setMyFavorites] = useState<User['myFavorites']>([]);
+  const [favoriteRecipes, setFavoriteRecipes] = useState<Recipe[]>([]);
   const [favoriteRecipeIndex, setFavoriteRecipeIndex] = useState(0);
-  const [allRecipes, setAllRecipes] = useState([]);
+  const [allRecipes, setAllRecipes] = useState<Recipe[]>([]);
   const [allRecipeIndex, setAllRecipeIndex] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  const allRef = useRef(null);
-  const recommendRef = useRef(null);
-  const userRef = useRef(null);
-  const favoriteRef = useRef(null);
+  const allRef = useRef<HTMLDivElement>(null);
+  const recommendRef = useRef<HTMLDivElement>(null);
+  const userRef = useRef<HTMLDivElement>(null);
+  const favoriteRef = useRef<HTMLDivElement>(null);
 
   const [checkingUser, setCheckingUser] = useState(true);
   const navigate = useNavigate();
@@ -322,24 +329,23 @@ function AuthHome() {
   const [sectionImgLoaded, setSectionImgLoaded] = useState(false);
 
   useEffect(() => {
-    if (userInfo === '') {
-      setCheckingUser(true);
-    }
-    if (userInfo === null) {
-      navigate({ pathname: '/' });
-    }
-    if (userId) {
-      setCheckingUser(false);
-    }
-  }, [navigate, userId, userInfo]);
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setCheckingUser(false);
+      } else {
+        navigate({ pathname: '/login' });
+      }
+    });
+  }, [navigate]);
 
   useEffect(() => {
     const recipeRef = collection(db, 'recipes');
-    let queryDataArray = [];
+    let queryDataArray: Recipe[] = [];
     getDocs(recipeRef).then((querySnapshot) => {
       querySnapshot.forEach(
         (document) => {
-          queryDataArray = [...queryDataArray, document.data()];
+          const data = document.data() as Recipe;
+          queryDataArray = [...queryDataArray, data];
         },
       );
       setAllRecipes(queryDataArray);
@@ -350,11 +356,12 @@ function AuthHome() {
     const recipeRef = collection(db, 'recipes');
     if (userId) {
       const q = query(recipeRef, where('authorId', '==', userId));
-      let queryDataArray = [];
+      let queryDataArray: Recipe[] = [];
       getDocs(q).then((querySnapshot) => {
         querySnapshot.forEach(
           (document) => {
-            queryDataArray = [...queryDataArray, document.data()];
+            const data = document.data() as Recipe;
+            queryDataArray = [...queryDataArray, data];
           },
         );
         setUserRecipes(queryDataArray);
@@ -366,11 +373,12 @@ function AuthHome() {
     const recipeRef = collection(db, 'recipes');
     if (userId) {
       const q = query(recipeRef, where('authorId', '==', userId));
-      let queryDifficultyArray = [];
+      let queryDifficultyArray: Recipe['difficulty'][] = [];
       getDocs(q).then((querySnapshot) => {
         querySnapshot.forEach(
           (document) => {
-            queryDifficultyArray = [...queryDifficultyArray, document.data().difficulty];
+            const data = document.data() as Recipe;
+            queryDifficultyArray = [...queryDifficultyArray, data.difficulty];
           },
         );
         const sum = queryDifficultyArray.reduce((cur, acc) => cur + acc, 0);
@@ -385,11 +393,12 @@ function AuthHome() {
   useEffect(() => {
     const recipeRef = collection(db, 'recipes');
     const q = query(recipeRef, where('difficulty', '>=', averageDifficulty));
-    let queryRecipeArray = [];
+    let queryRecipeArray: Recipe[] = [];
     getDocs(q).then((querySnapshot) => {
       querySnapshot.forEach(
         (document) => {
-          queryRecipeArray = [...queryRecipeArray, document.data()];
+          const data = document.data() as Recipe;
+          queryRecipeArray = [...queryRecipeArray, data];
         },
       );
       const filterRecipeArray = queryRecipeArray.filter((recipe) => recipe.authorId !== userId);
@@ -404,9 +413,9 @@ function AuthHome() {
       const unsubscribe = onSnapshot(
         UserRef,
         (document) => {
-          const userdata = document.data();
-          if (userdata.myFavorites) {
-            setMyFavorites(userdata.myFavorites);
+          const userData = document.data() as User;
+          if (userData.myFavorites) {
+            setMyFavorites(userData.myFavorites);
           }
         },
       );
@@ -418,7 +427,7 @@ function AuthHome() {
   useEffect(() => {
     const recipeRef = collection(db, 'recipes');
     getDocs(recipeRef)
-      .then((res) => res.docs.map((docc) => docc.data()))
+      .then((res) => res.docs.map((docs) => docs.data() as Recipe))
       .then((data) => data.filter((each) => myFavorites.includes(each.recipeId)))
       .then((dataArray) => setFavoriteRecipes(dataArray));
   }, [myFavorites]);
@@ -455,7 +464,7 @@ function AuthHome() {
     setAllRecipeIndex((prev) => prev - 1);
   };
 
-  const scrollToRef = (ref) => { ref.current.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'end' }); };
+  const scrollToRef = (ref: React.RefObject<HTMLDivElement>) => { ref.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'end' }); };
 
   if (checkingUser) {
     return (

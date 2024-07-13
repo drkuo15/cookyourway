@@ -1,7 +1,7 @@
 import {
   Routes, Route, BrowserRouter as Router,
 } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import styled, { createGlobalStyle } from 'styled-components';
@@ -13,11 +13,12 @@ import AuthHome from './pages/AuthHome';
 import Register from './pages/Register';
 import UnAuthHome from './pages/UnAuthHome';
 import Login from './pages/LogIn';
-import { auth, db } from './firestore/index';
+import { auth, db } from './firestore';
 import AuthContext from './components/AuthContext';
 import NoMatch from './pages/NoMatch';
 import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
+import { User } from './types/User';
 
 const GlobalStyle = createGlobalStyle`
   * {
@@ -33,7 +34,7 @@ const BodyDiv = styled.div`
 `;
 
 function App() {
-  const [userInfo, setUserInfo] = useState('');
+  const [userInfo, setUserInfo] = useState<User | null>(null);
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -41,7 +42,7 @@ function App() {
         const userRef = doc(db, 'users', uid);
         const getUserData = async () => {
           const docSnap = await getDoc(userRef);
-          return docSnap.data();
+          return docSnap.data() as User;
         };
         getUserData().then((data) => {
           setUserInfo(data);
