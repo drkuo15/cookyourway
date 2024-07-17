@@ -1,10 +1,12 @@
-import { useEffect, useState } from 'react';
+import React, {
+  useEffect, useState, Dispatch, SetStateAction,
+} from 'react';
 import styled, { keyframes } from 'styled-components/macro';
 import {
   West, East, OutdoorGrill, LocalDining,
 } from '@styled-icons/material-rounded';
-import PropTypes from 'prop-types';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { Step } from '../../types/Step';
 
 const RecipeArea = styled.div`
   width: calc(1250*100/9*16vh/1920);
@@ -43,6 +45,10 @@ const StepsNav = styled(Wrapper)`
   color: white;
 `;
 
+interface StepAreaProps {
+  selected: boolean;
+}
+
 const StepArea = styled.div`
   display: inline-flex;
   position: relative;
@@ -52,7 +58,7 @@ const StepArea = styled.div`
   line-height: calc(110*100/9*16vh/1920);
   margin-right: calc(62.5*100/9*16vh/1920);
   padding-left: calc(100*100/9*16vh/1920);
-  background-color: ${(props) => (props.selected ? '#EB811F' : '#584743')};
+  background-color: ${({ selected }: StepAreaProps) => (selected ? '#EB811F' : '#584743')};
   border-radius: calc(4*100/9*16vh/1920);
   font-size: calc(36*100/9*16vh/1920);
   color: #FDFDFC;
@@ -149,9 +155,17 @@ const Icon = styled.span`
     color:#EB811F;
   }
 `;
+
+interface RecipeProps {
+  stepIndex: number;
+  setStepIndex: Dispatch<SetStateAction<number>>;
+  setIsCounting: Dispatch<SetStateAction<boolean>>
+  steps: Step[];
+}
+
 function Recipe({
   stepIndex, setStepIndex, setIsCounting, steps,
-}) {
+}: RecipeProps) {
   const [isNextStep, setIsNextStep] = useState(true);
   const [isPrevStep, setIsPrevStep] = useState(false);
   const location = useLocation();
@@ -242,14 +256,14 @@ function Recipe({
           </WrapperStep>
           {imgLoaded ? (
             <Img
-              src={step.stepImgUrl}
+              src={step.stepMainImage}
               alt="stepImage"
             />
           ) : (
             <>
               <Img
                 style={imgLoaded ? {} : { display: 'none' }}
-                src={step.stepImgUrl}
+                src={step.stepMainImage}
                 alt="stepImage"
                 onLoad={() => { setImgLoaded(true); }}
               />
@@ -277,12 +291,5 @@ function Recipe({
     </RecipeArea>
   );
 }
-
-Recipe.propTypes = {
-  stepIndex: PropTypes.number.isRequired,
-  setStepIndex: PropTypes.func.isRequired,
-  setIsCounting: PropTypes.func.isRequired,
-  steps: PropTypes.PropTypes.arrayOf(PropTypes.objectOf).isRequired,
-};
 
 export default Recipe;

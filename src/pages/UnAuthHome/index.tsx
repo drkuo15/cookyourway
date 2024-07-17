@@ -1,5 +1,5 @@
 import styled, { keyframes } from 'styled-components';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { registerUser } from '../../firestore';
 import mainImage from '../../images/healthy.webp';
@@ -134,7 +134,7 @@ const RegisterBox = styled.div`
   }
 `;
 
-const ManualRegister = styled.div`
+const ManualRegister = styled.form`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -167,7 +167,7 @@ const ManualInput = styled.input`
   }
 `;
 
-const RegisterButton = styled.div`
+const RegisterButton = styled.button`
   text-align: center;
   vertical-align: middle;
   font-size: calc(28*100vw/1920);
@@ -177,6 +177,7 @@ const RegisterButton = styled.div`
   height: calc(72*100vw/1920);
   line-height: calc(72*100vw/1920);
   border-radius: calc(15*100vw/1920);
+  border-width: 0;
   cursor: pointer;
   z-index: 10;
   &:hover{
@@ -215,29 +216,29 @@ function UnAuthHome() {
     name: '',
     email: '',
     password: '',
-    error: null,
+    error: '',
     loading: false,
   });
   const {
     name, email, password, error, loading,
   } = data;
 
-  const handleChange = (e) => {
-    setData({ ...data, [e.target.name]: e.target.value });
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setData({ ...data, [e.currentTarget.name]: e.currentTarget.value });
   };
 
-  const renderError = (err) => {
-    if (err.message === 'Firebase: Password should be at least 6 characters (auth/weak-password).') {
+  const renderError = (message: string) => {
+    if (message === 'Firebase: Password should be at least 6 characters (auth/weak-password).') {
       return '密碼至少要六位數呦！';
-    } if (err.message === 'Firebase: Error (auth/email-already-in-use).') {
+    } if (message === 'Firebase: Error (auth/email-already-in-use).') {
       return '帳號已存在，請嘗試其它帳號';
     }
-    return err.message;
+    return message;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    setData({ ...data, error: null, loading: true });
+    setData({ ...data, error: '', loading: true });
     if (!name || !email || !password) {
       setData({ ...data, error: '所有欄位都需要填寫呦！' });
     }
@@ -247,15 +248,22 @@ function UnAuthHome() {
         name: '',
         email: '',
         password: '',
-        error: null,
+        error: '',
         loading: false,
       });
       showCustomAlert('您已註冊成功，即將轉跳首頁');
       setTimeout(() => { navigate('/home', { replace: true }); }, 4000);
     } catch (err) {
+      let errorMessage = '';
+      if (err instanceof Error) {
+        errorMessage = err.message;
+      }
+      if (typeof err === 'string') {
+        errorMessage = err;
+      }
       setData({
         ...data,
-        error: renderError(err),
+        error: renderError(errorMessage),
         loading: false,
       });
     }
@@ -300,6 +308,7 @@ function UnAuthHome() {
                 placeholder="使用者名稱"
                 value={name}
                 onChange={handleChange}
+                autoComplete="name"
               />
               <ManualInput
                 type="text"
@@ -307,6 +316,7 @@ function UnAuthHome() {
                 placeholder="電子郵件"
                 value={email}
                 onChange={handleChange}
+                autoComplete="email"
               />
               <ManualInput
                 type="password"
@@ -314,6 +324,7 @@ function UnAuthHome() {
                 placeholder="密碼"
                 value={password}
                 onChange={handleChange}
+                autoComplete="new-password"
               />
               <RegisterButton onClick={handleSubmit}>
                 {loading ? '帳號註冊中...' : '註冊'}

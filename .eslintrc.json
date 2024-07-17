@@ -7,20 +7,52 @@
         "plugin:react/recommended",
         "react-app",
         "airbnb",
+        "airbnb-typescript",
         "airbnb/hooks"
     ],
+    "parser": "@typescript-eslint/parser",
     "parserOptions": {
         "ecmaFeatures": {
             "jsx": true
         },
+        "project": "./tsconfig.json",
         "ecmaVersion": "latest",
         "sourceType": "module"
     },
     "plugins": [
-        "react"
+        "react",
+        "@typescript-eslint"
     ],
     "rules": {
-        "react/jsx-filename-extension": 0,
-        "react/react-in-jsx-scope": 0
+        // defaultProps will be deprecated soon
+        "react/require-default-props": [
+            "error",
+            {
+                "forbidDefaultForRequired": true,
+                "functions": "defaultArguments"
+            }
+        ],
+        "import/extensions": [
+            "error",
+            "ignorePackages",
+            {
+                "js": "never",
+                "jsx": "never",
+                "ts": "never",
+                "tsx": "never"
+            }
+        ]
+    },
+    "settings": {
+        "import/resolver": {
+            "node": {
+                "extensions": [
+                    ".js",
+                    ".jsx",
+                    ".ts",
+                    ".tsx"
+                ]
+            }
+        }
     }
 }

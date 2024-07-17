@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
 import { ScreenRotation } from '@styled-icons/material-rounded';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -67,7 +67,21 @@ const Title = styled.div`
   margin-bottom: calc(50*100/9*16vh/1920);
 `;
 
-const playlist = [music1, music2, music3, music4];
+const playlist: string[] = [music1, music2, music3, music4];
+
+const getRandomMusic: () => string = () => {
+  const cachedMusic = localStorage.getItem('cachedMusic');
+  let musicList;
+  if (!cachedMusic) {
+    musicList = playlist;
+  } else {
+    musicList = playlist.filter((music) => music !== cachedMusic);
+  }
+  const randomIndex = Math.floor(Math.random() * musicList.length);
+  const musicForCache = musicList[randomIndex];
+  localStorage.setItem('cachedMusic', musicForCache);
+  return musicForCache;
+};
 
 function Cooking() {
   const [title, setTitle] = useState('');
@@ -76,13 +90,16 @@ function Cooking() {
   const [isCounting, setIsCounting] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
   const [stepsLength, setStepsLength] = useState(0);
-  const [playIndex, setPlayIndex] = useState(Math.floor(Math.random() * 4));
-  const url = playlist[playIndex];
+  const [music, setMusic] = useState('');
   const location = useLocation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [steps, setSteps] = useState([]);
   const { checkingUser } = useCheckingUser();
+
+  useEffect(() => {
+    setMusic(getRandomMusic());
+  }, [stepIndex]);
 
   useEffect(() => {
     setTime(initialTime);
@@ -112,7 +129,7 @@ function Cooking() {
   if (checkingUser || loading) {
     return (
       <>
-        <Header setIsCounting={setIsCounting} />
+        <Header />
         <Loading />
       </>
     );
@@ -126,7 +143,7 @@ function Cooking() {
         <Icon><ScreenRotation /></Icon>
       </ForceLandscapeAlert>
       <CookingWrapper>
-        <Header setIsCounting={setIsCounting} />
+        <Header />
         <Wrapper>
           <LeftTimer>
             <Title>{title}</Title>
@@ -137,26 +154,17 @@ function Cooking() {
               setIsCounting={setIsCounting}
               initialTime={initialTime}
               onTimeUp={() => {
-                const generateRandomNumber = () => {
-                  const randomNumber = Math.floor(Math.random() * playlist.length);
-                  if (randomNumber !== playIndex) {
-                    return randomNumber;
-                  }
-                  return generateRandomNumber();
-                };
                 if (stepIndex + 1 < stepsLength) {
                   setStepIndex((prev) => prev + 1);
                   setTime(initialTime);
-                  setPlayIndex(generateRandomNumber());
                 } else {
                   setIsCounting(false);
                 }
               }}
             />
             <Player
-              url={url}
+              url={music}
               isCounting={isCounting}
-              setIsCounting={setIsCounting}
             />
           </LeftTimer>
           <RightRecipe>

@@ -1,10 +1,9 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import styled from 'styled-components/macro';
-import { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   Search, FavoriteBorder, Favorite, ContentCopy, Edit,
 } from '@styled-icons/material-rounded';
-import PropTypes from 'prop-types';
 import { signOutUser } from '../firestore';
 import logoImage from '../images/CookYourWay_logo_v1.png';
 import { devices } from '../utils/StyleUtils';
@@ -127,12 +126,16 @@ const SignOutButton = styled.button`
   }
 `;
 
+interface MemberProps {
+  active: boolean;
+}
+
 const MemberPhoto = styled.img`
   width: calc(64*100vw/1920);
   height: calc(64*100vw/1920);
   cursor: pointer;
   border-radius: 50%;
-  display: ${(props) => (props.active ? 'flex' : 'none')};
+  display: ${({ active }: MemberProps) => (active ? 'flex' : 'none')};
   justify-content: center;
   align-items: center;
   box-shadow: 0px 0px 3px #e0e0e0;
@@ -152,7 +155,7 @@ const MemberWord = styled.div`
   font-size: calc(28*100vw/1920);
   color: #2B2A29;
   border: 0;
-  display: ${(props) => (props.active ? 'flex' : 'none')};
+  display: ${({ active }: MemberProps) => (active ? 'flex' : 'none')};
   justify-content: center;
   align-items: center;
   box-shadow: 0px 0px 3px #e0e0e0;
@@ -200,8 +203,6 @@ const SearchWrap = styled.div`
   }
 `;
 
-const SearchForm = styled.form``;
-
 const SearchInputImg = styled.div`
   height: calc(62*100vw/1920);
   width: calc(62*100vw/1920);
@@ -224,6 +225,10 @@ const SearchInputImg = styled.div`
   }
 `;
 
+interface SearchInputProps {
+  show: boolean;
+}
+
 const SearchInput = styled.input`
   height: calc(80*100vw/1920);
   display: inline-block;
@@ -235,7 +240,7 @@ const SearchInput = styled.input`
   top: calc(24*100vw/1920);
   right: 0;
   background: none;
-  z-index: ${(props) => (props.show ? 3 : 1)};
+  z-index: ${({ show }: SearchInputProps) => (show ? 3 : 1)};
   transition: width 0.4s cubic-bezier(0, 0.795, 0, 1);
   cursor: pointer;
   &:hover ~ ${SearchInputImg}{
@@ -271,11 +276,11 @@ const DropBtn = styled.button`
   font-weight: 500;
   color: #2B2A29;
   border: 0;
-  border-bottom: calc(5*100vw/1920) #EB811F solid;
   display: flex;
   justify-content: center;
   align-items: center;
   &:hover { 
+    border-bottom: calc(5*100vw/1920) #EB811F solid;
     box-shadow: 0 2px 2px -2px #EB811F ;
     color: #000000;
   }
@@ -304,15 +309,20 @@ const ToolTipText = styled.span`
   transition: opacity 1s;
 `;
 
+interface IconProps {
+  colorCode: string;
+  selected: string;
+}
+
 const Icon = styled.span`
   position: relative;
   cursor: pointer;
   font-size: calc(40*100vw/1920);
   display: flex;
   align-items: end;
-  color:  ${(props) => ((props.colorCode))};
+  color:  ${({ colorCode }: IconProps) => (colorCode)};
   &:hover {
-    color: ${(props) => ((props.selected))};
+    color: ${({ selected }: IconProps) => (selected)};
   }
   & > svg{
     width: calc(60*100vw/1920);
@@ -356,33 +366,31 @@ function SearchRecipe() {
   const navigate = useNavigate();
   return (
     <SearchWrap>
-      <SearchForm action="" autocomplete="on">
-        <SearchInput
-          show={inputShown}
-          name="search"
-          type="search"
-          placeholder="來找些料理吧！"
-          onKeyPress={(e) => {
-            if (e.key === 'Enter') {
-              navigate({ pathname: '/search_recipe', search: `?q=${e.target.value}` });
-            }
-          }}
-          onChange={(e) => { setSearchName(e.target.value); }}
-          onBlur={() => {
-            setInputShown(false);
-          }}
+      <SearchInput
+        show={inputShown}
+        name="search"
+        type="search"
+        placeholder="來找些料理吧！"
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            navigate({ pathname: '/search_recipe', search: `?q=${e.currentTarget.value}` });
+          }
+        }}
+        onChange={(e) => { setSearchName(e.currentTarget.value); }}
+        onBlur={() => {
+          setInputShown(false);
+        }}
+      />
+      <SearchInputImg>
+        <Search onClick={() => {
+          if (searchName) {
+            navigate({ pathname: '/search_recipe', search: `?q=${searchName}` });
+          } else {
+            setInputShown(true);
+          }
+        }}
         />
-        <SearchInputImg>
-          <Search onClick={() => {
-            if (searchName) {
-              navigate({ pathname: '/search_recipe', search: `?q=${searchName}` });
-            } else {
-              setInputShown(true);
-            }
-          }}
-          />
-        </SearchInputImg>
-      </SearchForm>
+      </SearchInputImg>
     </SearchWrap>
   );
 }
@@ -405,7 +413,7 @@ function LogOut() {
     if (userInfo) {
       const userName = userInfo.name.split('');
       const initial = userName.shift();
-      setUserInitial(initial.toUpperCase());
+      setUserInitial(initial!.toUpperCase());
     }
   }, [userInfo]);
 
@@ -440,9 +448,16 @@ function LogIn() {
   );
 }
 
+interface CollectRecipeProps {
+  addToFavorites: () => void;
+  removeFromFavorites: () => void;
+  myFavorites: string[];
+  currentRecipeId: string;
+}
+
 function CollectRecipe({
   addToFavorites, removeFromFavorites, myFavorites, currentRecipeId,
-}) {
+}: CollectRecipeProps) {
   return (
 
     myFavorites.includes(currentRecipeId)
@@ -465,7 +480,12 @@ function CollectRecipe({
   );
 }
 
-function CopyOrModifyRecipe({ userId, authorId }) {
+interface CopyOrModifyRecipeProps {
+  userId: string;
+  authorId: string;
+}
+
+function CopyOrModifyRecipe({ userId, authorId }: CopyOrModifyRecipeProps) {
   const location = useLocation();
   return (
     <Button to={`/modify_recipe?id=${location.search.split('=')[1]}`}>
@@ -490,9 +510,23 @@ function CopyOrModifyRecipe({ userId, authorId }) {
   );
 }
 
+interface HeaderProps {
+  authorId?: string;
+  userId?: string;
+  addToFavorites?: () => void;
+  removeFromFavorites?: () => void;
+  myFavorites?: string[];
+  currentRecipeId?: string;
+}
+
 function Header({
-  authorId, userId, addToFavorites, removeFromFavorites, myFavorites, currentRecipeId,
-}) {
+  authorId = '',
+  userId = '',
+  addToFavorites = () => { },
+  removeFromFavorites = () => { },
+  myFavorites = [],
+  currentRecipeId = '',
+}: HeaderProps) {
   const location = useLocation();
   const isHomePage = location.pathname === '/home';
   const isHomeOrSearchPage = location.pathname === '/home' || location.pathname === '/search_recipe';
@@ -538,35 +572,5 @@ function Header({
     </>
   );
 }
-
-Header.propTypes = {
-  authorId: PropTypes.string,
-  userId: PropTypes.string,
-  addToFavorites: PropTypes.func,
-  removeFromFavorites: PropTypes.func,
-  myFavorites: PropTypes.arrayOf(PropTypes.string),
-  currentRecipeId: PropTypes.string,
-};
-
-Header.defaultProps = {
-  authorId: '',
-  userId: '',
-  addToFavorites: () => { },
-  removeFromFavorites: () => { },
-  myFavorites: [],
-  currentRecipeId: '',
-};
-
-CollectRecipe.propTypes = {
-  addToFavorites: PropTypes.func.isRequired,
-  removeFromFavorites: PropTypes.func.isRequired,
-  myFavorites: PropTypes.arrayOf(PropTypes.string).isRequired,
-  currentRecipeId: PropTypes.string.isRequired,
-};
-
-CopyOrModifyRecipe.propTypes = {
-  authorId: PropTypes.string.isRequired,
-  userId: PropTypes.string.isRequired,
-};
 
 export default Header;

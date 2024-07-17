@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import React, {
+  useState, useEffect, useCallback,
+} from 'react';
 import styled, { keyframes } from 'styled-components/macro';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import PropTypes from 'prop-types';
 import { motion, useAnimation } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { IosShare } from '@styled-icons/material-rounded';
@@ -14,6 +15,8 @@ import Header from '../../components/Header';
 import tipImage from '../../images/tips.png';
 import Loading from '../../components/Loading';
 import useCheckingUser from '../../components/useCheckingUser';
+import { User } from '../../types/User';
+import { Recipe } from '../../types/Recipe';
 
 const Background = styled.div`
   padding: 0 calc(116*100vw/1920);
@@ -425,23 +428,27 @@ const Icon = styled.span`
   }
 `;
 
-function ReadRecipe({ onChangeMyFavorites }) {
+interface ReadRecipeProps {
+  onChangeMyFavorites: (newMyFavorites: User['myFavorites']) => void;
+}
+
+function ReadRecipe({ onChangeMyFavorites }: ReadRecipeProps) {
   const { userInfo, userId, checkingUser } = useCheckingUser();
   const myFavorites = userInfo?.myFavorites || [];
-  const initialRecipe = {
+  const initialRecipe: Recipe = {
     title: '',
     difficulty: 1,
     ingredients: [],
     steps: [],
     comment: '',
-    imgUrl: '',
+    mainImage: '',
     authorName: '',
     authorId: '',
     fullTime: 0,
   };
   const [recipeData, setRecipeData] = useState(initialRecipe);
   const {
-    title, difficulty, ingredients, steps, comment, imgUrl, authorName, authorId, fullTime,
+    title, difficulty, ingredients, steps, comment, mainImage, authorName, authorId, fullTime,
   } = recipeData;
   const location = useLocation();
   const navigate = useNavigate();
@@ -452,7 +459,7 @@ function ReadRecipe({ onChangeMyFavorites }) {
 
   useEffect(() => {
     if (currentRecipeId) {
-      const unsubscribe = onRecipeSnapshot(currentRecipeId, setRecipeData, 'authorName', 'fullTime');
+      const unsubscribe = onRecipeSnapshot(currentRecipeId, setRecipeData);
       setLoading(false);
       return unsubscribe;
     }
@@ -460,9 +467,8 @@ function ReadRecipe({ onChangeMyFavorites }) {
     return undefined;
   }, [currentRecipeId, navigate]);
 
-  const copyText = ingredients.reduce((acc, i) => `${acc}${i.ingredientsTitle}:${i.ingredientsQuantity}公克,`, '');
-
-  function exportIngredients() {
+  const exportIngredients = useCallback(() => {
+    const copyText = ingredients.reduce((acc, i) => `${acc}${i.ingredientsTitle}:${i.ingredientsQuantity}公克,`, '');
     if (navigator.share) {
       navigator.clipboard.writeText(`【 ${title} 】食材內容: \n ${copyText}`);
       navigator.clipboard.readText().then(() => showCustomAlert(`【 ${title} 】採買清單 \n\n已為您複製囉！ \n\n請自行選擇記錄方式`));
@@ -474,7 +480,7 @@ function ReadRecipe({ onChangeMyFavorites }) {
       navigator.clipboard.writeText(`【 ${title} 】食材內容: \n ${copyText}`);
       navigator.clipboard.readText().then(() => showCustomAlert(`【 ${title} 】採買清單 \n\n已為您複製囉！ \n\n請自行選擇記錄方式`));
     }
-  }
+  }, [ingredients, title]);
 
   function addToFavorites() {
     const isRecipeExisting = myFavorites.some((id) => id === currentRecipeId);
@@ -540,22 +546,22 @@ function ReadRecipe({ onChangeMyFavorites }) {
           <ContentDiv>
             <LargeDiv>總時長</LargeDiv>
             <LargeDiv>
-              {Math.floor(fullTime / 60) === 0 ? '' : `${Math.floor(fullTime / 60)}分`}
-              {fullTime % 60 === 0 ? '' : `${fullTime % 60}秒`}
+              {Math.floor(fullTime! / 60) === 0 ? '' : `${Math.floor(fullTime! / 60)}分`}
+              {fullTime! % 60 === 0 ? '' : `${fullTime! % 60}秒`}
             </LargeDiv>
           </ContentDiv>
         </ContentWrapper>
         <ContentWrapper>
           {imgLoaded ? (
             <Img
-              src={imgUrl || defaultImage}
+              src={mainImage || defaultImage}
               alt="mainImage"
             />
           ) : (
             <>
               <Img
                 style={imgLoaded ? {} : { display: 'none' }}
-                src={imgUrl || defaultImage}
+                src={mainImage || defaultImage}
                 alt="mainImage"
                 onLoad={() => { setImgLoaded(true); }}
               />
@@ -565,7 +571,7 @@ function ReadRecipe({ onChangeMyFavorites }) {
           <IngredientContentDiv>
             <IngredientTitleDiv>
               <LargeDiv>食材</LargeDiv>
-              <Icon onClick={() => exportIngredients()}>
+              <Icon onClick={exportIngredients}>
                 <IosShare />
                 <ToolTipText>匯出食材！方便記錄採買清單</ToolTipText>
               </Icon>
@@ -605,14 +611,14 @@ function ReadRecipe({ onChangeMyFavorites }) {
                   </StepContentDiv>
                   {stepImgLoaded ? (
                     <StepImg
-                      src={steps[index].stepImgUrl || defaultImage}
+                      src={steps[index].stepMainImage || defaultImage}
                       alt="stepImages"
                     />
                   ) : (
                     <>
                       <StepImg
                         style={stepImgLoaded ? {} : { display: 'none' }}
-                        src={steps[index].stepImgUrl || defaultImage}
+                        src={steps[index].stepMainImage || defaultImage}
                         alt="stepImages"
                         onLoad={() => { setStepImgLoaded(true); }}
                       />
@@ -643,16 +649,5 @@ function ReadRecipe({ onChangeMyFavorites }) {
     </>
   );
 }
-
-ReadRecipe.propTypes = {
-  onChangeMyFavorites: PropTypes.func.isRequired,
-};
-
-Stars.propTypes = {
-  stars: PropTypes.number.isRequired,
-  size: PropTypes.number.isRequired,
-  spacing: PropTypes.number.isRequired,
-  fill: PropTypes.string.isRequired,
-};
 
 export default ReadRecipe;

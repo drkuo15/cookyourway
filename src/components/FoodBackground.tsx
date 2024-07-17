@@ -1,11 +1,12 @@
+import React from 'react';
 import styled from 'styled-components';
-import cookieImage from '../images/foodSVG/cookie_FILL0_wght400_GRAD0_opsz48.svg';
-import eggImage from '../images/foodSVG/egg_alt_FILL0_wght400_GRAD0_opsz48.svg';
-import icecreamImage from '../images/foodSVG/icecream_FILL0_wght400_GRAD0_opsz48.svg';
-import localBarImage from '../images/foodSVG/local_bar_FILL0_wght400_GRAD0_opsz48.svg';
-import localPizzaImage from '../images/foodSVG/local_pizza_FILL0_wght400_GRAD0_opsz48.svg';
-import lunchDining from '../images/foodSVG/lunch_dining_FILL0_wght400_GRAD0_opsz48.svg';
-import ramenDining from '../images/foodSVG/ramen_dining_FILL0_wght400_GRAD0_opsz48.svg';
+import cookieImage from '../images/foodSVG/cookie.svg';
+import eggImage from '../images/foodSVG/egg.svg';
+import icecreamImage from '../images/foodSVG/icecream.svg';
+import localBarImage from '../images/foodSVG/local_bar.svg';
+import localPizzaImage from '../images/foodSVG/local_pizza.svg';
+import lunchDining from '../images/foodSVG/lunch_dining.svg';
+import ramenDining from '../images/foodSVG/ramen_dining.svg';
 import { devices } from '../utils/StyleUtils';
 
 const Background = styled.div`
