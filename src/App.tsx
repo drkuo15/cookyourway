@@ -1,7 +1,7 @@
 import {
   Routes, Route, BrowserRouter as Router,
 } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled, { createGlobalStyle } from 'styled-components';
 import { changeUserDataOnAuthState } from './firestore';
 import Cooking from './pages/Cooking';
@@ -16,6 +16,7 @@ import AuthContext from './components/AuthContext';
 import NoMatch from './pages/NoMatch';
 import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
+import { User } from './types/User';
 
 const GlobalStyle = createGlobalStyle`
   * {
@@ -31,13 +32,13 @@ const BodyDiv = styled.div`
 `;
 
 function App() {
-  const [userInfo, setUserInfo] = useState('');
+  const [userInfo, setUserInfo] = useState<User | null>(null);
   useEffect(() => {
     changeUserDataOnAuthState(setUserInfo);
   }, []);
 
-  const onChangeMyFavorites = (newMyFavorites) => {
-    setUserInfo({ ...userInfo, myFavorites: newMyFavorites });
+  const onChangeMyFavorites = (newMyFavorites: User['myFavorites']) => {
+    setUserInfo({ ...userInfo!, myFavorites: newMyFavorites });
   };
 
   return (

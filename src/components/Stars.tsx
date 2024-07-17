@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { devices } from '../utils/StyleUtils';
 
@@ -12,8 +11,20 @@ const StarSpan = styled.span`
   }
 `;
 
-class StarRating extends React.Component {
-  constructor(props) {
+interface StarRatingState {
+  stars: number[];
+  hovered: number;
+  selectedIcon: string;
+  deselectedIcon: string;
+}
+
+interface StarRatingProps {
+  onChange: (rating: number) => void;
+  rating: number;
+}
+
+class StarRating extends React.Component<StarRatingProps, StarRatingState> {
+  constructor(props: StarRatingProps) {
     super(props);
     this.state = {
       stars: [],
@@ -28,12 +39,12 @@ class StarRating extends React.Component {
     }
   }
 
-  changeRating(newRating) {
+  changeRating(newRating: number) {
     const { onChange } = this.props;
     if (onChange) { onChange(newRating); }
   }
 
-  hoverRating(rating) {
+  hoverRating(rating: number) {
     this.setState({
       hovered: rating,
     });
@@ -53,7 +64,7 @@ class StarRating extends React.Component {
               key={star}
               onClick={() => { this.changeRating(star); }}
               role="presentation"
-              onKeyPress={this.handleKeyPress}
+              // onKeyDown={this.handleKeyDown}
               onMouseEnter={() => { this.hoverRating(star); }}
               onMouseLeave={() => { this.hoverRating(0); }}
             >
@@ -66,10 +77,5 @@ class StarRating extends React.Component {
     );
   }
 }
-
-StarRating.propTypes = {
-  onChange: PropTypes.func.isRequired,
-  rating: PropTypes.number.isRequired,
-};
 
 export default StarRating;

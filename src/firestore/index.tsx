@@ -12,6 +12,8 @@ import {
   signInWithEmailAndPassword, setPersistence, browserSessionPersistence,
   signOut,
 } from 'firebase/auth';
+import { Recipe } from '../types/Recipe';
+import { User } from '../types/User';
 
 export const firebaseApp = initializeApp({
   apiKey: process.env.REACT_APP_FIREBASE_APIKEY,
@@ -33,7 +35,7 @@ const recipeRef = collection(db, 'recipes');
 
 export const recipeDoc = doc(collection(db, 'recipes'));
 
-export const changeUserDataOnAuthState = async (setUserInfo) => {
+export const changeUserDataOnAuthState = async (setUserInfo: (user: User | null) => void) => {
   onAuthStateChanged(auth, (user) => {
     if (user) {
       const { uid } = user;
@@ -43,7 +45,7 @@ export const changeUserDataOnAuthState = async (setUserInfo) => {
         return docSnap.data();
       };
       getUserData().then((data) => {
-        setUserInfo(data);
+        setUserInfo(data as User);
       });
     } else {
       setUserInfo(user);
@@ -51,7 +53,7 @@ export const changeUserDataOnAuthState = async (setUserInfo) => {
   });
 };
 
-export const registerUser = async (email, password, name) => {
+export const registerUser = async (email: string, password: string, name: string) => {
   const result = await createUserWithEmailAndPassword(
     auth,
     email,
@@ -65,52 +67,54 @@ export const registerUser = async (email, password, name) => {
   });
 };
 
-export const loginUser = async (email, password) => new Promise((resolve, reject) => {
-  setPersistence(auth, browserSessionPersistence)
-    .then(() => {
-      signInWithEmailAndPassword(auth, email, password)
-        .then(() => {
-          resolve();
-        })
-        .catch((err) => {
-          reject(err);
-        });
-    });
-});
+export const loginUser = async (email: string, password: string) => new Promise<void>(
+  (resolve, reject) => {
+    setPersistence(auth, browserSessionPersistence)
+      .then(() => {
+        signInWithEmailAndPassword(auth, email, password)
+          .then(() => {
+            resolve();
+          })
+          .catch((err) => {
+            reject(err);
+          });
+      });
+  },
+);
 
 export const signOutUser = () => {
   signOut(auth);
 };
 
 export const getAllRecipes = async () => {
-  let queryDataArray = [];
+  let queryDataArray: Recipe[] = [];
   await getDocs(recipeRef).then((querySnapshot) => {
     querySnapshot.forEach(
       (document) => {
-        queryDataArray = [...queryDataArray, document.data()];
+        queryDataArray = [...queryDataArray, document.data() as Recipe];
       },
     );
   });
   return queryDataArray;
 };
 
-export const getUserRecipes = async (userId) => {
+export const getUserRecipes = async (userId: string) => {
   const q = query(recipeRef, where('authorId', '==', userId));
-  let queryDataArray = [];
+  let queryDataArray: Recipe[] = [];
   await getDocs(q).then((querySnapshot) => {
     querySnapshot.forEach(
       (document) => {
-        queryDataArray = [...queryDataArray, document.data()];
+        queryDataArray = [...queryDataArray, document.data() as Recipe];
       },
     );
   });
   return queryDataArray;
 };
 
-export const getAverageDifficulty = async (userId) => {
+export const getAverageDifficulty = async (userId: string) => {
   const q = query(recipeRef, where('authorId', '==', userId));
-  let queryDifficultyArray = [];
-  let avg;
+  let queryDifficultyArray: Recipe['difficulty'][] = [];
+  let avg = 0;
   await getDocs(q).then((querySnapshot) => {
     querySnapshot.forEach(
       (document) => {
@@ -123,68 +127,59 @@ export const getAverageDifficulty = async (userId) => {
   return avg;
 };
 
-export const getRecommendRecipes = async (userId, averageDifficulty) => {
+export const getRecommendRecipes = async (userId: string, averageDifficulty: number) => {
   const q = query(recipeRef, where('difficulty', '>=', averageDifficulty));
-  let queryRecipeArray = [];
+  let queryRecipeArray: Recipe[] = [];
   await getDocs(q).then((querySnapshot) => {
     querySnapshot.forEach(
       (document) => {
-        queryRecipeArray = [...queryRecipeArray, document.data()];
+        queryRecipeArray = [...queryRecipeArray, document.data() as Recipe];
       },
     );
   });
   return queryRecipeArray.filter((recipe) => recipe.authorId !== userId);
 };
 
-export const onUserSnapshot = (userId, callback) => {
+export const onUserSnapshot = (userId: string, callback: (data: User['myFavorites']) => void) => {
   const UserRef = doc(db, 'users', userId);
   return onSnapshot(
     UserRef,
     (document) => {
-      const userdata = document.data();
-      callback(userdata.myFavorites);
+      const userData = document.data() as User;
+      callback(userData.myFavorites);
     },
   );
 };
 
-export const onRecipeSnapshot = (currentRecipeId, callback, ...keys) => {
+export const onRecipeSnapshot = (
+  currentRecipeId: string,
+  callback: (data: Recipe) => void,
+  ...keys: string[]
+) => {
   const RecipeRef = doc(db, 'recipes', currentRecipeId);
   return onSnapshot(
     RecipeRef,
     (document) => {
-      const data = document.data();
-      const otherProperty = {};
-      keys.forEach((key) => {
-        if (key === 'oldTitle') {
-          otherProperty[key] = data.title;
-          return;
-        }
-        if (key === 'imgPath') {
-          otherProperty[key] = data.mainImagePath;
-          return;
-        }
-        otherProperty[key] = data[key];
-      });
-      callback({
-        title: data.title,
-        difficulty: data.difficulty,
-        imgUrl: data.mainImage,
-        ingredients: data.ingredients,
-        steps: data.steps,
-        comment: data.comment,
-        authorId: data.authorId,
-        ...otherProperty,
-      });
+      const data = document.data() as Recipe;
+      const completeData = { ...data };
+      if (keys) {
+        keys.forEach((key) => {
+          if (key === 'defaultTitle') {
+            completeData[key] = data.title;
+          }
+        });
+      }
+      callback(completeData);
     },
   );
 };
-export const getCurrentData = async (currentRecipeId) => {
+export const getCurrentData = async (currentRecipeId: string) => {
   const docRef = doc(db, 'recipes', currentRecipeId);
   const docSnap = await getDoc(docRef);
   return docSnap.data();
 };
 
-export const uploadImg = async (img, folder) => {
+export const uploadImg = async (img: File, folder: string) => {
   const imgRef = ref(
     storage,
     `${folder}/${new Date().getTime()} - ${img.name}`,
@@ -192,30 +187,30 @@ export const uploadImg = async (img, folder) => {
   const snap = await uploadBytes(imgRef, img);
   const url = await getDownloadURL(ref(storage, snap.ref.fullPath));
   return {
-    imgUrl: url,
-    imgPath: snap.ref.fullPath,
+    mainImage: url,
+    mainImagePath: snap.ref.fullPath,
   };
 };
 
-export const setRecipeDoc = async (docId, newRecipeData) => {
+export const setRecipeDoc = async (docId: string, newRecipeData: Recipe) => {
   setDoc(doc(db, 'recipes', docId), newRecipeData);
 };
 
-export const updateRecipeDoc = async (currentRecipeId, newRecipeData) => {
+export const updateRecipeDoc = async (currentRecipeId: string, newRecipeData: Recipe) => {
   const currentRecipeRef = doc(db, 'recipes', currentRecipeId);
-  updateDoc(currentRecipeRef, newRecipeData);
+  updateDoc(currentRecipeRef, { ...newRecipeData });
 };
 
-export const getSearchArray = async (searchName) => {
+export const getSearchArray = async (searchName: string) => {
   const searchNameArray = searchName.split('');
   const q = query(recipeRef, where('titleKeywords', 'array-contains', searchNameArray[0]));
-  let queryDataArray = [];
+  let queryDataArray: Recipe[] = [];
   await getDocs(q).then((querySnapshot) => {
     if (!querySnapshot.empty) {
       querySnapshot.forEach(
         (document) => {
           if (document.data().title.includes(searchName)) {
-            queryDataArray = [...queryDataArray, document.data()];
+            queryDataArray = [...queryDataArray, document.data() as Recipe];
           }
         },
       );
@@ -224,7 +219,7 @@ export const getSearchArray = async (searchName) => {
   return queryDataArray;
 };
 
-export const updateUserDoc = async (userId, updatedMyFavorite) => {
+export const updateUserDoc = async (userId: string, updatedMyFavorite: User['myFavorites']) => {
   const UserRef = doc(db, 'users', userId);
   updateDoc(UserRef, { myFavorites: updatedMyFavorite });
 };

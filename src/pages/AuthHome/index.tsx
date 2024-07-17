@@ -1,4 +1,4 @@
-import {
+import React, {
   useState, useEffect, useRef, useReducer,
 } from 'react';
 import styled, { keyframes } from 'styled-components/macro';
@@ -17,6 +17,8 @@ import pineapple from '../../images/fruits/pineapple.webp';
 import strawberry from '../../images/fruits/strawberry.webp';
 import blueberry from '../../images/fruits/blueberry.webp';
 import useCheckingUser from '../../components/useCheckingUser';
+import { User } from '../../types/User';
+import { Recipe } from '../../types/Recipe';
 
 const Background = styled.div`
   padding-bottom: calc(80*100vw/1920);
@@ -247,6 +249,10 @@ const Selections = styled.div`
   margin-top: calc(100*100vw/1920);
 `;
 
+interface SelectiveProps {
+  mainImage: Recipe['mainImage'];
+}
+
 const Selective = styled.div`
     height: 150px;
     background-color: #e4e6e9;
@@ -259,7 +265,7 @@ const Selective = styled.div`
     border-radius: 5px;
     position: relative;
     cursor: pointer;
-    background-image: url(${(props) => (props.mainImage)})
+    background-image: url(${({ mainImage }: SelectiveProps) => (mainImage)})
 `;
 
 const DefaultSelective = styled.div`
@@ -302,7 +308,19 @@ function AuthHome() {
     favoriteIndex: 0,
     allIndex: 0,
   };
-  const reducer = (state, action) => {
+
+  interface State {
+    userIndex: number;
+    recommendIndex: number;
+    favoriteIndex: number;
+    allIndex: number;
+  }
+
+  interface Action {
+    type: 'IncreaseUserIndex' | 'DecreaseUserIndex' | 'IncreaseRecommendIndex' | 'DecreaseRecommendIndex' | 'IncreaseFavoriteIndex' | 'DecreaseFavoriteIndex' | 'IncreaseAllIndex' | 'DecreaseAllIndex';
+  }
+
+  const reducer = (state: State, action: Action) => {
     switch (action.type) {
       case 'IncreaseUserIndex':
         return { ...state, userIndex: state.userIndex + 1 };
@@ -324,19 +342,19 @@ function AuthHome() {
     }
   };
   const [indices, dispatch] = useReducer(reducer, initialIndices);
-  const [allRecipes, setAllRecipes] = useState([]);
-  const [userRecipes, setUserRecipes] = useState([]);
-  const [recommendRecipes, setRecommendRecipes] = useState([]);
-  const [favoriteRecipes, setFavoriteRecipes] = useState([]);
-  const [myFavorites, setMyFavorites] = useState([]);
+  const [allRecipes, setAllRecipes] = useState<Recipe[]>([]);
+  const [userRecipes, setUserRecipes] = useState<Recipe[]>([]);
+  const [recommendRecipes, setRecommendRecipes] = useState<Recipe[]>([]);
+  const [favoriteRecipes, setFavoriteRecipes] = useState<Recipe[]>([]);
+  const [myFavorites, setMyFavorites] = useState<User['myFavorites']>([]);
   const [averageDifficulty, setAverageDifficulty] = useState(1);
   const [loading, setLoading] = useState(true);
   const [imgLoaded, setImgLoaded] = useState(false);
   const [sectionImgLoaded, setSectionImgLoaded] = useState(false);
-  const allRef = useRef(null);
-  const recommendRef = useRef(null);
-  const userRef = useRef(null);
-  const favoriteRef = useRef(null);
+  const allRef = useRef<HTMLDivElement>(null);
+  const recommendRef = useRef<HTMLDivElement>(null);
+  const userRef = useRef<HTMLDivElement>(null);
+  const favoriteRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     async function setDataFromFirebase() {
@@ -348,7 +366,7 @@ function AuthHome() {
       setUserRecipes(data[1]);
       setAverageDifficulty(data[2]);
       setRecommendRecipes(data[3]);
-      const myFavoriteArray = data[0].filter((each) => myFavorites.includes(each.recipeId));
+      const myFavoriteArray = data[0].filter((each) => myFavorites.includes(each.recipeId!));
       setFavoriteRecipes(myFavoriteArray);
     }
     if (userId) {
@@ -365,7 +383,7 @@ function AuthHome() {
     return undefined;
   }, [userId]);
 
-  const scrollToRef = (ref) => { ref.current.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'end' }); };
+  const scrollToRef = (ref: React.RefObject<HTMLDivElement>) => { ref.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'end' }); };
 
   if (checkingUser || loading) {
     return (

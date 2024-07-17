@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components/macro';
 import { loginUser } from '../../firestore/index';
 import CenterTopHeader from '../../components/CenterTopHeader';
-import FoodBackground from '../../components/FoodBackgroud';
-import helpImage from '../../images/help_center_FILL0_wght400_GRAD0_opsz48.svg';
+import FoodBackground from '../../components/FoodBackground';
+import helpImage from '../../images/help.svg';
 import { devices } from '../../utils/StyleUtils';
 
 const Wrapper = styled.div`
@@ -32,7 +32,7 @@ const LoginBox = styled.div`
   }
 `;
 
-const ManualSignIn = styled.div`
+const ManualSignIn = styled.form`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -64,7 +64,7 @@ const ManualInput = styled.input`
   }
 `;
 
-const LoginButton = styled.div`
+const LoginButton = styled.button`
   text-align: center;
   vertical-align: middle;
   font-size: calc(28*100vw/1920);
@@ -74,6 +74,7 @@ const LoginButton = styled.div`
   height: calc(72*100vw/1920);
   line-height: calc(72*100vw/1920);
   border-radius: calc(15*100vw/1920);
+  border-width: 0;
   cursor: pointer;
   z-index: 10;
   &:hover{
@@ -126,7 +127,7 @@ const HelpImg = styled.img`
   }
 `;
 
-const RegisterButton = styled.div`
+const RegisterButton = styled.button`
   text-align: center;
   vertical-align: middle;
   font-size: calc(28*100vw/1920);
@@ -136,6 +137,7 @@ const RegisterButton = styled.div`
   height: calc(72*100vw/1920);
   line-height: calc(72*100vw/1920);
   border-radius: calc(15*100vw/1920);
+  border-width: 0;
   cursor: pointer;
   z-index: 10;
   &:hover {background-color: #4c3732;}
@@ -166,9 +168,9 @@ const TestMsg = styled.p`
 
 function Login() {
   const [data, setData] = useState({
-    email: 'test@test.test',
-    password: 123456,
-    error: null,
+    email: '',
+    password: '',
+    error: '',
     loading: false,
   });
   const navigate = useNavigate();
@@ -176,13 +178,13 @@ function Login() {
   const {
     email, password, error, loading,
   } = data;
-  const handleChange = (e) => {
-    setData({ ...data, [e.target.name]: e.target.value });
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setData({ ...data, [e.currentTarget.name]: e.currentTarget.value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    setData({ ...data, error: null, loading: true });
+    setData({ ...data, error: '', loading: true });
     if (!email || !password) {
       setData({ ...data, error: '所有欄位都需要填寫呦！' });
       return;
@@ -193,7 +195,7 @@ function Login() {
           setData({
             email: '',
             password: '',
-            error: null,
+            error: '',
             loading: false,
           });
           navigate('/home', { replace: true });
@@ -220,6 +222,7 @@ function Login() {
               value={email}
               onChange={handleChange}
               autoFocus
+              autoComplete="email"
             />
             <ManualInput
               type="password"
@@ -227,6 +230,7 @@ function Login() {
               placeholder="密碼"
               value={password}
               onChange={handleChange}
+              autoComplete="current-password"
             />
             <LoginButton onClick={handleSubmit}>
               {loading ? '登入中...' : '登入'}

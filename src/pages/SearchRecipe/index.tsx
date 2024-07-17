@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components/macro';
 import { Search } from '@styled-icons/material-rounded';
 import { getSearchArray } from '../../firestore';
@@ -8,6 +8,7 @@ import Stars from '../../components/DisplayStars';
 import Header from '../../components/Header';
 import Loading from '../../components/Loading';
 import useCheckingUser from '../../components/useCheckingUser';
+import { Recipe } from '../../types/Recipe';
 
 const SearchInput = styled.input`
   width: calc(1282*100vw/1920);
@@ -254,7 +255,7 @@ function SearchRecipe() {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchName, setSearchName] = useState(decodeURI(location.search.split('=')[1]));
-  const [searchResult, setSearchResult] = useState([]);
+  const [searchResult, setSearchResult] = useState<Recipe[]>([]);
   const { userId, checkingUser } = useCheckingUser();
   const [loading, setLoading] = useState(true);
   const [imgLoaded, setImgLoaded] = useState(false);
@@ -288,9 +289,9 @@ function SearchRecipe() {
         <SearchInput
           type="search"
           placeholder="請輸入料理名稱"
-          onKeyPress={(e) => {
+          onKeyDown={(e) => {
             if (e.key === 'Enter') {
-              navigate({ pathname: '/search_recipe', search: `?q=${e.target.value}` });
+              navigate({ pathname: '/search_recipe', search: `?q=${e.currentTarget.value}` });
             }
           }}
           onChange={(e) => { setSearchName(e.target.value); }}
@@ -352,9 +353,9 @@ function SearchRecipe() {
                       </div>
                     ))}
                   </IngredientsDiv>
-                  {Math.floor(recipe.fullTime / 60)}
+                  {Math.floor(recipe.fullTime! / 60)}
                   分
-                  {recipe.fullTime % 60}
+                  {recipe.fullTime! % 60}
                   秒
                 </ResultContentBottom>
               </ResultContent>
