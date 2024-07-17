@@ -5,6 +5,6 @@ export interface Step {
   stepMinute: number;
   stepSecond: number;
   stepTime: number;
-  stepImgUrl: string;
-  stepImgPath: string;
+  stepMainImage: string;
+  stepMainImagePath: string;
 }

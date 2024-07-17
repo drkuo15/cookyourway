@@ -2,9 +2,8 @@ import {
   Routes, Route, BrowserRouter as Router,
 } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
-import { onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
 import styled, { createGlobalStyle } from 'styled-components';
+import { changeUserDataOnAuthState } from './firestore';
 import Cooking from './pages/Cooking';
 import ModifyRecipe from './pages/ModifyRecipe';
 import ReadRecipe from './pages/ReadRecipe';
@@ -13,7 +12,6 @@ import AuthHome from './pages/AuthHome';
 import Register from './pages/Register';
 import UnAuthHome from './pages/UnAuthHome';
 import Login from './pages/LogIn';
-import { auth, db } from './firestore';
 import AuthContext from './components/AuthContext';
 import NoMatch from './pages/NoMatch';
 import Footer from './components/Footer';
@@ -36,22 +34,12 @@ const BodyDiv = styled.div`
 function App() {
   const [userInfo, setUserInfo] = useState<User | null>(null);
   useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        const { uid } = user;
-        const userRef = doc(db, 'users', uid);
-        const getUserData = async () => {
-          const docSnap = await getDoc(userRef);
-          return docSnap.data() as User;
-        };
-        getUserData().then((data) => {
-          setUserInfo(data);
-        });
-      } else {
-        setUserInfo(user);
-      }
-    });
+    changeUserDataOnAuthState(setUserInfo);
   }, []);
+
+  const onChangeMyFavorites = (newMyFavorites: User['myFavorites']) => {
+    setUserInfo({ ...userInfo!, myFavorites: newMyFavorites });
+  };
 
   return (
     <>
@@ -62,7 +50,7 @@ function App() {
             <Routes>
               <Route path="/cooking" element={<Cooking />} />
               <Route path="/modify_recipe" element={<ModifyRecipe />} />
-              <Route path="/read_recipe" element={<ReadRecipe setUserInfo={setUserInfo} />} />
+              <Route path="/read_recipe" element={<ReadRecipe onChangeMyFavorites={onChangeMyFavorites} />} />
               <Route path="/search_recipe" element={<SearchRecipe />} />
               <Route path="/home" element={<AuthHome />} />
               <Route path="/register" element={<Register />} />

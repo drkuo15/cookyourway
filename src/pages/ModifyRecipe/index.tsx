@@ -1,29 +1,23 @@
 import React, {
-  useEffect, useState, useContext, useRef,
+  useEffect, useState, useReducer, useRef,
 } from 'react';
-import {
-  collection, doc, setDoc, onSnapshot, updateDoc,
-} from 'firebase/firestore';
-import { onAuthStateChanged } from 'firebase/auth';
-import {
-  getDownloadURL, uploadBytes, ref,
-} from 'firebase/storage';
 import styled from 'styled-components/macro';
 import { v4 } from 'uuid';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, useAnimation } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-// import PropTypes from 'prop-types';
-import { db, storage, auth } from '../../firestore';
 import { devices } from '../../utils/StyleUtils';
 import defaultImage from '../../images/upload.png';
 import StarRating from '../../components/Stars';
 import { ToastContainer, showCustomAlert } from '../../components/CustomAlert';
-import AuthContext from '../../components/AuthContext';
 import Header from '../../components/Header';
 import binImage from '../../images/bin.png';
 import tipImage from '../../images/tips.png';
 import Loading from '../../components/Loading';
+import {
+  uploadImg, onRecipeSnapshot, setRecipeDoc, updateRecipeDoc, recipeDoc,
+} from '../../firestore';
+import useCheckingUser from '../../components/useCheckingUser';
 import { Ingredient } from '../../types/Ingredient';
 import { Recipe } from '../../types/Recipe';
 import { Step } from '../../types/Step';
@@ -666,241 +660,151 @@ function AlwaysScrollToBottom({ ingredients }: { ingredients: Ingredient[] }) {
 }
 
 function ModifyRecipe() {
-  const [title, setTitle] = useState('');
-  const [oldTitle, setOldTitle] = useState('');
-  const [titleKeywords, setTitleKeyWords] = useState<string[]>([]);
-  const [difficulty, setDifficulty] = useState(0);
-  const [ingredients, setIngredients] = useState<Ingredient[]>([{
-    ingredientsQuantity: 0,
-    ingredientsTitle: '',
-    id: v4(),
-  },
-  ]);
-  const [steps, setSteps] = useState<Step[]>(
-    [{
+  const initialRecipe: Recipe = {
+    title: '',
+    titleKeywords: [],
+    difficulty: 0,
+    ingredients: [{
+      ingredientsQuantity: 0,
+      ingredientsTitle: '',
+      id: v4(),
+    }],
+    steps: [{
       stepTitle: '',
       stepContent: '',
       stepMinute: 0,
       stepSecond: 0,
       stepTime: 0,
-      stepImgUrl: '',
-      stepImgPath: '',
+      stepMainImage: '',
+      stepMainImagePath: '',
       id: v4(),
-    },
-    ],
+    }],
+    comment: '',
+    mainImagePath: '',
+    mainImage: '',
+    authorId: '',
+  };
+  const [recipeData, setRecipeData] = useReducer(
+    (recipeDataDetails: Recipe, newDetails: Partial<Recipe>) => ({
+      ...recipeDataDetails, ...newDetails,
+    }),
+    initialRecipe,
   );
-  const [comment, setComment] = useState('');
+
+  const {
+    title, defaultTitle, titleKeywords, difficulty, ingredients, steps,
+    comment, mainImagePath, mainImage, authorId,
+  } = recipeData;
   const [img, setImg] = useState<File>();
-  const [imgPath, setImgPath] = useState('');
-  const [imgUrl, setImgUrl] = useState('');
-  const [authorId, setAuthorId] = useState('');
-  const userInfo = useContext(AuthContext);
-  const userId = userInfo?.uid || '';
-  const userName = userInfo?.name || '';
-  const fullTime = steps.reduce((accValue, step) => accValue + Number(step.stepTime), 0);
+  const fullTime = steps.reduce((accValue: number, step: Step) => accValue + step.stepTime, 0);
   const navigate = useNavigate();
   const location = useLocation();
   const [loading, setLoading] = useState(true);
-  const [checkingUser, setCheckingUser] = useState(true);
-
-  useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setCheckingUser(false);
-      } else {
-        navigate({ pathname: '/login' });
-      }
-    });
-  }, [navigate]);
+  const { userInfo, userId, checkingUser } = useCheckingUser();
+  const userName = userInfo?.name || '';
+  const currentRecipeId = location.search.split('=')[1];
+  const docId = recipeDoc.id;
 
   useEffect(() => {
     const queryString = location.search;
-    const currentRecipeId = location.search.split('=')[1];
     if (queryString) {
-      const unsubscribe = onSnapshot(
-        doc(db, 'recipes', currentRecipeId),
-        (document) => {
-          const recipeData = document.data() as Recipe;
-          setTitle(recipeData.title);
-          setOldTitle(recipeData.title);
-          setTitleKeyWords(recipeData.titleKeywords);
-          setDifficulty(recipeData.difficulty);
-          setImgUrl(recipeData.mainImage);
-          setImgPath(recipeData.mainImagePath);
-          setIngredients(recipeData.ingredients);
-          setSteps(recipeData.steps);
-          setComment(recipeData.comment);
-          setAuthorId(recipeData.authorId);
-          setLoading(false);
-        },
-      );
+      const unsubscribe = onRecipeSnapshot(currentRecipeId, setRecipeData, 'defaultTitle');
+      setLoading(false);
       return unsubscribe;
     }
     setLoading(false);
-
     return undefined;
-  }, [location]);
+  }, [currentRecipeId, location]);
 
   useEffect(() => {
     if (img) {
-      const uploadImg = async () => {
-        const imgRef = ref(
-          storage,
-          `recipe/${new Date().getTime()} - ${img.name}`,
-        );
-        const snap = await uploadBytes(imgRef, img);
-        const url = await getDownloadURL(ref(storage, snap.ref.fullPath));
-        setImgUrl(url);
-        setImgPath(snap.ref.fullPath);
-        setImg(undefined);
-      };
-      uploadImg();
+      uploadImg(img, 'recipe')
+        .then((data) => {
+          setRecipeData({
+            mainImage: data.mainImage,
+            mainImagePath: data.mainImagePath,
+          });
+          setImg(undefined);
+        });
     }
-  }, [img, imgPath]);
+  }, [img]);
 
   function addIngredients() {
-    const newIngredients = [...ingredients, {
-      ingredientsQuantity: 0,
-      ingredientsTitle: '',
-      id: v4(),
-    }];
-    setIngredients(newIngredients);
+    const newIngredients = [...ingredients, initialRecipe.ingredients[0]];
+    setRecipeData({ ingredients: newIngredients });
   }
 
   function deleteIngredients(i: number) {
     const newIngredients = ingredients.filter((_, index) => i !== index);
-    setIngredients(newIngredients);
+    setRecipeData({ ingredients: newIngredients });
   }
+
   function updateQuantityValue(e: React.ChangeEvent<HTMLInputElement>, targetIndex: number) {
     const newIngredients = [...ingredients];
-    if (Number(e.target.value) < 0) {
+    if (e.target.valueAsNumber < 0) {
       e.target.valueAsNumber = 0;
     }
     newIngredients[targetIndex].ingredientsQuantity = e.target.valueAsNumber;
-    setIngredients(newIngredients);
+    setRecipeData({ ingredients: newIngredients });
   }
   function updateTitleValue(e: React.ChangeEvent<HTMLInputElement>, index: number) {
     const newIngredients = [...ingredients];
     newIngredients[index].ingredientsTitle = e.target.value;
-    setIngredients(newIngredients);
+    setRecipeData({ ingredients: newIngredients });
   }
 
   function addSteps() {
-    setSteps((prevSteps) => [...prevSteps, {
-      stepTitle: '',
-      stepContent: '',
-      stepMinute: 0,
-      stepSecond: 0,
-      stepTime: 0,
-      stepImgUrl: '',
-      stepImgPath: '',
-      id: v4(),
-    }]);
+    setRecipeData({
+      steps: [...steps, {
+        stepTitle: '',
+        stepContent: '',
+        stepMinute: 0,
+        stepSecond: 0,
+        stepTime: 0,
+        stepMainImage: '',
+        stepMainImagePath: '',
+        id: v4(),
+      }],
+    });
   }
 
   function updateStepTitleValue(e: React.ChangeEvent<HTMLInputElement>, index: number) {
     const newSteps = [...steps];
     newSteps[index].stepTitle = e.target.value;
-    setSteps(newSteps);
+    setRecipeData({ steps: newSteps });
   }
 
-  function updateStepMinuteValue(e: React.ChangeEvent<HTMLInputElement>, index: number) {
+  function updateStepTimeValue(e: React.ChangeEvent<HTMLInputElement>, index: number, name: 'stepMinute' | 'stepSecond') {
     const newSteps = [...steps];
-    newSteps[index].stepMinute = e.target.valueAsNumber;
-    if (newSteps[index].stepMinute < 0) {
-      newSteps[index].stepMinute = 0;
-    }
-    if (newSteps[index].stepMinute % 1 !== 0) {
-      newSteps[index].stepMinute = Math.floor(e.target.valueAsNumber);
-    }
-    newSteps[index].stepTime = newSteps[index].stepMinute * 60
-      + newSteps[index].stepSecond;
-    // if (Number(newSteps[index].stepMinute) < 0) {
-    //   newSteps[index].stepMinute = 0;
-    // }
-    // if (Number(newSteps[index].stepMinute) % 1 !== 0) {
-    //   newSteps[index].stepMinute = Math.floor(e.target.value);
-    // }
-    // newSteps[index].stepTime = Number(newSteps[index].stepMinute) * 60
-    //   + Number(newSteps[index].stepSecond);
-    setSteps(newSteps);
-  }
-
-  function updateStepSecondValue(e: React.ChangeEvent<HTMLInputElement>, index: number) {
-    const newSteps = [...steps];
-    newSteps[index].stepSecond = e.target.valueAsNumber;
-    if (newSteps[index].stepSecond > 59) {
-      newSteps[index].stepSecond = 59;
-    }
-    if (newSteps[index].stepSecond < 0) {
-      newSteps[index].stepSecond = 0;
-    }
-    if (newSteps[index].stepMinute % 1 !== 0) {
-      newSteps[index].stepMinute = Math.floor(e.target.valueAsNumber);
-    }
-    newSteps[index].stepTime = Number(newSteps[index].stepMinute) * 60
-      + Number(newSteps[index].stepSecond);
-    // if (Number(newSteps[index].stepSecond) > 59) {
-    //   newSteps[index].stepSecond = 59;
-    // }
-    // if (Number(newSteps[index].stepSecond) < 0) {
-    //   newSteps[index].stepSecond = 0;
-    // }
-    // if (Number(newSteps[index].stepMinute) % 1 !== 0) {
-    //   newSteps[index].stepMinute = Math.floor(e.target.value);
-    // }
-    // newSteps[index].stepTime = Number(newSteps[index].stepMinute) * 60
-    //   + Number(newSteps[index].stepSecond);
-    setSteps(newSteps);
+    const stepForUpdate = newSteps[index];
+    const max = Number(e.target.max);
+    const min = Number(e.target.min);
+    const timeValue = e.target.valueAsNumber || 0;
+    stepForUpdate[name] = Math.floor(Math.max(Math.min(timeValue, max), min));
+    stepForUpdate.stepTime = stepForUpdate.stepMinute * 60 + stepForUpdate.stepSecond;
+    setRecipeData({ steps: newSteps });
   }
 
   function updateStepContentValue(e: React.ChangeEvent<HTMLTextAreaElement>, index: number) {
     const newSteps = [...steps];
     newSteps[index].stepContent = e.target.value;
-    setSteps(newSteps);
+    setRecipeData({ steps: newSteps });
   }
 
   function DeleteSteps(i: number) {
     const newSteps = steps.filter((_, index) => i !== index);
-    setSteps(newSteps);
+    setRecipeData({ steps: newSteps });
   }
 
   function UpdateImageValue(e: React.ChangeEvent<HTMLInputElement>, index: number) {
-    const uploadImg = async () => {
-      const imgRef = ref(
-        storage,
-        `recipeStep/${new Date().getTime()} - ${e.target.files![0].name}`,
-      );
-      const snap = await uploadBytes(imgRef, e.target.files![0]);
-      const url = await getDownloadURL(ref(storage, snap.ref.fullPath));
-      const newSteps = [...steps];
-      newSteps[index].stepImgUrl = url;
-      newSteps[index].stepImgPath = snap.ref.fullPath;
-      setSteps(newSteps);
-    };
-    uploadImg();
+    uploadImg(e.target.files![0], 'recipeStep')
+      .then((data) => {
+        const newSteps = [...steps];
+        newSteps[index].stepMainImage = data.mainImage;
+        newSteps[index].stepMainImagePath = data.mainImagePath;
+        setRecipeData({ steps: newSteps });
+      });
   }
-
-  // function parseIngredientsQuantity() {
-  //   const parsedIngredients = [...ingredients];
-  //   parsedIngredients.forEach((ingredientObj) => {
-  //     const ingredientObjTemp = ingredientObj;
-  //     ingredientObjTemp.ingredientsQuantity = Number(ingredientObj.ingredientsQuantity);
-  //     return ingredientObjTemp;
-  //   });
-  //   return parsedIngredients;
-  // }
-
-  // function parseStepsTime() {
-  //   const parsedSteps = [...steps];
-  //   parsedSteps.forEach((stepObject) => {
-  //     const stepObjTemp = stepObject;
-  //     stepObjTemp.stepMinute = Number(stepObjTemp.stepMinute);
-  //     stepObjTemp.stepSecond = Number(stepObjTemp.stepSecond);
-  //     stepObjTemp.stepTime = Number(stepObjTemp.stepTime);
-  //   });
-  //   return parsedSteps;
-  // }
 
   function checkInputValue(newRecipeData: Recipe) {
     const hasEmptyIngValue = (obj: Ingredient) => Object.values(obj).some((value) => value === '' || value === 0);
@@ -924,7 +828,7 @@ function ModifyRecipe() {
       showCustomAlert('請選擇難易度');
       return;
     }
-    if (!imgUrl) {
+    if (!mainImage) {
       showCustomAlert('請上傳食譜封面照');
       return;
     }
@@ -956,67 +860,34 @@ function ModifyRecipe() {
       showCustomAlert('步驟時間不可以都是0喔');
       return;
     }
-    if (steps.some((step) => step.stepImgUrl === '')) {
+    if (steps.some((step) => step.stepMainImage === '')) {
       showCustomAlert('請上傳步驟照片');
     }
   }
 
-  async function setNewRecipeAndNavigate() {
-    const docId = doc(collection(db, 'recipes')).id;
-    // const parsedIngredients = parseIngredientsQuantity();
-    // const parsedSteps = parseStepsTime();
-    const newRecipeData = {
-      recipeId: docId,
-      createTime: new Date(),
-      title,
-      titleKeywords,
-      difficulty,
-      fullTime,
-      mainImage: imgUrl,
-      mainImagePath: imgPath,
-      // ingredients: parsedIngredients,
-      ingredients,
-      steps,
-      // steps: parsedSteps,
-      comment,
-      authorName: userName,
-      authorId: userId,
-    };
-    const isInputCompleted = checkInputValue(newRecipeData);
-    if (isInputCompleted) {
-      setDoc(doc(db, 'recipes', docId), newRecipeData);
-      navigate({ pathname: '/read_recipe', search: `?id=${docId}` });
-    } else {
-      alertUnfinishedInput();
-    }
+  interface UpdateCallback {
+    (id: string, newRecipeData: Recipe): Promise<void>;
   }
-
-  async function updateRecipeAndNavigate() {
-    const currentRecipeId = location.search.split('=')[1];
-    const RecipeRef = doc(db, 'recipes', currentRecipeId);
-    // const parsedIngredients = parseIngredientsQuantity();
-    // const parsedSteps = parseStepsTime();
-    const newRecipeData = {
-      recipeId: currentRecipeId,
+  async function updateRecipeDBAndNavigate(id: string, updateCallback: UpdateCallback) {
+    const newRecipeData: Recipe = {
+      recipeId: id,
       createTime: new Date(),
       title,
       titleKeywords,
       difficulty,
       fullTime,
-      mainImage: imgUrl,
-      mainImagePath: imgPath,
-      // ingredients: parsedIngredients,
+      mainImage,
+      mainImagePath,
       ingredients,
       steps,
-      // steps: parsedSteps,
       comment,
       authorName: userName,
       authorId: userId,
     };
     const isInputCompleted = checkInputValue(newRecipeData);
     if (isInputCompleted) {
-      updateDoc(RecipeRef, newRecipeData);
-      navigate({ pathname: '/read_recipe', search: `?id=${currentRecipeId}` });
+      await updateCallback(id, newRecipeData);
+      navigate({ pathname: '/read_recipe', search: `?id=${id}` });
     } else {
       alertUnfinishedInput();
     }
@@ -1026,33 +897,24 @@ function ModifyRecipe() {
     const queryString = location.search;
     if (queryString) {
       if (userId === authorId) {
-        updateRecipeAndNavigate();
+        updateRecipeDBAndNavigate(currentRecipeId, updateRecipeDoc);
       } else {
-        if (title === oldTitle) {
+        if (title === defaultTitle) {
           showCustomAlert('請更改食譜名稱');
           return;
         }
-        setNewRecipeAndNavigate();
+        updateRecipeDBAndNavigate(docId, setRecipeDoc);
       }
       return;
     }
-    setNewRecipeAndNavigate();
+    updateRecipeDBAndNavigate(docId, setRecipeDoc);
   }
 
   function submitData() {
     decideToUpdateOrSetRecipe();
   }
 
-  if (checkingUser) {
-    return (
-      <>
-        <Header />
-        <Loading />
-      </>
-    );
-  }
-
-  if (loading) {
+  if (checkingUser || loading) {
     return (
       <>
         <Header />
@@ -1069,16 +931,23 @@ function ModifyRecipe() {
           <TittleInputWrapper>
             <TitleInput
               value={title}
-              onChange={(e) => { setTitle(e.target.value); setTitleKeyWords(e.target.value.split('')); }}
+              maxLength={10}
+              onChange={(e) => {
+                setRecipeData({ title: e.target.value, titleKeywords: e.target.value.split('') });
+              }}
               placeholder="請輸入食譜名稱..."
+              autoFocus
             />
-            {authorId && userId !== authorId && title === oldTitle ? <ErrorMsg>請為您的食譜取個新名稱</ErrorMsg> : ''}
+            {authorId && userId !== authorId && title === defaultTitle ? <ErrorMsg>請為您的食譜取個新名稱</ErrorMsg> : ''}
           </TittleInputWrapper>
         </TitleWrapper>
         <ContentWrapper>
           <ContentDiv>
             <MediumLargeDiv>難易度</MediumLargeDiv>
-            <StarRating onChange={(i) => setDifficulty(i)} rating={difficulty} />
+            <StarRating
+              onChange={(i) => setRecipeData({ difficulty: i })}
+              rating={difficulty}
+            />
           </ContentDiv>
           <ContentDiv>
             <MediumLargeDiv>總時長</MediumLargeDiv>
@@ -1090,7 +959,7 @@ function ModifyRecipe() {
         </ContentWrapper>
         <ContentWrapper>
           <ImgWrapper>
-            <FoodImg src={imgUrl || defaultImage} alt="stepImages" />
+            <FoodImg src={mainImage || defaultImage} alt="Images" />
             <Label htmlFor="photo">
               <UploadImgP>點擊上傳圖片</UploadImgP>
             </Label>
@@ -1111,6 +980,7 @@ function ModifyRecipe() {
                 <IngredientDiv key={ingredient.id}>
                   <Input
                     value={ingredient.ingredientsTitle}
+                    maxLength={10}
                     onChange={(e) => { updateTitleValue(e, index); }}
                     placeholder="請輸入食材名稱..."
                   />
@@ -1157,25 +1027,27 @@ function ModifyRecipe() {
                 <StepTitleAndTimeDiv>
                   <StepInput
                     value={step.stepTitle}
+                    maxLength={10}
                     onChange={(e) => { updateStepTitleValue(e, index); }}
                     placeholder="請輸入步驟簡稱..."
                   />
                   <StepTimeDiv>
                     <TimeInput
                       value={steps[index].stepMinute}
-                      onChange={(e) => { updateStepMinuteValue(e, index); }}
+                      onChange={(e) => { updateStepTimeValue(e, index, 'stepMinute'); }}
                       placeholder="0"
                       type="number"
-                      min="0"
+                      min={0}
+                      max={600}
                     />
                     <MediumLargeDiv>分</MediumLargeDiv>
                     <TimeInput
                       value={steps[index].stepSecond}
-                      onChange={(e) => { updateStepSecondValue(e, index); }}
+                      onChange={(e) => { updateStepTimeValue(e, index, 'stepSecond'); }}
                       placeholder="0"
                       type="number"
-                      min="0"
-                      max="59"
+                      min={0}
+                      max={59}
                     />
                     <MediumLargeDiv>秒</MediumLargeDiv>
                   </StepTimeDiv>
@@ -1184,12 +1056,13 @@ function ModifyRecipe() {
                   <StepContentDiv>
                     <TextArea
                       value={steps[index].stepContent}
+                      maxLength={100}
                       onChange={(e) => { updateStepContentValue(e, index); }}
                       placeholder="請描述步驟"
                     />
                   </StepContentDiv>
                   <ImgWrapper>
-                    <StepImg src={steps[index].stepImgUrl || defaultImage} alt="stepImages" />
+                    <StepImg src={steps[index].stepMainImage || defaultImage} alt="stepImages" />
                     <StepLabel htmlFor={step.id}>
                       <StepUploadImgP>點擊上傳圖片</StepUploadImgP>
                     </StepLabel>
@@ -1216,7 +1089,8 @@ function ModifyRecipe() {
           <CommentContentDiv>
             <CommentTextArea
               value={comment}
-              onChange={(e) => setComment(e.target.value)}
+              maxLength={100}
+              onChange={(e) => setRecipeData({ comment: e.target.value })}
               placeholder="有什麼我們可以注意的地方嗎？"
             />
           </CommentContentDiv>
@@ -1227,9 +1101,5 @@ function ModifyRecipe() {
     </>
   );
 }
-
-// AlwaysScrollToBottom.propTypes = {
-//   ingredients: PropTypes.arrayOf(PropTypes.objectOf).isRequired,
-// };
 
 export default ModifyRecipe;

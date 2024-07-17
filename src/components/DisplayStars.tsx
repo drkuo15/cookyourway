@@ -1,5 +1,4 @@
 import React, { CSSProperties } from 'react';
-// import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { devices } from '../utils/StyleUtils';
 
@@ -50,12 +49,5 @@ function Stars({
     />
   );
 }
-
-// Stars.propTypes = {
-//   stars: PropTypes.number.isRequired,
-//   size: PropTypes.number.isRequired,
-//   spacing: PropTypes.number.isRequired,
-//   fill: PropTypes.string.isRequired,
-// };
 
 export default Stars;

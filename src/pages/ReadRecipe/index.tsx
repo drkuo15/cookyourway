@@ -1,27 +1,22 @@
 import React, {
-  useState, useEffect, useContext, useCallback, Dispatch, SetStateAction,
+  useState, useEffect, useCallback,
 } from 'react';
 import styled, { keyframes } from 'styled-components/macro';
-import { doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-// import PropTypes from 'prop-types';
 import { motion, useAnimation } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { IosShare } from '@styled-icons/material-rounded';
-import { onAuthStateChanged } from 'firebase/auth';
-import { db, auth } from '../../firestore';
+import { onRecipeSnapshot, updateUserDoc } from '../../firestore';
 import { devices } from '../../utils/StyleUtils';
 import Stars from '../../components/DisplayStars';
 import defaultImage from '../../images/upload.png';
 import { ToastContainer, showCustomAlert } from '../../components/CustomAlert';
-import AuthContext from '../../components/AuthContext';
 import Header from '../../components/Header';
 import tipImage from '../../images/tips.png';
 import Loading from '../../components/Loading';
+import useCheckingUser from '../../components/useCheckingUser';
 import { User } from '../../types/User';
-import { Ingredient } from '../../types/Ingredient';
 import { Recipe } from '../../types/Recipe';
-import { Step } from '../../types/Step';
 
 const Background = styled.div`
   padding: 0 calc(116*100vw/1920);
@@ -434,66 +429,38 @@ const Icon = styled.span`
 `;
 
 interface ReadRecipeProps {
-  setUserInfo: Dispatch<SetStateAction<User>>
+  onChangeMyFavorites: (newMyFavorites: User['myFavorites']) => void;
 }
 
-function ReadRecipe({ setUserInfo }: ReadRecipeProps) {
-  const userInfo = useContext(AuthContext);
-  const userId = userInfo?.uid || '';
+function ReadRecipe({ onChangeMyFavorites }: ReadRecipeProps) {
+  const { userInfo, userId, checkingUser } = useCheckingUser();
   const myFavorites = userInfo?.myFavorites || [];
-  const [title, setTitle] = useState('');
-  const [difficulty, setDifficulty] = useState(1);
-  const [ingredients, setIngredients] = useState<Ingredient[]>([]);
-  const [steps, setSteps] = useState<Step[]>([]);
-  const [comment, setComment] = useState('');
-  const [imgUrl, setImgUrl] = useState('');
-  const [authorName, setAuthorName] = useState('');
-  const [authorId, setAuthorId] = useState('');
-  const [fullTime, setFulltime] = useState(0);
+  const initialRecipe: Recipe = {
+    title: '',
+    difficulty: 1,
+    ingredients: [],
+    steps: [],
+    comment: '',
+    mainImage: '',
+    authorName: '',
+    authorId: '',
+    fullTime: 0,
+  };
+  const [recipeData, setRecipeData] = useState(initialRecipe);
+  const {
+    title, difficulty, ingredients, steps, comment, mainImage, authorName, authorId, fullTime,
+  } = recipeData;
   const location = useLocation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [checkingUser, setCheckingUser] = useState(true);
   const [imgLoaded, setImgLoaded] = useState(false);
   const [stepImgLoaded, setStepImgLoaded] = useState(false);
-
-  const setMyFavorites = (newMyFavorites: User['myFavorites']) => {
-    setUserInfo({ ...userInfo!, myFavorites: newMyFavorites });
-  };
-
-  useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setCheckingUser(false);
-      } else {
-        navigate({ pathname: '/login' });
-      }
-    });
-  }, [navigate]);
-
   const currentRecipeId = location.search.split('=')[1];
+
   useEffect(() => {
     if (currentRecipeId) {
-      const unsubscribe = onSnapshot(
-        doc(db, 'recipes', currentRecipeId),
-        (document) => {
-          const recipeData = document.data() as Recipe;
-          if (!recipeData) {
-            navigate({ pathname: '/home' });
-            return;
-          }
-          setTitle(recipeData.title);
-          setDifficulty(recipeData.difficulty);
-          setImgUrl(recipeData.mainImage);
-          setIngredients(recipeData.ingredients);
-          setSteps(recipeData.steps);
-          setComment(recipeData.comment);
-          setAuthorName(recipeData.authorName);
-          setAuthorId(recipeData.authorId);
-          setFulltime(recipeData.fullTime);
-          setLoading(false);
-        },
-      );
+      const unsubscribe = onRecipeSnapshot(currentRecipeId, setRecipeData);
+      setLoading(false);
       return unsubscribe;
     }
     navigate({ pathname: '/home' });
@@ -516,45 +483,27 @@ function ReadRecipe({ setUserInfo }: ReadRecipeProps) {
   }, [ingredients, title]);
 
   function addToFavorites() {
-    const UserRef = doc(db, 'users', userId);
     const isRecipeExisting = myFavorites.some((id) => id === currentRecipeId);
     if (isRecipeExisting) {
       return;
     }
     const updatedMyFavorite = [...myFavorites, currentRecipeId];
-    setMyFavorites(updatedMyFavorite);
-    updateDoc(UserRef, { myFavorites: updatedMyFavorite });
-    showCustomAlert('已成功加入收藏清單\n\n請前往首頁查看');
+    onChangeMyFavorites(updatedMyFavorite);
+    updateUserDoc(userId, updatedMyFavorite)
+      .then(() => showCustomAlert('已成功加入收藏清單\n\n請前往首頁查看'));
   }
 
   function removeFromFavorites() {
-    const UserRef = doc(db, 'users', userId);
     const isRecipeExisting = myFavorites.some((id) => id === currentRecipeId);
     if (isRecipeExisting) {
       const updatedMyFavorite = myFavorites.filter((id) => id !== currentRecipeId);
-      setMyFavorites(updatedMyFavorite);
-      updateDoc(UserRef, { myFavorites: updatedMyFavorite });
-      showCustomAlert('已從收藏清單成功移除');
+      onChangeMyFavorites(updatedMyFavorite);
+      updateUserDoc(userId, updatedMyFavorite)
+        .then(() => showCustomAlert('已從收藏清單成功移除'));
     }
   }
 
-  if (checkingUser) {
-    return (
-      <>
-        <Header
-          authorId={authorId}
-          userId={userId}
-          addToFavorites={() => { addToFavorites(); }}
-          removeFromFavorites={() => { removeFromFavorites(); }}
-          myFavorites={myFavorites}
-          currentRecipeId={currentRecipeId}
-        />
-        <Loading />
-      </>
-    );
-  }
-
-  if (loading) {
+  if (checkingUser || loading) {
     return (
       <>
         <Header
@@ -597,22 +546,22 @@ function ReadRecipe({ setUserInfo }: ReadRecipeProps) {
           <ContentDiv>
             <LargeDiv>總時長</LargeDiv>
             <LargeDiv>
-              {Math.floor(fullTime / 60) === 0 ? '' : `${Math.floor(fullTime / 60)}分`}
-              {fullTime % 60 === 0 ? '' : `${fullTime % 60}秒`}
+              {Math.floor(fullTime! / 60) === 0 ? '' : `${Math.floor(fullTime! / 60)}分`}
+              {fullTime! % 60 === 0 ? '' : `${fullTime! % 60}秒`}
             </LargeDiv>
           </ContentDiv>
         </ContentWrapper>
         <ContentWrapper>
           {imgLoaded ? (
             <Img
-              src={imgUrl || defaultImage}
+              src={mainImage || defaultImage}
               alt="mainImage"
             />
           ) : (
             <>
               <Img
                 style={imgLoaded ? {} : { display: 'none' }}
-                src={imgUrl || defaultImage}
+                src={mainImage || defaultImage}
                 alt="mainImage"
                 onLoad={() => { setImgLoaded(true); }}
               />
@@ -662,14 +611,14 @@ function ReadRecipe({ setUserInfo }: ReadRecipeProps) {
                   </StepContentDiv>
                   {stepImgLoaded ? (
                     <StepImg
-                      src={steps[index].stepImgUrl || defaultImage}
+                      src={steps[index].stepMainImage || defaultImage}
                       alt="stepImages"
                     />
                   ) : (
                     <>
                       <StepImg
                         style={stepImgLoaded ? {} : { display: 'none' }}
-                        src={steps[index].stepImgUrl || defaultImage}
+                        src={steps[index].stepMainImage || defaultImage}
                         alt="stepImages"
                         onLoad={() => { setStepImgLoaded(true); }}
                       />
@@ -700,16 +649,5 @@ function ReadRecipe({ setUserInfo }: ReadRecipeProps) {
     </>
   );
 }
-
-// ReadRecipe.propTypes = {
-//   setUserInfo: PropTypes.func.isRequired,
-// };
-
-// Stars.propTypes = {
-//   stars: PropTypes.number.isRequired,
-//   size: PropTypes.number.isRequired,
-//   spacing: PropTypes.number.isRequired,
-//   fill: PropTypes.string.isRequired,
-// };
 
 export default ReadRecipe;

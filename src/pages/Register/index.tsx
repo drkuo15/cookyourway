@@ -1,9 +1,7 @@
-import { createUserWithEmailAndPassword } from 'firebase/auth';
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { doc, setDoc } from 'firebase/firestore';
-import { auth, db } from '../../firestore';
+import { registerUser } from '../../firestore';
 import CenterTopHeader from '../../components/CenterTopHeader';
 import FoodBackground from '../../components/FoodBackground';
 import helpImage from '../../images/help.svg';
@@ -177,6 +175,15 @@ function Register() {
     setData({ ...data, [e.currentTarget.name]: e.currentTarget.value });
   };
 
+  const renderError = (message: string) => {
+    if (message === 'Firebase: Password should be at least 6 characters (auth/weak-password).') {
+      return '密碼至少要六位數呦！';
+    } if (message === 'Firebase: Error (auth/email-already-in-use).') {
+      return '帳號已存在，請嘗試其它帳號';
+    }
+    return message;
+  };
+
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setData({ ...data, error: '', loading: true });
@@ -184,17 +191,7 @@ function Register() {
       setData({ ...data, error: '所有欄位都需要填寫呦！' });
     }
     try {
-      const result = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password,
-      );
-      await setDoc(doc(db, 'users', result.user.uid), {
-        uid: result.user.uid,
-        name,
-        email,
-        myFavorites: [],
-      });
+      await registerUser(email, password, name);
       setData({
         name: '',
         email: '',
@@ -205,7 +202,18 @@ function Register() {
       showCustomAlert('您已註冊成功，即將轉跳首頁');
       setTimeout(() => { navigate('/home', { replace: true }); }, 4000);
     } catch (err) {
-      setData({ ...data, error: err.message, loading: false });
+      let errorMessage = '';
+      if (err instanceof Error) {
+        errorMessage = err.message;
+      }
+      if (typeof err === 'string') {
+        errorMessage = err;
+      }
+      setData({
+        ...data,
+        error: renderError(errorMessage),
+        loading: false,
+      });
     }
   };
   return (
@@ -226,6 +234,7 @@ function Register() {
               placeholder="使用者名稱"
               value={name}
               onChange={handleChange}
+              autoFocus
             />
             <ManualInput
               type="text"

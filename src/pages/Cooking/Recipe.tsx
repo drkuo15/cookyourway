@@ -5,7 +5,6 @@ import styled, { keyframes } from 'styled-components/macro';
 import {
   West, East, OutdoorGrill, LocalDining,
 } from '@styled-icons/material-rounded';
-// import PropTypes from 'prop-types';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Step } from '../../types/Step';
 
@@ -257,14 +256,14 @@ function Recipe({
           </WrapperStep>
           {imgLoaded ? (
             <Img
-              src={step.stepImgUrl}
+              src={step.stepMainImage}
               alt="stepImage"
             />
           ) : (
             <>
               <Img
                 style={imgLoaded ? {} : { display: 'none' }}
-                src={step.stepImgUrl}
+                src={step.stepMainImage}
                 alt="stepImage"
                 onLoad={() => { setImgLoaded(true); }}
               />
@@ -292,12 +291,5 @@ function Recipe({
     </RecipeArea>
   );
 }
-
-// Recipe.propTypes = {
-//   stepIndex: PropTypes.number.isRequired,
-//   setStepIndex: PropTypes.func.isRequired,
-//   setIsCounting: PropTypes.func.isRequired,
-//   steps: PropTypes.PropTypes.arrayOf(PropTypes.objectOf).isRequired,
-// };
 
 export default Recipe;

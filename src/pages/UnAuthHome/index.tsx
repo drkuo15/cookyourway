@@ -1,11 +1,9 @@
 import styled, { keyframes } from 'styled-components';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { doc, setDoc } from 'firebase/firestore';
-import mainImage from '../../images/healthy.jpg';
+import { registerUser } from '../../firestore';
+import mainImage from '../../images/healthy.webp';
 import Header from '../../components/Header';
-import { auth, db } from '../../firestore';
 import { devices } from '../../utils/StyleUtils';
 import { ToastContainer, showCustomAlert } from '../../components/CustomAlert';
 import backgroundImg from '../../images/BG.svg';
@@ -201,6 +199,16 @@ const ErrorMsg = styled.p`
   }
 `;
 
+const TestMsg = styled.p`
+  font-size: calc(24*100vw/1920);
+  font-weight: bold;
+  width: 100%;
+  text-align: center;
+  @media ${devices.Tablet} and (orientation:portrait) {
+    font-size: calc(60*100vw/1920);
+  }
+`;
+
 function UnAuthHome() {
   const [imgLoaded, setImgLoaded] = useState(false);
   const navigate = useNavigate();
@@ -219,6 +227,15 @@ function UnAuthHome() {
     setData({ ...data, [e.currentTarget.name]: e.currentTarget.value });
   };
 
+  const renderError = (message: string) => {
+    if (message === 'Firebase: Password should be at least 6 characters (auth/weak-password).') {
+      return '密碼至少要六位數呦！';
+    } if (message === 'Firebase: Error (auth/email-already-in-use).') {
+      return '帳號已存在，請嘗試其它帳號';
+    }
+    return message;
+  };
+
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setData({ ...data, error: '', loading: true });
@@ -226,17 +243,7 @@ function UnAuthHome() {
       setData({ ...data, error: '所有欄位都需要填寫呦！' });
     }
     try {
-      const result = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password,
-      );
-      await setDoc(doc(db, 'users', result.user.uid), {
-        uid: result.user.uid,
-        name,
-        email,
-        myFavorites: [],
-      });
+      await registerUser(email, password, name);
       setData({
         name: '',
         email: '',
@@ -247,7 +254,18 @@ function UnAuthHome() {
       showCustomAlert('您已註冊成功，即將轉跳首頁');
       setTimeout(() => { navigate('/home', { replace: true }); }, 4000);
     } catch (err) {
-      setData({ ...data, error: err.message, loading: false });
+      let errorMessage = '';
+      if (err instanceof Error) {
+        errorMessage = err.message;
+      }
+      if (typeof err === 'string') {
+        errorMessage = err;
+      }
+      setData({
+        ...data,
+        error: renderError(errorMessage),
+        loading: false,
+      });
     }
   };
 
@@ -311,7 +329,11 @@ function UnAuthHome() {
               <RegisterButton onClick={handleSubmit}>
                 {loading ? '帳號註冊中...' : '註冊'}
               </RegisterButton>
-              {error && <ErrorMsg>{error}</ErrorMsg>}
+              {error ? <ErrorMsg>{error}</ErrorMsg> : (
+                <TestMsg>
+                  請直接點擊右上角登入按鈕進行測試！
+                </TestMsg>
+              )}
             </ManualRegister>
           </RegisterBox>
         </Wrapper>

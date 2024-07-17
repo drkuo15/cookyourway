@@ -1,13 +1,11 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import styled from 'styled-components/macro';
-import { signOut } from 'firebase/auth';
 import React, { useContext, useEffect, useState } from 'react';
 import {
   Search, FavoriteBorder, Favorite, ContentCopy, Edit,
 } from '@styled-icons/material-rounded';
-// import PropTypes from 'prop-types';
+import { signOutUser } from '../firestore';
 import logoImage from '../images/CookYourWay_logo_v1.png';
-import { auth } from '../firestore';
 import { devices } from '../utils/StyleUtils';
 import AuthContext from './AuthContext';
 import chefImage from '../images/chef.png';
@@ -353,10 +351,8 @@ const Button = styled(Link)`
 function SignOut() {
   const navigate = useNavigate();
   function handleSignOut() {
-    signOut(auth).then(() => {
-      navigate('/login', { replace: true });
-      // Sign-out successful.
-    });
+    signOutUser();
+    navigate('/login', { replace: true });
   }
 
   return (
@@ -576,37 +572,5 @@ function Header({
     </>
   );
 }
-
-// Header.defaultProps = defaultHeaderProps;
-
-// Header.propTypes = {
-//   authorId: PropTypes.string,
-//   userId: PropTypes.string,
-//   addToFavorites: PropTypes.func,
-//   removeFromFavorites: PropTypes.func,
-//   myFavorites: PropTypes.arrayOf(PropTypes.string),
-//   currentRecipeId: PropTypes.string,
-// };
-
-// Header.defaultProps = {
-//   authorId: '',
-//   userId: '',
-//   addToFavorites: () => { },
-//   removeFromFavorites: () => { },
-//   myFavorites: [],
-//   currentRecipeId: '',
-// };
-
-// CollectRecipe.propTypes = {
-//   addToFavorites: PropTypes.func.isRequired,
-//   removeFromFavorites: PropTypes.func.isRequired,
-//   myFavorites: PropTypes.arrayOf(PropTypes.string).isRequired,
-//   currentRecipeId: PropTypes.string.isRequired,
-// };
-
-// CopyOrModifyRecipe.propTypes = {
-//   authorId: PropTypes.string.isRequired,
-//   userId: PropTypes.string.isRequired,
-// };
 
 export default Header;

@@ -1,10 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import {
-  signInWithEmailAndPassword, setPersistence, browserSessionPersistence,
-} from 'firebase/auth';
 import styled from 'styled-components/macro';
-import { auth } from '../../firestore';
+import { loginUser } from '../../firestore/index';
 import CenterTopHeader from '../../components/CenterTopHeader';
 import FoodBackground from '../../components/FoodBackground';
 import helpImage from '../../images/help.svg';
@@ -192,8 +189,7 @@ function Login() {
       setData({ ...data, error: '所有欄位都需要填寫呦！' });
       return;
     }
-    setPersistence(auth, browserSessionPersistence)
-      .then(() => signInWithEmailAndPassword(auth, email, password))
+    loginUser(email, password)
       .then(() => {
         setTimeout(() => {
           setData({
@@ -203,9 +199,15 @@ function Login() {
             loading: false,
           });
           navigate('/home', { replace: true });
-        }, 800);
+        }, 900);
       })
-      .catch((err) => { setData({ ...data, error: err.message, loading: false }); });
+      .catch((err) => {
+        setData({
+          ...data,
+          error: err.message === 'Firebase: Error (auth/wrong-password).' ? '帳號密碼錯誤，請重新嘗試' : err.message,
+          loading: false,
+        });
+      });
   };
   return (
     <>
@@ -219,6 +221,7 @@ function Login() {
               placeholder="電子郵件"
               value={email}
               onChange={handleChange}
+              autoFocus
               autoComplete="email"
             />
             <ManualInput

@@ -1,7 +1,6 @@
 import React, {
   useRef, useEffect, Dispatch, SetStateAction,
 } from 'react';
-// import PropTypes from 'prop-types';
 import styled from 'styled-components/macro';
 import { PlayCircle, PauseCircle, ReplayCircleFilled } from '@styled-icons/material-rounded';
 import MusicDisc from '../../components/MusicDisc';
@@ -61,10 +60,6 @@ function Counter({
 }: CounterProps) {
   const timerRef = useRef<number | null>(null);
 
-  const toggleCounting = () => {
-    setIsCounting((prev) => !prev);
-  };
-
   useEffect(() => {
     if (!isCounting) {
       return undefined;
@@ -87,6 +82,10 @@ function Counter({
     return clearTimer;
   }, [isCounting, time, onTimeUp, setTime]);
 
+  const toggleCounting = () => {
+    setIsCounting((prev) => !prev);
+  };
+
   const resetTime = () => {
     setTime(initialTime);
     setIsCounting(true);
@@ -105,14 +104,5 @@ function Counter({
     </CounterWrapper>
   );
 }
-
-// Counter.propTypes = {
-//   setIsCounting: PropTypes.func.isRequired,
-//   isCounting: PropTypes.bool.isRequired,
-//   time: PropTypes.number.isRequired,
-//   setTime: PropTypes.func.isRequired,
-//   initialTime: PropTypes.number.isRequired,
-//   onTimeUp: PropTypes.func.isRequired,
-// };
 
 export default Counter;

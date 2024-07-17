@@ -1,6 +1,5 @@
 import { useRef, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-// import PropTypes from 'prop-types';
 
 interface PlayerProps {
   url: string;
@@ -41,11 +40,5 @@ function Player({ url, isCounting }: PlayerProps) {
 
   return null;
 }
-
-// Player.propTypes = {
-//   url: PropTypes.string.isRequired,
-//   setIsCounting: PropTypes.func.isRequired,
-//   isCounting: PropTypes.bool.isRequired,
-// };
 
 export default Player;
