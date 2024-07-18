@@ -700,8 +700,7 @@ function ModifyRecipe() {
   const navigate = useNavigate();
   const location = useLocation();
   const [loading, setLoading] = useState(true);
-  const { userInfo, userId, checkingUser } = useCheckingUser();
-  const userName = userInfo?.name || '';
+  const { userName, userId, checkingUser } = useCheckingUser();
   const currentRecipeId = location.search.split('=')[1];
   const docId = recipeDoc.id;
 
