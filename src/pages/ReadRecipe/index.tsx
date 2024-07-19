@@ -433,8 +433,7 @@ interface ReadRecipeProps {
 }
 
 function ReadRecipe({ onChangeMyFavorites }: ReadRecipeProps) {
-  const { userInfo, userId, checkingUser } = useCheckingUser();
-  const myFavorites = userInfo?.myFavorites || [];
+  const { userFavorites, userId, checkingUser } = useCheckingUser();
   const initialRecipe: Recipe = {
     title: '',
     difficulty: 1,
@@ -483,20 +482,20 @@ function ReadRecipe({ onChangeMyFavorites }: ReadRecipeProps) {
   }, [ingredients, title]);
 
   function addToFavorites() {
-    const isRecipeExisting = myFavorites.some((id) => id === currentRecipeId);
+    const isRecipeExisting = userFavorites.some((id) => id === currentRecipeId);
     if (isRecipeExisting) {
       return;
     }
-    const updatedMyFavorite = [...myFavorites, currentRecipeId];
+    const updatedMyFavorite = [...userFavorites, currentRecipeId];
     onChangeMyFavorites(updatedMyFavorite);
     updateUserDoc(userId, updatedMyFavorite)
       .then(() => showCustomAlert('已成功加入收藏清單\n\n請前往首頁查看'));
   }
 
   function removeFromFavorites() {
-    const isRecipeExisting = myFavorites.some((id) => id === currentRecipeId);
+    const isRecipeExisting = userFavorites.some((id) => id === currentRecipeId);
     if (isRecipeExisting) {
-      const updatedMyFavorite = myFavorites.filter((id) => id !== currentRecipeId);
+      const updatedMyFavorite = userFavorites.filter((id) => id !== currentRecipeId);
       onChangeMyFavorites(updatedMyFavorite);
       updateUserDoc(userId, updatedMyFavorite)
         .then(() => showCustomAlert('已從收藏清單成功移除'));
@@ -511,7 +510,7 @@ function ReadRecipe({ onChangeMyFavorites }: ReadRecipeProps) {
           userId={userId}
           addToFavorites={() => { addToFavorites(); }}
           removeFromFavorites={() => { removeFromFavorites(); }}
-          myFavorites={myFavorites}
+          myFavorites={userFavorites}
           currentRecipeId={currentRecipeId}
         />
         <Loading />
@@ -526,7 +525,7 @@ function ReadRecipe({ onChangeMyFavorites }: ReadRecipeProps) {
         userId={userId}
         addToFavorites={() => { addToFavorites(); }}
         removeFromFavorites={() => { removeFromFavorites(); }}
-        myFavorites={myFavorites}
+        myFavorites={userFavorites}
         currentRecipeId={currentRecipeId}
       />
       <Background>
