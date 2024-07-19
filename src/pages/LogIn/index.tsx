@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components/macro';
-import { loginUser } from '../../firestore/index';
+import { loginUser } from '../../firestore';
 import CenterTopHeader from '../../components/CenterTopHeader';
 import FoodBackground from '../../components/FoodBackground';
 import helpImage from '../../images/help.svg';
