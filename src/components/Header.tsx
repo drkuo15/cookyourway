@@ -8,7 +8,7 @@ import { signOutUser } from '../firestore';
 import logoImage from '../images/CookYourWay_logo_v1.png';
 import { devices } from '../utils/StyleUtils';
 import chefImage from '../images/chef.png';
-import useCheckingUser from './useCheckingUser';
+import useCheckingUser from '../hooks/useCheckingUser';
 
 const Background = styled.div`
   width: 100%;

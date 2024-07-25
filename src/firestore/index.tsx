@@ -83,20 +83,10 @@ export const registerUser = async (email: string, password: string, name: string
   });
 };
 
-export const loginUser = async (email: string, password: string) => new Promise<void>(
-  (resolve, reject) => {
-    setPersistence(auth, browserSessionPersistence)
-      .then(() => {
-        signInWithEmailAndPassword(auth, email, password)
-          .then(() => {
-            resolve();
-          })
-          .catch((err) => {
-            reject(err);
-          });
-      });
-  },
-);
+export const loginUser = async (email: string, password: string) => {
+  await setPersistence(auth, browserSessionPersistence);
+  await signInWithEmailAndPassword(auth, email, password);
+};
 
 export const signOutUser = () => {
   signOut(auth);

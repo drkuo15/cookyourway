@@ -7,7 +7,7 @@ import { devices } from '../../utils/StyleUtils';
 import Stars from '../../components/DisplayStars';
 import Header from '../../components/Header';
 import Loading from '../../components/Loading';
-import useCheckingUser from '../../components/useCheckingUser';
+import useCheckingUser from '../../hooks/useCheckingUser';
 import { Recipe } from '../../types/Recipe';
 
 const SearchInput = styled.input`

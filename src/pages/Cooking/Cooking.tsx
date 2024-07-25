@@ -12,7 +12,7 @@ import music3 from '../../music/music3.m4a';
 import music4 from '../../music/music4.m4a';
 import Loading from '../../components/Loading';
 import { getCurrentData } from '../../firestore';
-import useCheckingUser from '../../components/useCheckingUser';
+import useCheckingUser from '../../hooks/useCheckingUser';
 
 const ForceLandscapeAlert = styled.div`
   display:none;
