@@ -17,7 +17,7 @@ import Loading from '../../components/Loading';
 import {
   uploadImg, onRecipeSnapshot, setRecipeDoc, updateRecipeDoc, recipeDoc,
 } from '../../firestore';
-import useCheckingUser from '../../components/useCheckingUser';
+import useCheckingUser from '../../hooks/useCheckingUser';
 import { Ingredient } from '../../types/Ingredient';
 import { Recipe } from '../../types/Recipe';
 import { Step } from '../../types/Step';

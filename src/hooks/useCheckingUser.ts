@@ -2,7 +2,7 @@ import {
   useState, useEffect, useContext,
 } from 'react';
 import { useNavigate } from 'react-router-dom';
-import AuthContext from './AuthContext';
+import AuthContext from '../components/AuthContext';
 import { handleAuthStateChange } from '../firestore';
 
 export default function useCheckingUser() {

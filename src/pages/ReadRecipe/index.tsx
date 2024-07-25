@@ -14,7 +14,7 @@ import { ToastContainer, showCustomAlert } from '../../components/CustomAlert';
 import Header from '../../components/Header';
 import tipImage from '../../images/tips.png';
 import Loading from '../../components/Loading';
-import useCheckingUser from '../../components/useCheckingUser';
+import useCheckingUser from '../../hooks/useCheckingUser';
 import { User } from '../../types/User';
 import { Recipe } from '../../types/Recipe';
 

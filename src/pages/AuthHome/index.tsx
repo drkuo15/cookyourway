@@ -16,7 +16,7 @@ import mandarin from '../../images/fruits/mandarin.webp';
 import pineapple from '../../images/fruits/pineapple.webp';
 import strawberry from '../../images/fruits/strawberry.webp';
 import blueberry from '../../images/fruits/blueberry.webp';
-import useCheckingUser from '../../components/useCheckingUser';
+import useCheckingUser from '../../hooks/useCheckingUser';
 import { User } from '../../types/User';
 import { Recipe } from '../../types/Recipe';
 
