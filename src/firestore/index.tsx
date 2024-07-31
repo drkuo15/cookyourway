@@ -1,8 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import {
   getFirestore, doc, setDoc, collection,
-  query, where, getDocs, onSnapshot,
-  getDoc, updateDoc,
+  query, where, getDocs, getDoc, updateDoc,
 } from 'firebase/firestore';
 import {
   getStorage, getDownloadURL, uploadBytes, ref,
@@ -146,43 +145,10 @@ export const getRecommendRecipes = async (userId: string, averageDifficulty: num
   return queryRecipeArray.filter((recipe) => recipe.authorId !== userId);
 };
 
-export const onUserSnapshot = (userId: string, callback: (data: User['myFavorites']) => void) => {
-  const UserRef = doc(db, 'users', userId);
-  return onSnapshot(
-    UserRef,
-    (document) => {
-      const userData = document.data() as User;
-      callback(userData.myFavorites);
-    },
-  );
-};
-
-export const onRecipeSnapshot = (
-  currentRecipeId: string,
-  callback: (data: Recipe) => void,
-  ...keys: string[]
-) => {
-  const RecipeRef = doc(db, 'recipes', currentRecipeId);
-  return onSnapshot(
-    RecipeRef,
-    (document) => {
-      const data = document.data() as Recipe;
-      const completeData = { ...data };
-      if (keys) {
-        keys.forEach((key) => {
-          if (key === 'defaultTitle') {
-            completeData[key] = data.title;
-          }
-        });
-      }
-      callback(completeData);
-    },
-  );
-};
-export const getCurrentData = async (currentRecipeId: string) => {
+export const getRecipe = async (currentRecipeId: string) => {
   const docRef = doc(db, 'recipes', currentRecipeId);
   const docSnap = await getDoc(docRef);
-  return docSnap.data();
+  return docSnap.data() as Recipe;
 };
 
 export const uploadImg = async (img: File, folder: string) => {
