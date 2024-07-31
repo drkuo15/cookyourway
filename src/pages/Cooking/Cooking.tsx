@@ -11,8 +11,9 @@ import music2 from '../../music/music2.m4a';
 import music3 from '../../music/music3.m4a';
 import music4 from '../../music/music4.m4a';
 import Loading from '../../components/Loading';
-import { getCurrentData } from '../../firestore';
+import { getRecipe } from '../../firestore';
 import useCheckingUser from '../../hooks/useCheckingUser';
+import { Step } from '../../types/Step';
 
 const ForceLandscapeAlert = styled.div`
   display:none;
@@ -94,7 +95,7 @@ function Cooking() {
   const location = useLocation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [steps, setSteps] = useState([]);
+  const [steps, setSteps] = useState<Step[]>([]);
   const { checkingUser } = useCheckingUser();
 
   useEffect(() => {
@@ -107,20 +108,16 @@ function Cooking() {
 
   const currentRecipeId = location.search.split('=')[1];
   useEffect(() => {
-    async function getData() {
-      const currentData = await getCurrentData(currentRecipeId);
-      if (!currentData) {
-        navigate({ pathname: '/home' });
-        return;
-      }
-      setSteps(currentData.steps);
-      setTitle(currentData.title);
-      setInitialTime((currentData.steps[stepIndex].stepTime));
-      setStepsLength(currentData.steps.length);
+    async function getRecipeData() {
+      const currentRecipe = await getRecipe(currentRecipeId);
+      setSteps(currentRecipe.steps);
+      setTitle(currentRecipe.title);
+      setInitialTime((currentRecipe.steps[stepIndex].stepTime));
+      setStepsLength(currentRecipe.steps.length);
       setLoading(false);
     }
     if (currentRecipeId) {
-      getData();
+      getRecipeData();
     } else {
       navigate({ pathname: '/home' });
     }

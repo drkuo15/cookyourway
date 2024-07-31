@@ -6,7 +6,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, useAnimation } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { IosShare } from '@styled-icons/material-rounded';
-import { onRecipeSnapshot, updateUserDoc } from '../../firestore';
+import { getRecipe, updateUserDoc } from '../../firestore';
 import { devices } from '../../utils/StyleUtils';
 import Stars from '../../components/DisplayStars';
 import defaultImage from '../../images/upload.png';
@@ -457,13 +457,16 @@ function ReadRecipe({ onChangeMyFavorites }: ReadRecipeProps) {
   const currentRecipeId = location.search.split('=')[1];
 
   useEffect(() => {
-    if (currentRecipeId) {
-      const unsubscribe = onRecipeSnapshot(currentRecipeId, setRecipeData);
-      setLoading(false);
-      return unsubscribe;
+    async function getRecipeData() {
+      const currentRecipe = await getRecipe(currentRecipeId);
+      setRecipeData(currentRecipe);
     }
-    navigate({ pathname: '/home' });
-    return undefined;
+    if (currentRecipeId) {
+      getRecipeData();
+      setLoading(false);
+    } else {
+      navigate({ pathname: '/home' });
+    }
   }, [currentRecipeId, navigate]);
 
   const exportIngredients = useCallback(() => {
