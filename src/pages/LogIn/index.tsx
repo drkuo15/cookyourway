@@ -158,15 +158,6 @@ const ErrorMsg = styled.p`
   }
 `;
 
-const TestMsg = styled.p`
-  font-size: calc(24*100vw/1920);
-  width: 100%;
-  text-align: center;
-  @media ${devices.Tablet} and (orientation:portrait) {
-    font-size: calc(60*100vw/1920);
-  }
-`;
-
 function Login() {
   const fields = ['電子郵件', '密碼'];
   const {
@@ -198,13 +189,7 @@ function Login() {
             <LoginButton onClick={handleSubmit}>
               {loading ? '登入中...' : '登入'}
             </LoginButton>
-            {error ? <ErrorMsg>{error}</ErrorMsg> : (
-              <TestMsg>
-                測試帳號: test@test.test
-                &nbsp;
-                測試密碼: 123456
-              </TestMsg>
-            )}
+            {error && <ErrorMsg>{error}</ErrorMsg>}
           </ManualSignIn>
         </LoginBox>
         <VerticalLine />

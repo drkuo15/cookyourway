@@ -2,7 +2,12 @@
 ![Cook Your Way](./src/images/readme.webp "This is a cover image.")
 
 > **Cook Your Way is an online recipe website with music timer and autoplay recipes**. Designed for users to read and follow recipes easily while cooking. 
-> [View Website >>](https://cook-your-way.web.app/)
+
+## Cook, Share, and Explore Today!
+Let's Turn Ingredients into Masterpieces: [Cook Your Way](https://cook-your-way.web.app/)
+
+##### - Account for experiencing: test@test.test 
+##### - Password for experiencing: 123456
 
 ## Main Features
 
