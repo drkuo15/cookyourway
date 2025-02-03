@@ -1,12 +1,12 @@
 import styled, { keyframes } from 'styled-components';
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { registerUser } from '../../firestore';
 import mainImage from '../../images/healthy.webp';
 import Header from '../../components/Header';
 import { devices } from '../../utils/StyleUtils';
-import { ToastContainer, showCustomAlert } from '../../components/CustomAlert';
+import { ToastContainer } from '../../components/CustomAlert';
 import backgroundImg from '../../images/BG.svg';
+import useManageUserAuth from '../../hooks/useManageUserAuth';
 
 const Background = styled.div`
   padding: calc(44*100vw/1920) calc(116*100vw/1920) calc(44*100vw/1920) calc(116*100vw/1920);
@@ -199,75 +199,12 @@ const ErrorMsg = styled.p`
   }
 `;
 
-const TestMsg = styled.p`
-  font-size: calc(24*100vw/1920);
-  font-weight: bold;
-  width: 100%;
-  text-align: center;
-  @media ${devices.Tablet} and (orientation:portrait) {
-    font-size: calc(60*100vw/1920);
-  }
-`;
-
 function UnAuthHome() {
   const [imgLoaded, setImgLoaded] = useState(false);
-  const navigate = useNavigate();
-  const [data, setData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    error: '',
-    loading: false,
-  });
+  const fields = ['使用者名稱', '電子郵件', '密碼'];
   const {
-    name, email, password, error, loading,
-  } = data;
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setData({ ...data, [e.currentTarget.name]: e.currentTarget.value });
-  };
-
-  const renderError = (message: string) => {
-    if (message === 'Firebase: Password should be at least 6 characters (auth/weak-password).') {
-      return '密碼至少要六位數呦！';
-    } if (message === 'Firebase: Error (auth/email-already-in-use).') {
-      return '帳號已存在，請嘗試其它帳號';
-    }
-    return message;
-  };
-
-  const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    setData({ ...data, error: '', loading: true });
-    if (!name || !email || !password) {
-      setData({ ...data, error: '所有欄位都需要填寫呦！' });
-    }
-    try {
-      await registerUser(email, password, name);
-      setData({
-        name: '',
-        email: '',
-        password: '',
-        error: '',
-        loading: false,
-      });
-      showCustomAlert('您已註冊成功，即將轉跳首頁');
-      setTimeout(() => { navigate('/home', { replace: true }); }, 4000);
-    } catch (err) {
-      let errorMessage = '';
-      if (err instanceof Error) {
-        errorMessage = err.message;
-      }
-      if (typeof err === 'string') {
-        errorMessage = err;
-      }
-      setData({
-        ...data,
-        error: renderError(errorMessage),
-        loading: false,
-      });
-    }
-  };
+    name, email, password, error, loading, handleChange, handleSubmit,
+  } = useManageUserAuth(registerUser, fields);
 
   return (
     <>
@@ -305,7 +242,7 @@ function UnAuthHome() {
               <ManualInput
                 type="text"
                 name="name"
-                placeholder="使用者名稱"
+                placeholder={fields[0]}
                 value={name}
                 onChange={handleChange}
                 autoComplete="name"
@@ -313,7 +250,7 @@ function UnAuthHome() {
               <ManualInput
                 type="text"
                 name="email"
-                placeholder="電子郵件"
+                placeholder={fields[1]}
                 value={email}
                 onChange={handleChange}
                 autoComplete="email"
@@ -321,7 +258,7 @@ function UnAuthHome() {
               <ManualInput
                 type="password"
                 name="password"
-                placeholder="密碼"
+                placeholder={fields[2]}
                 value={password}
                 onChange={handleChange}
                 autoComplete="new-password"
@@ -329,11 +266,7 @@ function UnAuthHome() {
               <RegisterButton onClick={handleSubmit}>
                 {loading ? '帳號註冊中...' : '註冊'}
               </RegisterButton>
-              {error ? <ErrorMsg>{error}</ErrorMsg> : (
-                <TestMsg>
-                  請直接點擊右上角登入按鈕進行測試！
-                </TestMsg>
-              )}
+              {error && <ErrorMsg>{error}</ErrorMsg>}
             </ManualRegister>
           </RegisterBox>
         </Wrapper>

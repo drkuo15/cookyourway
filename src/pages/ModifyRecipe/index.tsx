@@ -15,9 +15,9 @@ import binImage from '../../images/bin.png';
 import tipImage from '../../images/tips.png';
 import Loading from '../../components/Loading';
 import {
-  uploadImg, onRecipeSnapshot, setRecipeDoc, updateRecipeDoc, recipeDoc,
+  uploadImg, setRecipeDoc, updateRecipeDoc, recipeDoc, getRecipe,
 } from '../../firestore';
-import useCheckingUser from '../../components/useCheckingUser';
+import useCheckingUser from '../../hooks/useCheckingUser';
 import { Ingredient } from '../../types/Ingredient';
 import { Recipe } from '../../types/Recipe';
 import { Step } from '../../types/Step';
@@ -692,28 +692,29 @@ function ModifyRecipe() {
   );
 
   const {
-    title, defaultTitle, titleKeywords, difficulty, ingredients, steps,
+    title, titleKeywords, difficulty, ingredients, steps,
     comment, mainImagePath, mainImage, authorId,
   } = recipeData;
+  const [defaultTitle, setDefaultTitle] = useState(title);
+
   const [img, setImg] = useState<File>();
   const fullTime = steps.reduce((accValue: number, step: Step) => accValue + step.stepTime, 0);
   const navigate = useNavigate();
   const location = useLocation();
   const [loading, setLoading] = useState(true);
-  const { userInfo, userId, checkingUser } = useCheckingUser();
-  const userName = userInfo?.name || '';
+  const { userName, userId, checkingUser } = useCheckingUser();
   const currentRecipeId = location.search.split('=')[1];
   const docId = recipeDoc.id;
 
   useEffect(() => {
-    const queryString = location.search;
-    if (queryString) {
-      const unsubscribe = onRecipeSnapshot(currentRecipeId, setRecipeData, 'defaultTitle');
-      setLoading(false);
-      return unsubscribe;
+    async function getRecipeData() {
+      const currentRecipe = await getRecipe(currentRecipeId);
+      setRecipeData(currentRecipe);
+      setDefaultTitle(currentRecipe.title);
     }
+    const queryString = location.search;
+    if (queryString) getRecipeData();
     setLoading(false);
-    return undefined;
   }, [currentRecipeId, location]);
 
   useEffect(() => {

@@ -1,8 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import {
   getFirestore, doc, setDoc, collection,
-  query, where, getDocs, onSnapshot,
-  getDoc, updateDoc,
+  query, where, getDocs, getDoc, updateDoc,
 } from 'firebase/firestore';
 import {
   getStorage, getDownloadURL, uploadBytes, ref,
@@ -12,6 +11,8 @@ import {
   signInWithEmailAndPassword, setPersistence, browserSessionPersistence,
   signOut,
 } from 'firebase/auth';
+import type { User as FirebaseUser } from 'firebase/auth';
+import type { NavigateFunction } from 'react-router-dom';
 import { Recipe } from '../types/Recipe';
 import { User } from '../types/User';
 
@@ -36,9 +37,9 @@ const recipeRef = collection(db, 'recipes');
 export const recipeDoc = doc(collection(db, 'recipes'));
 
 export const changeUserDataOnAuthState = async (setUserInfo: (user: User | null) => void) => {
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      const { uid } = user;
+  onAuthStateChanged(auth, (FirebaseUser: FirebaseUser) => {
+    if (FirebaseUser) {
+      const { uid } = FirebaseUser;
       const userRef = doc(db, 'users', uid);
       const getUserData = async () => {
         const docSnap = await getDoc(userRef);
@@ -48,7 +49,21 @@ export const changeUserDataOnAuthState = async (setUserInfo: (user: User | null)
         setUserInfo(data as User);
       });
     } else {
-      setUserInfo(user);
+      setUserInfo(null);
+    }
+  });
+};
+
+interface StateChangeCallback {
+  setCheckingUser: (value: boolean) => void;
+  navigate: NavigateFunction;
+}
+export const handleAuthStateChange = async ({ setCheckingUser, navigate }: StateChangeCallback) => {
+  onAuthStateChanged(auth, (FirebaseUser: FirebaseUser) => {
+    if (FirebaseUser) {
+      setCheckingUser(false);
+    } else {
+      navigate({ pathname: '/login' });
     }
   });
 };
@@ -67,20 +82,10 @@ export const registerUser = async (email: string, password: string, name: string
   });
 };
 
-export const loginUser = async (email: string, password: string) => new Promise<void>(
-  (resolve, reject) => {
-    setPersistence(auth, browserSessionPersistence)
-      .then(() => {
-        signInWithEmailAndPassword(auth, email, password)
-          .then(() => {
-            resolve();
-          })
-          .catch((err) => {
-            reject(err);
-          });
-      });
-  },
-);
+export const loginUser = async (email: string, password: string) => {
+  await setPersistence(auth, browserSessionPersistence);
+  await signInWithEmailAndPassword(auth, email, password);
+};
 
 export const signOutUser = () => {
   signOut(auth);
@@ -140,43 +145,10 @@ export const getRecommendRecipes = async (userId: string, averageDifficulty: num
   return queryRecipeArray.filter((recipe) => recipe.authorId !== userId);
 };
 
-export const onUserSnapshot = (userId: string, callback: (data: User['myFavorites']) => void) => {
-  const UserRef = doc(db, 'users', userId);
-  return onSnapshot(
-    UserRef,
-    (document) => {
-      const userData = document.data() as User;
-      callback(userData.myFavorites);
-    },
-  );
-};
-
-export const onRecipeSnapshot = (
-  currentRecipeId: string,
-  callback: (data: Recipe) => void,
-  ...keys: string[]
-) => {
-  const RecipeRef = doc(db, 'recipes', currentRecipeId);
-  return onSnapshot(
-    RecipeRef,
-    (document) => {
-      const data = document.data() as Recipe;
-      const completeData = { ...data };
-      if (keys) {
-        keys.forEach((key) => {
-          if (key === 'defaultTitle') {
-            completeData[key] = data.title;
-          }
-        });
-      }
-      callback(completeData);
-    },
-  );
-};
-export const getCurrentData = async (currentRecipeId: string) => {
+export const getRecipe = async (currentRecipeId: string) => {
   const docRef = doc(db, 'recipes', currentRecipeId);
   const docSnap = await getDoc(docRef);
-  return docSnap.data();
+  return docSnap.data() as Recipe;
 };
 
 export const uploadImg = async (img: File, folder: string) => {

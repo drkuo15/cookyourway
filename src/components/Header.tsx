@@ -1,14 +1,14 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import styled from 'styled-components/macro';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Search, FavoriteBorder, Favorite, ContentCopy, Edit,
 } from '@styled-icons/material-rounded';
 import { signOutUser } from '../firestore';
 import logoImage from '../images/CookYourWay_logo_v1.png';
 import { devices } from '../utils/StyleUtils';
-import AuthContext from './AuthContext';
 import chefImage from '../images/chef.png';
+import useCheckingUser from '../hooks/useCheckingUser';
 
 const Background = styled.div`
   width: 100%;
@@ -404,18 +404,17 @@ function CreateRecipe() {
 }
 
 function LogOut() {
-  const userInfo = useContext(AuthContext);
+  const { userName } = useCheckingUser();
   const [userInitial, setUserInitial] = useState('');
   const [showMemberWord, setShowMemberWord] = useState(true);
   const [showMemberPhoto, setShowMemberPhoto] = useState(false);
 
   useEffect(() => {
-    if (userInfo) {
-      const userName = userInfo.name.split('');
-      const initial = userName.shift();
+    if (userName) {
+      const initial = userName.split('').shift();
       setUserInitial(initial!.toUpperCase());
     }
-  }, [userInfo]);
+  }, [userName]);
 
   return (
     <DropdownDiv>

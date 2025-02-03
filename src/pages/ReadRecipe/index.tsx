@@ -6,7 +6,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, useAnimation } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { IosShare } from '@styled-icons/material-rounded';
-import { onRecipeSnapshot, updateUserDoc } from '../../firestore';
+import { getRecipe, updateUserDoc } from '../../firestore';
 import { devices } from '../../utils/StyleUtils';
 import Stars from '../../components/DisplayStars';
 import defaultImage from '../../images/upload.png';
@@ -14,7 +14,7 @@ import { ToastContainer, showCustomAlert } from '../../components/CustomAlert';
 import Header from '../../components/Header';
 import tipImage from '../../images/tips.png';
 import Loading from '../../components/Loading';
-import useCheckingUser from '../../components/useCheckingUser';
+import useCheckingUser from '../../hooks/useCheckingUser';
 import { User } from '../../types/User';
 import { Recipe } from '../../types/Recipe';
 
@@ -433,8 +433,7 @@ interface ReadRecipeProps {
 }
 
 function ReadRecipe({ onChangeMyFavorites }: ReadRecipeProps) {
-  const { userInfo, userId, checkingUser } = useCheckingUser();
-  const myFavorites = userInfo?.myFavorites || [];
+  const { userFavorites, userId, checkingUser } = useCheckingUser();
   const initialRecipe: Recipe = {
     title: '',
     difficulty: 1,
@@ -458,13 +457,16 @@ function ReadRecipe({ onChangeMyFavorites }: ReadRecipeProps) {
   const currentRecipeId = location.search.split('=')[1];
 
   useEffect(() => {
-    if (currentRecipeId) {
-      const unsubscribe = onRecipeSnapshot(currentRecipeId, setRecipeData);
-      setLoading(false);
-      return unsubscribe;
+    async function getRecipeData() {
+      const currentRecipe = await getRecipe(currentRecipeId);
+      setRecipeData(currentRecipe);
     }
-    navigate({ pathname: '/home' });
-    return undefined;
+    if (currentRecipeId) {
+      getRecipeData();
+      setLoading(false);
+    } else {
+      navigate({ pathname: '/home' });
+    }
   }, [currentRecipeId, navigate]);
 
   const exportIngredients = useCallback(() => {
@@ -483,20 +485,20 @@ function ReadRecipe({ onChangeMyFavorites }: ReadRecipeProps) {
   }, [ingredients, title]);
 
   function addToFavorites() {
-    const isRecipeExisting = myFavorites.some((id) => id === currentRecipeId);
+    const isRecipeExisting = userFavorites.some((id) => id === currentRecipeId);
     if (isRecipeExisting) {
       return;
     }
-    const updatedMyFavorite = [...myFavorites, currentRecipeId];
+    const updatedMyFavorite = [...userFavorites, currentRecipeId];
     onChangeMyFavorites(updatedMyFavorite);
     updateUserDoc(userId, updatedMyFavorite)
       .then(() => showCustomAlert('已成功加入收藏清單\n\n請前往首頁查看'));
   }
 
   function removeFromFavorites() {
-    const isRecipeExisting = myFavorites.some((id) => id === currentRecipeId);
+    const isRecipeExisting = userFavorites.some((id) => id === currentRecipeId);
     if (isRecipeExisting) {
-      const updatedMyFavorite = myFavorites.filter((id) => id !== currentRecipeId);
+      const updatedMyFavorite = userFavorites.filter((id) => id !== currentRecipeId);
       onChangeMyFavorites(updatedMyFavorite);
       updateUserDoc(userId, updatedMyFavorite)
         .then(() => showCustomAlert('已從收藏清單成功移除'));
@@ -511,7 +513,7 @@ function ReadRecipe({ onChangeMyFavorites }: ReadRecipeProps) {
           userId={userId}
           addToFavorites={() => { addToFavorites(); }}
           removeFromFavorites={() => { removeFromFavorites(); }}
-          myFavorites={myFavorites}
+          myFavorites={userFavorites}
           currentRecipeId={currentRecipeId}
         />
         <Loading />
@@ -526,7 +528,7 @@ function ReadRecipe({ onChangeMyFavorites }: ReadRecipeProps) {
         userId={userId}
         addToFavorites={() => { addToFavorites(); }}
         removeFromFavorites={() => { removeFromFavorites(); }}
-        myFavorites={myFavorites}
+        myFavorites={userFavorites}
         currentRecipeId={currentRecipeId}
       />
       <Background>

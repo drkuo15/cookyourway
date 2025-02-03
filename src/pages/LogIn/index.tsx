@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components/macro';
-import { loginUser } from '../../firestore/index';
+import { loginUser } from '../../firestore';
 import CenterTopHeader from '../../components/CenterTopHeader';
 import FoodBackground from '../../components/FoodBackground';
 import helpImage from '../../images/help.svg';
 import { devices } from '../../utils/StyleUtils';
+import useManageUserAuth from '../../hooks/useManageUserAuth';
 
 const Wrapper = styled.div`
   display: flex;
@@ -157,58 +158,11 @@ const ErrorMsg = styled.p`
   }
 `;
 
-const TestMsg = styled.p`
-  font-size: calc(24*100vw/1920);
-  width: 100%;
-  text-align: center;
-  @media ${devices.Tablet} and (orientation:portrait) {
-    font-size: calc(60*100vw/1920);
-  }
-`;
-
 function Login() {
-  const [data, setData] = useState({
-    email: '',
-    password: '',
-    error: '',
-    loading: false,
-  });
-  const navigate = useNavigate();
-
+  const fields = ['電子郵件', '密碼'];
   const {
-    email, password, error, loading,
-  } = data;
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setData({ ...data, [e.currentTarget.name]: e.currentTarget.value });
-  };
-
-  const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    setData({ ...data, error: '', loading: true });
-    if (!email || !password) {
-      setData({ ...data, error: '所有欄位都需要填寫呦！' });
-      return;
-    }
-    loginUser(email, password)
-      .then(() => {
-        setTimeout(() => {
-          setData({
-            email: '',
-            password: '',
-            error: '',
-            loading: false,
-          });
-          navigate('/home', { replace: true });
-        }, 900);
-      })
-      .catch((err) => {
-        setData({
-          ...data,
-          error: err.message === 'Firebase: Error (auth/wrong-password).' ? '帳號密碼錯誤，請重新嘗試' : err.message,
-          loading: false,
-        });
-      });
-  };
+    email, password, error, loading, handleChange, handleSubmit,
+  } = useManageUserAuth(loginUser, fields);
   return (
     <>
       <CenterTopHeader />
@@ -218,7 +172,7 @@ function Login() {
             <ManualInput
               type="text"
               name="email"
-              placeholder="電子郵件"
+              placeholder={fields[0]}
               value={email}
               onChange={handleChange}
               autoFocus
@@ -227,7 +181,7 @@ function Login() {
             <ManualInput
               type="password"
               name="password"
-              placeholder="密碼"
+              placeholder={fields[1]}
               value={password}
               onChange={handleChange}
               autoComplete="current-password"
@@ -235,13 +189,7 @@ function Login() {
             <LoginButton onClick={handleSubmit}>
               {loading ? '登入中...' : '登入'}
             </LoginButton>
-            {error ? <ErrorMsg>{error}</ErrorMsg> : (
-              <TestMsg>
-                測試帳號: test@test.test
-                &nbsp;
-                測試密碼: 123456
-              </TestMsg>
-            )}
+            {error && <ErrorMsg>{error}</ErrorMsg>}
           </ManualSignIn>
         </LoginBox>
         <VerticalLine />

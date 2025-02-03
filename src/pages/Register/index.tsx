@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { registerUser } from '../../firestore';
 import CenterTopHeader from '../../components/CenterTopHeader';
 import FoodBackground from '../../components/FoodBackground';
 import helpImage from '../../images/help.svg';
-import { ToastContainer, showCustomAlert } from '../../components/CustomAlert';
+import { ToastContainer } from '../../components/CustomAlert';
 import { devices } from '../../utils/StyleUtils';
+import useManageUserAuth from '../../hooks/useManageUserAuth';
 
 const Wrapper = styled.div`
   display: flex;
@@ -159,63 +160,11 @@ const ErrorMsg = styled.p`
 `;
 
 function Register() {
-  const navigate = useNavigate();
-  const [data, setData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    error: '',
-    loading: false,
-  });
+  const fields = ['使用者名稱', '電子郵件', '密碼'];
   const {
-    name, email, password, error, loading,
-  } = data;
+    name, email, password, error, loading, handleChange, handleSubmit,
+  } = useManageUserAuth(registerUser, fields);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setData({ ...data, [e.currentTarget.name]: e.currentTarget.value });
-  };
-
-  const renderError = (message: string) => {
-    if (message === 'Firebase: Password should be at least 6 characters (auth/weak-password).') {
-      return '密碼至少要六位數呦！';
-    } if (message === 'Firebase: Error (auth/email-already-in-use).') {
-      return '帳號已存在，請嘗試其它帳號';
-    }
-    return message;
-  };
-
-  const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    setData({ ...data, error: '', loading: true });
-    if (!name || !email || !password) {
-      setData({ ...data, error: '所有欄位都需要填寫呦！' });
-    }
-    try {
-      await registerUser(email, password, name);
-      setData({
-        name: '',
-        email: '',
-        password: '',
-        error: '',
-        loading: false,
-      });
-      showCustomAlert('您已註冊成功，即將轉跳首頁');
-      setTimeout(() => { navigate('/home', { replace: true }); }, 4000);
-    } catch (err) {
-      let errorMessage = '';
-      if (err instanceof Error) {
-        errorMessage = err.message;
-      }
-      if (typeof err === 'string') {
-        errorMessage = err;
-      }
-      setData({
-        ...data,
-        error: renderError(errorMessage),
-        loading: false,
-      });
-    }
-  };
   return (
     <section>
       <CenterTopHeader />
@@ -231,7 +180,7 @@ function Register() {
             <ManualInput
               type="text"
               name="name"
-              placeholder="使用者名稱"
+              placeholder={fields[0]}
               value={name}
               onChange={handleChange}
               autoFocus
@@ -239,14 +188,14 @@ function Register() {
             <ManualInput
               type="text"
               name="email"
-              placeholder="電子郵件"
+              placeholder={fields[1]}
               value={email}
               onChange={handleChange}
             />
             <ManualInput
               type="password"
               name="password"
-              placeholder="密碼"
+              placeholder={fields[2]}
               value={password}
               onChange={handleChange}
             />

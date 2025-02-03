@@ -4,7 +4,7 @@ import React, {
 import styled, { keyframes } from 'styled-components/macro';
 import { Link } from 'react-router-dom';
 import {
-  getAllRecipes, getAverageDifficulty, onUserSnapshot, getRecommendRecipes, getUserRecipes,
+  getAllRecipes, getAverageDifficulty, getRecommendRecipes, getUserRecipes,
 } from '../../firestore';
 import { devices } from '../../utils/StyleUtils';
 import Stars from '../../components/DisplayStars';
@@ -16,8 +16,7 @@ import mandarin from '../../images/fruits/mandarin.webp';
 import pineapple from '../../images/fruits/pineapple.webp';
 import strawberry from '../../images/fruits/strawberry.webp';
 import blueberry from '../../images/fruits/blueberry.webp';
-import useCheckingUser from '../../components/useCheckingUser';
-import { User } from '../../types/User';
+import useCheckingUser from '../../hooks/useCheckingUser';
 import { Recipe } from '../../types/Recipe';
 
 const Background = styled.div`
@@ -346,7 +345,7 @@ function AuthHome() {
   const [userRecipes, setUserRecipes] = useState<Recipe[]>([]);
   const [recommendRecipes, setRecommendRecipes] = useState<Recipe[]>([]);
   const [favoriteRecipes, setFavoriteRecipes] = useState<Recipe[]>([]);
-  const [myFavorites, setMyFavorites] = useState<User['myFavorites']>([]);
+  const { userFavorites } = useCheckingUser();
   const [averageDifficulty, setAverageDifficulty] = useState(1);
   const [loading, setLoading] = useState(true);
   const [imgLoaded, setImgLoaded] = useState(false);
@@ -366,22 +365,14 @@ function AuthHome() {
       setUserRecipes(data[1]);
       setAverageDifficulty(data[2]);
       setRecommendRecipes(data[3]);
-      const myFavoriteArray = data[0].filter((each) => myFavorites.includes(each.recipeId!));
-      setFavoriteRecipes(myFavoriteArray);
+      const userFavoriteRecipes = data[0].filter((each) => userFavorites.includes(each.recipeId!));
+      setFavoriteRecipes(userFavoriteRecipes);
     }
     if (userId) {
       setDataFromFirebase()
         .then(() => { setLoading(false); });
     }
-  }, [averageDifficulty, myFavorites, userId]);
-
-  useEffect(() => {
-    if (userId) {
-      const unsubscribe = onUserSnapshot(userId, setMyFavorites);
-      return unsubscribe;
-    }
-    return undefined;
-  }, [userId]);
+  }, [averageDifficulty, userFavorites, userId]);
 
   const scrollToRef = (ref: React.RefObject<HTMLDivElement>) => { ref.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'end' }); };
 
