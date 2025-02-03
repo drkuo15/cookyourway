@@ -199,16 +199,6 @@ const ErrorMsg = styled.p`
   }
 `;
 
-const TestMsg = styled.p`
-  font-size: calc(24*100vw/1920);
-  font-weight: bold;
-  width: 100%;
-  text-align: center;
-  @media ${devices.Tablet} and (orientation:portrait) {
-    font-size: calc(60*100vw/1920);
-  }
-`;
-
 function UnAuthHome() {
   const [imgLoaded, setImgLoaded] = useState(false);
   const fields = ['使用者名稱', '電子郵件', '密碼'];
@@ -276,11 +266,7 @@ function UnAuthHome() {
               <RegisterButton onClick={handleSubmit}>
                 {loading ? '帳號註冊中...' : '註冊'}
               </RegisterButton>
-              {error ? <ErrorMsg>{error}</ErrorMsg> : (
-                <TestMsg>
-                  請直接點擊右上角登入按鈕進行測試！
-                </TestMsg>
-              )}
+              {error && <ErrorMsg>{error}</ErrorMsg>}
             </ManualRegister>
           </RegisterBox>
         </Wrapper>
