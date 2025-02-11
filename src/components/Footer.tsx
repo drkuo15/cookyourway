@@ -20,11 +20,7 @@ const Background = styled.div`
 function Footer() {
   return (
     <Background>
-      Copyright ©
-      {' '}
-      {new Date().getFullYear()}
-      {' '}
-      Cook Your Way All rights reserved.
+      Copyright © 2022 Cook Your Way All rights reserved.
     </Background>
 
   );
